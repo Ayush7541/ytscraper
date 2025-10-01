@@ -114,16 +114,13 @@ def process_leads():
         row[status_col_idx - 1] = result
         processed_indices.add(row_idx)
 
-        # Classify into buckets. Treat Invalid/Disposable as invalid; Ok/Valid as valid; catch-all/unknown as risky (unknown).
+        # Classify into buckets. Treat Invalid/Disposable/Unknown as invalid; Ok/Valid as valid.
         if normalized in ("ok", "good", "valid"):
             valid_rows.append(row)
-        elif normalized in ("invalid", "disposable", "bad"):
+        elif normalized in ("invalid", "disposable", "bad", "catch_all", "unknown", "accept_all", "role", "free"):
             invalid_rows.append(row)
-        else:
-            # catch_all, unknown, accept_all, role, free, or any unexpected values -> keep as unknown/risky
-            unknown_rows.append(row)
 
-    # Rows that were not processed (no email or explicitly 'no') should be kept in raw leads as unknown
+    # Rows that were not processed (no email or explicitly 'no') should be kept in raw leads as invalid
     for i, row in enumerate(rows):
         if i in processed_indices:
             continue
@@ -131,14 +128,14 @@ def process_leads():
         while len(row) < status_col_idx:
             row.append("")
         row[status_col_idx - 1] = ""
-        unknown_rows.append(row)
+        invalid_rows.append(row)
 
-    # Update Invalid Leads tab
+    # Update Invalid Leads tab (include both invalid and unknown rows which are merged)
     if invalid_rows:
         invalid_tab.append_rows(invalid_rows, value_input_option="RAW")
 
-    # Overwrite Raw Leads tab with header + valid + unknown rows
-    all_rows_to_keep = valid_rows + unknown_rows
+    # Overwrite Raw Leads tab with header + valid rows only
+    all_rows_to_keep = valid_rows
 
     # Safely keep only the header row without using resize (resize can fail if sheet has frozen rows).
     # Clear all rows below the header instead, then re-append the rows we want to keep.
@@ -177,13 +174,11 @@ def process_leads():
     total_checked = len(emails_to_verify)
     total_valid = len(valid_rows)
     total_invalid = len(invalid_rows)
-    total_unknown = len(unknown_rows)
     slack_message = (
         f"✅ Email Verification Complete!\n"
         f"Total Leads Checked: {total_checked}\n"
         f"Valid Emails: {total_valid}\n"
-        f"Invalid Emails Moved: {total_invalid}\n"
-        f"Unknown Emails Kept: {total_unknown}"
+        f"Invalid/Unknown Emails Moved: {total_invalid}"
     )
     send_slack_message(slack_message)
     print(slack_message)
