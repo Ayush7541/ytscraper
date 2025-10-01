@@ -27,26 +27,28 @@ except gspread.WorksheetNotFound:
 
 # === HELPER: Bulk MillionVerifier API ===
 def verify_emails_bulk(emails):
-    url = f"https://api.millionverifier.com/api/v3/?api={MV_API_KEY}"
-    payload = {"emails": emails}
-    headers = {"Content-Type": "application/json"}
+    results = {}
     max_retries = 3
     delay_seconds = 5
-    for attempt in range(1, max_retries + 1):
-        try:
-            r = requests.post(url, headers=headers, json=payload, timeout=30)
-            r.raise_for_status()
-            data = r.json()
-            return data.get("result", {})
-        except Exception as e:
-            if attempt < max_retries:
-                print(f"Bulk verification attempt {attempt} failed: {e}. Retrying in {delay_seconds} seconds...")
-                time.sleep(delay_seconds)
-            else:
-                error_msg = f"Error during bulk verification after {max_retries} attempts: {e}"
-                print(error_msg)
-                send_slack_message(f":x: {error_msg}")
-                return None
+    for email in emails:
+        for attempt in range(1, max_retries + 1):
+            try:
+                url = f"https://api.millionverifier.com/api/v3/?api={MV_API_KEY}&email={email}"
+                r = requests.get(url, timeout=30)
+                r.raise_for_status()
+                data = r.json()
+                results[email] = data.get("result", "unknown")
+                break
+            except Exception as e:
+                if attempt < max_retries:
+                    print(f"Verification attempt {attempt} failed for {email}: {e}. Retrying in {delay_seconds} seconds...")
+                    time.sleep(delay_seconds)
+                else:
+                    error_msg = f"Error during verification of {email} after {max_retries} attempts: {e}"
+                    print(error_msg)
+                    send_slack_message(f":x: {error_msg}")
+                    results[email] = "unknown"
+    return results
 
 # === HELPER: Send Slack Notification ===
 def send_slack_message(message):
@@ -59,23 +61,27 @@ def send_slack_message(message):
 def process_leads():
     header = raw_tab.row_values(1)
     email_col_idx = header.index("Email") + 1
-    # Add Verification Status if missing
+
+    # Add Verification Status if missing and refresh header so indices stay correct
     if "Verification Status" not in header:
         raw_tab.update_cell(1, len(header) + 1, "Verification Status")
-        status_col_idx = len(header) + 1
-    else:
-        status_col_idx = header.index("Verification Status") + 1
+        # refresh header to include the newly added column
+        header = raw_tab.row_values(1)
+    status_col_idx = header.index("Verification Status") + 1
 
     rows = raw_tab.get_all_values()[1:]  # skip header
 
-    # Extract emails to verify, ignoring empty or "no"
+    # Extract emails to verify, ignoring empty or "no". Keep row indices so duplicates are handled.
     emails_to_verify = []
-    email_row_map = {}
+    email_row_indices = []  # parallel array to map each email to its row index in `rows`
     for i, row in enumerate(rows):
-        email = row[email_col_idx - 1].strip()
+        try:
+            email = row[email_col_idx - 1].strip()
+        except IndexError:
+            email = ""
         if email and email.lower() != "no":
             emails_to_verify.append(email)
-            email_row_map[email] = i
+            email_row_indices.append(i)
 
     if not emails_to_verify:
         print("No valid emails to verify.")
@@ -89,33 +95,43 @@ def process_leads():
     valid_rows = []
     invalid_rows = []
     unknown_rows = []
+    processed_indices = set()
 
-    # Update rows with verification status
-    for email in emails_to_verify:
+    # Update rows with verification status - handle duplicates by using email_row_indices
+    for k, email in enumerate(emails_to_verify):
         result = results.get(email, "unknown")
-        row_idx = email_row_map[email]
+        row_idx = email_row_indices[k]
         row = rows[row_idx]
+
         # Ensure row has enough columns for status
         while len(row) < status_col_idx:
             row.append("")
+
+        # Normalize the result string to avoid case/format mismatches from API (e.g. 'Ok', 'Invalid', 'catch-all')
+        normalized = str(result).lower().strip().replace('-', '_').replace(' ', '_')
+
+        # Set the visible status cell to the raw result we received (keeps original capitalization for debugging)
         row[status_col_idx - 1] = result
+        processed_indices.add(row_idx)
 
-        if result == "ok":
+        # Classify into buckets. Treat Invalid/Disposable as invalid; Ok/Valid as valid; catch-all/unknown as risky (unknown).
+        if normalized in ("ok", "good", "valid"):
             valid_rows.append(row)
-        elif result in ["bad", "disposable", "catch_all"]:
+        elif normalized in ("invalid", "disposable", "bad"):
             invalid_rows.append(row)
-        else:  # unknown or error
+        else:
+            # catch_all, unknown, accept_all, role, free, or any unexpected values -> keep as unknown/risky
             unknown_rows.append(row)
 
-    # Rows with no email or "no" remain unchanged and included as unknown_rows
+    # Rows that were not processed (no email or explicitly 'no') should be kept in raw leads as unknown
     for i, row in enumerate(rows):
-        email = row[email_col_idx - 1].strip()
-        if not email or email.lower() == "no":
-            # Ensure Verification Status column exists and empty
-            while len(row) < status_col_idx:
-                row.append("")
-            row[status_col_idx - 1] = ""
-            unknown_rows.append(row)
+        if i in processed_indices:
+            continue
+        # Ensure Verification Status column exists and empty
+        while len(row) < status_col_idx:
+            row.append("")
+        row[status_col_idx - 1] = ""
+        unknown_rows.append(row)
 
     # Update Invalid Leads tab
     if invalid_rows:
@@ -123,7 +139,37 @@ def process_leads():
 
     # Overwrite Raw Leads tab with header + valid + unknown rows
     all_rows_to_keep = valid_rows + unknown_rows
-    raw_tab.resize(rows=1)  # keep header
+
+    # Safely keep only the header row without using resize (resize can fail if sheet has frozen rows).
+    # Clear all rows below the header instead, then re-append the rows we want to keep.
+    try:
+        # Determine current number of rows in the worksheet
+        current_rows = raw_tab.row_count
+        if current_rows > 1:
+            # Number of columns to use for the clear range (use header length as safe max)
+            max_col = max(len(header), status_col_idx) if header else status_col_idx
+
+            # Helper: convert 1-based column index to letter(s) (1 -> A, 27 -> AA)
+            def col_idx_to_letter(idx):
+                letters = ''
+                while idx > 0:
+                    idx, rem = divmod(idx - 1, 26)
+                    letters = chr(65 + rem) + letters
+                return letters
+
+            last_col_letter = col_idx_to_letter(max_col)
+            range_to_clear = f"A2:{last_col_letter}{current_rows}"
+
+            # Clear everything below the header row while preserving header and frozen rows
+            raw_tab.batch_clear([range_to_clear])
+    except Exception as e:
+        # If batch_clear fails for any reason, fall back to clearing the entire sheet and
+        # rewriting the header row so the script can continue.
+        print(f"[Warning] Could not clear rows using batch_clear: {e}. Falling back to clear() and re-writing header.")
+        raw_tab.clear()
+        raw_tab.append_row(header, value_input_option="RAW")
+
+    # Append rows we want to keep (below header)
     if all_rows_to_keep:
         raw_tab.append_rows(all_rows_to_keep, value_input_option="RAW")
 

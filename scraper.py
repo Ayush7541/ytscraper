@@ -865,17 +865,14 @@ try:
                         "Trigger Video URL": f"https://www.youtube.com/watch?v={sample_video_id}" if sample_video_id else ""
                     })
                     collected_channels.add(channel_id)
-                    # Track in-memory qualified count only; sheet appends are triggered in periodic saves (AUTO_SAVE_EVERY)
+                    # Track in-memory qualified count only; sheet appends are now immediate
                     num_new_leads_this_run += 1
                     print(f"[Qualified+] {channel_title} | Rating {rating}")
                     found_good_lead = True
                     title_keyword_lead_count += 1
-                    if len(qualified_leads) % AUTO_SAVE_EVERY == 0:
-                        added_now = save_all_state_periodically()
-                        added_now = added_now or 0
-                        if unique_appended_this_run >= TARGET_LEADS:
-                            break
+                    added_now = save_all_state_periodically()
                     if unique_appended_this_run >= TARGET_LEADS:
+                        print(f"[Target Reached] {unique_appended_this_run} leads collected. Stopping.")
                         break
                     time.sleep(DELAY_BETWEEN_REQUESTS)
         # Mark keyword as exhausted if no lead found
