@@ -86,6 +86,9 @@ SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 CREDS = ServiceAccountCredentials.from_json_keyfile_name("google_sheets_key.json", SCOPE)
 GSPREAD_CLIENT = gspread.authorize(CREDS)
 SHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE").worksheet("Raw Leads")
+# Additional sheets for deduplication
+INVALID_SHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE").worksheet("Invalid Leads")
+PROCESSED_SHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE").worksheet("Processed Leads")
 
 # instantiate clients
 youtube_clients = [build('youtube', 'v3', developerKey=key) for key in API_KEYS]
@@ -269,7 +272,7 @@ If unclear, use "unknown" or "None" for selling_type and keep other fields short
 """
     try:
         resp = openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[{"role":"user","content":prompt}],
             temperature=0
         )
@@ -483,20 +486,38 @@ api_index = 0
 # Load state if exists
 load_state()
 
-# Fetch existing keys from Google Sheet into a global set (Channel ID preferred; fallback to Channel URL)
+# Fetch existing keys from multiple Google Sheets into a global set (Channel ID preferred; fallback to Channel URL)
 global existing_ids_global, EXISTING_KEY_FIELD
+
+def get_existing_ids_from_sheets(sheets):
+    """
+    Given a list of gspread worksheets, return a set of unique Channel IDs (preferred) or Channel URLs.
+    """
+    ids = set()
+    has_channel_id = False
+    for ws in sheets:
+        try:
+            header = ws.row_values(1)
+            use_channel_id = "Channel ID" in header
+            if use_channel_id:
+                has_channel_id = True
+            recs = ws.get_all_records()
+            if use_channel_id:
+                ids.update(str(r.get("Channel ID", "")).strip() for r in recs if str(r.get("Channel ID", "")).strip())
+            else:
+                ids.update(str(r.get("Channel URL", "")).strip() for r in recs if str(r.get("Channel URL", "")).strip())
+        except Exception as e:
+            print(f"[Init] Error reading sheet {getattr(ws, 'title', 'unknown')}: {e}")
+    return ids, has_channel_id
+
 try:
-    header_row_init = SHEET.row_values(1)
-    use_channel_id_init = "Channel ID" in header_row_init
-    recs_init = SHEET.get_all_records()
-    if use_channel_id_init:
-        existing_ids_global = {str(r.get("Channel ID", "")).strip() for r in recs_init if str(r.get("Channel ID", "")).strip()}
-        EXISTING_KEY_FIELD = "id"
-    else:
-        existing_ids_global = {str(r.get("Channel URL", "")).strip() for r in recs_init if str(r.get("Channel URL", "")).strip()}
-        EXISTING_KEY_FIELD = "url"
+    # Use both Invalid and Processed Leads sheets for deduplication
+    sheets_to_check = [INVALID_SHEET, PROCESSED_SHEET]
+    ids_collected, has_channel_id = get_existing_ids_from_sheets(sheets_to_check)
+    existing_ids_global = ids_collected
+    EXISTING_KEY_FIELD = "id" if has_channel_id else "url"
 except Exception as e:
-    print(f"[Init] Error fetching existing keys from Google Sheet: {e}")
+    print(f"[Init] Error fetching existing keys from Google Sheets: {e}")
     existing_ids_global = set()
     EXISTING_KEY_FIELD = "id"
 
