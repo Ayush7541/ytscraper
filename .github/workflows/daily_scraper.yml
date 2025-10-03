@@ -2,8 +2,8 @@ name: Daily YouTube Scraper
 
 on:
   schedule:
-    - cron: '0 21 * * *'  # Runs every day at 3:00 AM IST (UTC+5:30 → 21:00 UTC)
-  workflow_dispatch:     # Allows manual trigger
+    - cron: '30 22 * * *'   # Runs every day at 4:00 AM IST (22:30 UTC)
+  workflow_dispatch:          # Allows manual trigger
 
 jobs:
   run-scraper:
@@ -24,3 +24,4 @@ jobs:
 
       - name: Run scraper
         run: python scraper.py
+
