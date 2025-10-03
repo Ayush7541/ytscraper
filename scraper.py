@@ -166,10 +166,10 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     """
     n = random.randint(n_min, n_max)
     prompt = """
-Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.).
-Each title should be realistic, engaging, and assume the creator is already monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.).
-Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products).
-Sprinkle in a few that mention platforms/tools (e.g., Patreon, Shopify, Teachable, Kajabi, Stripe, Etsy, Calendly).
+Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
+Also include less mainstream or unexpected niches (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
+Each title should be realistic, engaging, and assume the creator is already monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
+Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
 Return ONLY a valid JSON array of strings.
 
 Examples:
@@ -179,10 +179,20 @@ Examples:
 4. "Plumbing Business Taxes Explained for Home Service Owners"
 5. "Advanced Cooking Classes That Pay My Rent"
 6. "How to Monetize Your Dance Tutorials on YouTube"
-7. "Selling Gardening Courses on Teachable — My Monthly Income"
-8. "How I Run Paid Zoom Cooking Workshops"
-9. "Pet Care Coaching Profits with Kajabi and Stripe"
-10. "Craft Store Earnings Selling DIY Kits on Shopify & Etsy"
+7. "How I Run Paid Zoom Cooking Workshops"
+8. "Pet Care Coaching Profits from My Online Clients"
+9. "Craft Store Earnings Selling DIY Kits"
+10. "How I Turn My Calligraphy Hobby Into a Paid Online Class"
+11. "Earning from Pottery Workshops Online"
+12. "Nail Art Side Hustle: Selling Tutorials & Kits"
+13. "How My Journaling Courses Bring in Monthly Income"
+14. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
+15. "Car Detailing Coaching Calls That Pay My Bills"
+16. "Making Money Teaching Guitar Lessons Online"
+17. "Tarot Reading Clients That Support My Full-Time Income"
+18. "Woodworking Profits: Selling DIY Plans"
+19. "How I Monetize My Meal Prep Classes"
+20. "Turning Event Planning Tips Into Paid Consultations
 """
     try:
         resp = openai_client.chat.completions.create(
