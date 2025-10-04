@@ -189,19 +189,22 @@ Examples:
         )
         content = resp.choices[0].message.content.strip()
         if not content:
-            raise ValueError("Empty response from OpenAI")
-        keywords = json.loads(content)
-        if isinstance(keywords, list) and keywords:
-            return keywords
-        else:
-            print("[OpenAI Keywords] Unexpected response format from OpenAI.")
+            print("[OpenAI Keywords] Empty response from OpenAI.")
+            return []
+        try:
+            keywords = json.loads(content)
+            if isinstance(keywords, list) and keywords:
+                return keywords
+            else:
+                print("[OpenAI Keywords] Unexpected response format from OpenAI.")
+                return []
+        except Exception as parse_err:
+            print(f"[OpenAI Keywords] JSON parse error: {parse_err}")
+            print("[OpenAI Keywords Raw Response]", content)
             return []
     except Exception as e:
         print(f"[OpenAI Keywords] Failed to generate keywords with OpenAI: {e}")
-        # Option 1: raise error to stop the scraper
-        raise
-        # Option 2: return []
-        # return []
+        return []
 
 def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
     """
