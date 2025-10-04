@@ -158,8 +158,8 @@ def scrape_website_for_email(url):
 # --- NEW FUNCTION: generate_keywords_with_openai ---
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Generate a list of YouTube video title keywords using OpenAI (GPT-4o-mini).
-    If OpenAI fails, log the error and raise an exception (or return an empty list).
+    Generate a list of YouTube video title keywords using OpenAI (gpt-4o-mini).
+    Robust: retries, defensive parsing, never raises JSONDecodeError. Returns a list (may be empty).
     """
     n = random.randint(n_min, n_max)
     prompt = """
@@ -181,30 +181,79 @@ Examples:
 9. "How I Monetize My Meal Prep Classes"
 10. "Turning Event Planning Tips Into Paid Consultations"
 """
-    try:
-        resp = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5
-        )
-        content = resp.choices[0].message.content.strip()
+    max_attempts = 3
+    backoff = 1
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            resp = openai_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=800
+            )
+        except Exception as e:
+            print(f"[OpenAI Keywords] API call failed on attempt {attempt}: {e}")
+            if attempt < max_attempts:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+            else:
+                return []
+
+        # Defensive extraction of textual content from the response
+        content = ""
+        try:
+            if isinstance(resp, dict):
+                # Some clients return dict-like responses
+                content = resp.get("choices", [{}])[0].get("message", {}).get("content", "")
+            else:
+                # object-like response (sdk)
+                content = getattr(resp.choices[0].message, "content", "") if getattr(resp, "choices", None) else ""
+        except Exception as e:
+            print(f"[OpenAI Keywords] Error reading response content on attempt {attempt}: {e}")
+            content = ""
+
+        content = (content or "").strip()
         if not content:
-            print("[OpenAI Keywords] Empty response from OpenAI.")
+            print(f"[OpenAI Keywords] Empty content on attempt {attempt}. Raw resp: {resp}")
+            if attempt < max_attempts:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
             return []
+
+        # Try to parse JSON safely
         try:
             keywords = json.loads(content)
             if isinstance(keywords, list) and keywords:
                 return keywords
             else:
-                print("[OpenAI Keywords] Unexpected response format from OpenAI.")
+                print(f"[OpenAI Keywords] Parsed JSON not a non-empty list on attempt {attempt}.")
+                print("[OpenAI Keywords Raw Response]", content)
+                if attempt < max_attempts:
+                    time.sleep(backoff)
+                    backoff *= 2
+                    continue
                 return []
-        except Exception as parse_err:
-            print(f"[OpenAI Keywords] JSON parse error: {parse_err}")
+        except json.JSONDecodeError as e:
+            print(f"[OpenAI Keywords] JSON parse error on attempt {attempt}: {e}")
             print("[OpenAI Keywords Raw Response]", content)
+            if attempt < max_attempts:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
             return []
-    except Exception as e:
-        print(f"[OpenAI Keywords] Failed to generate keywords with OpenAI: {e}")
-        return []
+        except Exception as e:
+            print(f"[OpenAI Keywords] Unexpected parse error on attempt {attempt}: {e}")
+            if attempt < max_attempts:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+            return []
+
+    # If all attempts exhausted, return empty list
+    return []
 
 def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
     """
@@ -602,6 +651,10 @@ try:
     # Only use OpenAI-generated video title queries with fallback examples (base keywords are no longer used)
     # Generate a single set of OpenAI video title keywords for this run
     openai_title_keywords = generate_keywords_with_openai()
+    if not openai_title_keywords:
+        print("[Main] OpenAI failed to supply any keywords after retries. Saving state and exiting gracefully.")
+        save_all_state_periodically()
+        sys.exit(0)
     random.shuffle(openai_title_keywords)
     exhausted_keywords = set()
     # Main loop: ensure we never overshoot TARGET_LEADS, stop immediately when reached
