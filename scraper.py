@@ -204,6 +204,10 @@ Examples:
                 return []
 
             try:
+                # Remove Markdown code fences if present
+                content = re.sub(r"^```(?:json)?\s*", "", content)
+                content = re.sub(r"\s*```$", "", content)
+                content = content.strip()
                 keywords = json.loads(content)
                 if isinstance(keywords, list) and keywords:
                     return [k for k in keywords if isinstance(k, str)]
