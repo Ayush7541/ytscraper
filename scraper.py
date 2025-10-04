@@ -157,38 +157,20 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with structured JSON output.
-    Uses your detailed example prompt to guide the model and enforces a JSON schema to guarantee valid output.
+    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with detailed example prompt.
     Retries up to 3 times on failure, returns [] if all attempts fail.
+    Ensures content is non-empty and valid JSON.
     """
     import json, time, random
 
     n_target = random.randint(n_min, n_max)
-
-    schema = {
-        "name": "keyword_list",
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "keywords": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "minItems": n_min,
-                    "maxItems": n_max
-                }
-            },
-            "required": ["keywords"],
-            "additionalProperties": False
-        }
-    }
 
     prompt = """
 Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
 Also include less mainstream or unexpected niches (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
 Each title should be realistic, engaging, and assume the creator is already monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
 Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
-Return ONLY a valid JSON object with a 'keywords' array of strings.
+Return ONLY a valid JSON array of strings.
 
 Examples:
 1. "Earning from Pottery Workshops Online"
@@ -206,22 +188,14 @@ Examples:
     attempts, backoff = 3, 1
     for i in range(1, attempts + 1):
         try:
-            resp = openai_client.responses.create(
+            resp = openai_client.chat.completions.create(
                 model="gpt-4o-mini",
-                input=[{"role": "user", "content": prompt}],
-                response_format={"type": "json_schema", "json_schema": schema},
-                max_output_tokens=800,
+                messages=[{"role":"user","content":prompt}],
+                temperature=0.5,
+                max_tokens=800
             )
 
-            content = getattr(resp, "output_text", None)
-            if not content:
-                chunks = getattr(resp, "output", []) or []
-                if chunks and getattr(chunks[0], "content", None):
-                    part = chunks[0].content[0]
-                    if hasattr(part, "text"):
-                        content = part.text
-            content = (content or "").strip()
-
+            content = getattr(resp.choices[0].message, "content", "").strip()
             if not content:
                 print(f"[OpenAI Keywords] Empty response on attempt {i}.")
                 if i < attempts:
@@ -230,12 +204,11 @@ Examples:
                 return []
 
             try:
-                data = json.loads(content)
-                keywords = data.get("keywords", [])
+                keywords = json.loads(content)
                 if isinstance(keywords, list) and keywords:
                     return [k for k in keywords if isinstance(k, str)]
                 else:
-                    print(f"[OpenAI Keywords] No valid keywords found (attempt {i}). Raw:", content)
+                    print(f"[OpenAI Keywords] Response not a valid list (attempt {i}). Raw:", content)
             except Exception as e:
                 print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
                 print("[OpenAI Keywords Raw Response]", content)
