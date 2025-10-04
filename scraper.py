@@ -65,17 +65,16 @@ API_KEYS = [
 # OpenAI key via env var preferred
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "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"
 
+# Parameters
 MIN_SUBS = 5000
 MAX_SUBS = 350000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
-TARGET_LEADS = 60              # collect 60 qualified leads (rating >= 7)
+TARGET_LEADS = 60              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
 AUTO_SAVE_EVERY = 5            # autosave after every N saved leads
 MAX_VIDEOS_PER_PAGE = 50       # YouTube search maxResults (use 50 for broader coverage per call)
 KEYWORD_TITLES_MIN = 25         # generate between 25 and 30 video-title keywords
 KEYWORD_TITLES_MAX = 30
-# Limit number of channels processed per keyword
-MAX_CHANNELS_PER_KEYWORD = 300
 
 # Lock country suffixes: LOCATION_SUFFIXES mirrors the expanded ALLOWED_COUNTRIES set used in filtering.
 LOCATION_SUFFIXES = ["US", "GB", "CA", "AU", "AE", "NZ"]
@@ -86,13 +85,7 @@ OUTPUT_EXCEL = "qualified_youtube_leads.xlsx"
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 CREDS = ServiceAccountCredentials.from_json_keyfile_name("google_sheets_key.json", SCOPE)
 GSPREAD_CLIENT = gspread.authorize(CREDS)
-# Open the spreadsheet once, then get all relevant worksheets
-SPREADSHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE")
-RAW_WS = SPREADSHEET.worksheet("Raw Leads")
-INVALID_WS = SPREADSHEET.worksheet("Invalid Leads")
-PROCESSED_WS = SPREADSHEET.worksheet("Processed Leads")
-# Use RAW_WS as the main sheet for saving leads
-SHEET = RAW_WS
+SHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE").worksheet("Raw Leads")
 
 # instantiate clients
 youtube_clients = [build('youtube', 'v3', developerKey=key) for key in API_KEYS]
@@ -166,7 +159,7 @@ def scrape_website_for_email(url):
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
     Generate a list of YouTube video title keywords using OpenAI (GPT-4o-mini).
-    Falls back to a set of diverse monetization-related example titles if OpenAI fails.
+    If OpenAI fails, log the error and raise an exception (or return an empty list).
     """
     n = random.randint(n_min, n_max)
     prompt = """
@@ -177,32 +170,22 @@ Every title must signal monetization or income (e.g., making money, clients, bil
 Return ONLY a valid JSON array of strings.
 
 Examples:
-1. "How I Make Money Teaching Gardening Online"
-2. "Photography Client Billing Tips for Full-Time Freelancers"
-3. "Top Cleaning Hacks That Help Me Earn $5k/Month"
-4. "Plumbing Business Taxes Explained for Home Service Owners"
-5. "Advanced Cooking Classes That Pay My Rent"
-6. "How to Monetize Your Dance Tutorials on YouTube"
-7. "How I Run Paid Zoom Cooking Workshops"
-8. "Pet Care Coaching Profits from My Online Clients"
-9. "Craft Store Earnings Selling DIY Kits"
-10. "How I Turn My Calligraphy Hobby Into a Paid Online Class"
-11. "Earning from Pottery Workshops Online"
-12. "Nail Art Side Hustle: Selling Tutorials & Kits"
-13. "How My Journaling Courses Bring in Monthly Income"
-14. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
-15. "Car Detailing Coaching Calls That Pay My Bills"
-16. "Making Money Teaching Guitar Lessons Online"
-17. "Tarot Reading Clients That Support My Full-Time Income"
-18. "Woodworking Profits: Selling DIY Plans"
-19. "How I Monetize My Meal Prep Classes"
-20. "Turning Event Planning Tips Into Paid Consultations
+1. "Earning from Pottery Workshops Online"
+2. "Nail Art Side Hustle: Selling Tutorials & Kits"
+3. "How My Journaling Courses Bring in Monthly Income"
+4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
+5. "Car Detailing Coaching Calls That Pay My Bills"
+6. "Making Money Teaching Guitar Lessons Online"
+7. "Tarot Reading Clients That Support My Full-Time Income"
+8. "Woodworking Profits: Selling DIY Plans"
+9. "How I Monetize My Meal Prep Classes"
+10. "Turning Event Planning Tips Into Paid Consultations"
 """
     try:
         resp = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+            temperature=0.5
         )
         content = resp.choices[0].message.content.strip()
         if not content:
@@ -210,27 +193,15 @@ Examples:
         keywords = json.loads(content)
         if isinstance(keywords, list) and keywords:
             return keywords
-    except Exception:
-        pass
-    # fallback: return seeded examples so scraper keeps running if OpenAI fails
-    fallback_examples = [
-        "How I Make Money Teaching Gardening Online",
-        "Photography Client Billing Tips for Full-Time Freelancers",
-        "Top Cleaning Hacks That Help Me Earn $5k/Month",
-        "Plumbing Business Taxes Explained for Home Service Owners",
-        "Advanced Cooking Classes That Pay My Rent",
-        "How to Monetize Your Dance Tutorials on YouTube",
-        "Selling Gardening Courses on Teachable — My Monthly Income",
-        "How I Run Paid Zoom Cooking Workshops",
-        "Pet Care Coaching Profits with Kajabi and Stripe",
-        "Craft Store Earnings Selling DIY Kits on Shopify & Etsy"
-    ]
-    out = []
-    for i in range(n):
-        base = fallback_examples[i % len(fallback_examples)]
-        out.append(base)
-    random.shuffle(out)
-    return out
+        else:
+            print("[OpenAI Keywords] Unexpected response format from OpenAI.")
+            return []
+    except Exception as e:
+        print(f"[OpenAI Keywords] Failed to generate keywords with OpenAI: {e}")
+        # Option 1: raise error to stop the scraper
+        raise
+        # Option 2: return []
+        # return []
 
 def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
     """
@@ -286,7 +257,7 @@ If unclear, use "unknown" or "None" for selling_type and keep other fields short
 """
     try:
         resp = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-3.5-turbo",
             messages=[{"role":"user","content":prompt}],
             temperature=0
         )
@@ -406,14 +377,6 @@ def save_leads():
     # Track number of new unique leads added this run
     num_new_leads_this_run = len(rows_to_add)
 
-    # --- LIMIT rows_to_add so we never exceed TARGET_LEADS ---
-    global unique_appended_this_run
-    remaining_slots = TARGET_LEADS - unique_appended_this_run
-    if len(rows_to_add) > remaining_slots:
-        rows_to_add = rows_to_add[:remaining_slots]
-        added_keys = added_keys[:remaining_slots]
-        num_new_leads_this_run = len(rows_to_add)
-
     if not rows_to_add:
         print("[Save] No additional leads to save (all already appended earlier).")
         return 0
@@ -460,6 +423,7 @@ def save_leads():
         existing_keys.update(added_keys)
         existing_ids_global = set(existing_keys)
         EXISTING_KEY_FIELD = "id" if use_channel_id else "url"
+        global unique_appended_this_run
         unique_appended_this_run += len(rows_to_add_padded)
     except Exception as e:
         print(f"[Save] Error appending rows: {e}")
@@ -507,40 +471,31 @@ api_index = 0
 # Load state if exists
 load_state()
 
-# Fetch existing keys from all relevant Google Sheet worksheets into a global set (Channel ID preferred; fallback to Channel URL)
+# Fetch existing keys (Channel ID and Channel URL) from all relevant sheets for global deduplication
 global existing_ids_global, EXISTING_KEY_FIELD
 try:
-    # Get header rows for each worksheet
-    header_row_raw = RAW_WS.row_values(1)
-    header_row_invalid = INVALID_WS.row_values(1)
-    header_row_processed = PROCESSED_WS.row_values(1)
-
-    # Determine key field to use (Channel ID preferred)
-    use_channel_id_raw = "Channel ID" in header_row_raw
-    use_channel_id_invalid = "Channel ID" in header_row_invalid
-    use_channel_id_processed = "Channel ID" in header_row_processed
-
-    # Fetch records from each sheet
-    recs_raw = RAW_WS.get_all_records()
-    recs_invalid = INVALID_WS.get_all_records()
-    recs_processed = PROCESSED_WS.get_all_records()
-
-    # Decide global key field: Channel ID if present in Raw Leads, else fallback to Channel URL
-    if use_channel_id_raw:
-        get_key = lambda r: str(r.get("Channel ID", "")).strip()
-        EXISTING_KEY_FIELD = "id"
-    else:
-        get_key = lambda r: str(r.get("Channel URL", "")).strip()
-        EXISTING_KEY_FIELD = "url"
-
-    # Gather keys from all three sheets
-    raw_keys = {get_key(r) for r in recs_raw if get_key(r)}
-    invalid_keys = {get_key(r) for r in recs_invalid if get_key(r)}
-    processed_keys = {get_key(r) for r in recs_processed if get_key(r)}
-    existing_ids_global = set()
-    existing_ids_global.update(raw_keys)
-    existing_ids_global.update(invalid_keys)
-    existing_ids_global.update(processed_keys)
+    # Get all relevant sheets
+    SHEET_BOOK = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE")
+    worksheet_names = ["Raw Leads", "Processed Leads", "Invalid Leads"]
+    all_ids_urls = set()
+    for ws_name in worksheet_names:
+        try:
+            ws = SHEET_BOOK.worksheet(ws_name)
+            records = ws.get_all_records()
+            for r in records:
+                ch_id = str(r.get("Channel ID", "")).strip()
+                ch_url = str(r.get("Channel URL", "")).strip()
+                if ch_id:
+                    all_ids_urls.add(ch_id)
+                if ch_url:
+                    all_ids_urls.add(ch_url)
+        except Exception as ws_e:
+            print(f"[Init] Error fetching from sheet '{ws_name}': {ws_e}")
+    existing_ids_global = all_ids_urls
+    # Determine EXISTING_KEY_FIELD for current run based on Raw Leads header
+    header_row_init = SHEET.row_values(1)
+    use_channel_id_init = "Channel ID" in header_row_init
+    EXISTING_KEY_FIELD = "id" if use_channel_id_init else "url"
 except Exception as e:
     print(f"[Init] Error fetching existing keys from Google Sheets: {e}")
     existing_ids_global = set()
@@ -646,7 +601,9 @@ try:
     openai_title_keywords = generate_keywords_with_openai()
     random.shuffle(openai_title_keywords)
     exhausted_keywords = set()
-    while unique_appended_this_run < TARGET_LEADS:
+    # Main loop: ensure we never overshoot TARGET_LEADS, stop immediately when reached
+    stop_scraping = False
+    while unique_appended_this_run < TARGET_LEADS and not stop_scraping:
         # Pick a video title keyword not exhausted
         remaining = [k for k in openai_title_keywords if k not in exhausted_keywords]
         if not remaining:
@@ -661,6 +618,9 @@ try:
         found_good_lead = False
         page_token = None
         for page_num in range(2):
+            if unique_appended_this_run >= TARGET_LEADS or stop_scraping:
+                stop_scraping = True
+                break
             search_keyword = video_title_keyword
             youtube = youtube_clients[api_index]
             try:
@@ -693,247 +653,255 @@ try:
             channel_id_to_video_item = {}
             for item in items:
                 ch_id = item.get('snippet', {}).get('channelId')
-                if ch_id and ch_id not in channel_id_to_video_item:
+                if not ch_id:
+                    continue
+                channel_url_str = f"https://www.youtube.com/channel/{ch_id}"
+                # Check both Channel ID and Channel URL in global set
+                already_in_sheet = (str(ch_id) in existing_ids_global) or (channel_url_str in existing_ids_global)
+                if (ch_id in collected_channels) or already_in_sheet:
+                    continue
+                if ch_id not in channel_id_to_video_item:
                     channel_ids.append(ch_id)
                     channel_id_to_video_item[ch_id] = item
-            # Filter out channel_ids already processed in this run or already in the sheet
-            channel_ids = [
-                ch_id for ch_id in channel_ids
-                if ch_id not in collected_channels and (
-                    str(ch_id) not in existing_ids_global if EXISTING_KEY_FIELD == "id"
-                    else f"https://www.youtube.com/channel/{ch_id}" not in existing_ids_global
-                )
-            ]
             # Batch-fetch channel details
             channel_details_map = get_channel_details_batch(youtube, channel_ids)
             for channel_id in channel_ids:
-                # Guard: Never exceed TARGET_LEADS before processing a new channel
-                if unique_appended_this_run >= TARGET_LEADS:
-                    break
-                # Guard: Never exceed MAX_CHANNELS_PER_KEYWORD per keyword
-                if title_keyword_lead_count >= MAX_CHANNELS_PER_KEYWORD:
+                if unique_appended_this_run >= TARGET_LEADS or stop_scraping:
+                    stop_scraping = True
                     break
                 processed_items += 1
                 if processed_items % 100 == 0:
                     print(f"[Progress] Processed {processed_items} channels | Qualified this run: {num_new_leads_this_run}")
-                    ch = channel_details_map.get(channel_id)
-                    if not ch:
-                        continue
-                    stats = ch.get("statistics", {})
-                    subs_str = stats.get("subscriberCount", "0")
-                    try:
-                        subs_count = int(subs_str)
-                    except:
-                        subs_count = 0
+                ch = channel_details_map.get(channel_id)
+                if not ch:
+                    continue
+                stats = ch.get("statistics", {})
+                subs_str = stats.get("subscriberCount", "0")
+                try:
+                    subs_count = int(subs_str)
+                except:
+                    subs_count = 0
 
-                    # EARLY SUBSCRIBER CUTOFF
-                    if subs_count < MIN_SUBS or subs_count > MAX_SUBS:
-                        continue
+                # EARLY SUBSCRIBER CUTOFF
+                if subs_count < MIN_SUBS or subs_count > MAX_SUBS:
+                    continue
 
-                    snippet = ch.get("snippet", {})
-                    country = snippet.get("country", None)
-                    channel_title = snippet.get("title", "")
-                    channel_description = snippet.get("description", "")
-                    selling_clue = False
-                    avg_views = 0
-                    # Early filters: country, language, blacklist
-                    ALLOWED_COUNTRIES = [
-                        # North America
-                        "US", "CA",
-                        # Europe (West, North, South, East, Balkans)
-                        "GB", "IE", "FR", "DE", "IT", "ES", "PT", "NL", "BE", "LU", "AT", "CH",
-                        "SE", "NO", "DK", "FI", "IS", "GR", "CY", "MT",
-                        "PL", "CZ", "SK", "HU", "SI", "EE", "LV", "LT", "HR", "BG", "RO",
-                        "RS", "BA", "MK", "ME", "AL", "UA", "BY", "RU", "MD", "GE", "AM", "AZ",
-                        # Asia-Pacific
-                        "AU", "NZ", "JP", "KR", "SG", "HK", "TW", "MN", "VN",
-                        # Middle East high-income
-                        "AE", "SA", "KW", "QA", "BH", "OM", "IL",
-                        # Latin America (developed/upper-income)
-                        "CL", "UY", "AR"
-                    ]
-                    if country and country.upper() not in ALLOWED_COUNTRIES:
-                        continue
-                    # If country is missing/None, allow it
-                    if not (is_english(channel_title) or is_english(channel_description)):
-                        continue
-                    desc_low = channel_description.lower()
-                    BLACKLIST_KEYWORDS = [
-                        "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
-                    ]
-                    if any(bk.lower() in desc_low for bk in BLACKLIST_KEYWORDS):
-                        continue
-                    # Selling clue heuristics: selling phrases
-                    selling_phrases = [
-                        "course", "coaching", "mentorship", "lead magnet", "skool", "membership", "masterclass",
-                        "webinar", "consulting", "enroll", "join my program", "apply now", "enroll now", "sign up",
-                        "free training", "program", "bootcamp", "challenge", "academy", "mastermind", "cohort",
-                        "book a call", "strategy call", "free class", "training program"
-                    ]
+                snippet = ch.get("snippet", {})
+                country = snippet.get("country", None)
+                channel_title = snippet.get("title", "")
+                channel_description = snippet.get("description", "")
+                selling_clue = False
+                avg_views = 0
+                # Early filters: country, language, blacklist
+                ALLOWED_COUNTRIES = [
+                    # North America
+                    "US", "CA",
+                    # Europe (West, North, South, East, Balkans)
+                    "GB", "IE", "FR", "DE", "IT", "ES", "PT", "NL", "BE", "LU", "AT", "CH",
+                    "SE", "NO", "DK", "FI", "IS", "GR", "CY", "MT",
+                    "PL", "CZ", "SK", "HU", "SI", "EE", "LV", "LT", "HR", "BG", "RO",
+                    "RS", "BA", "MK", "ME", "AL", "UA", "BY", "RU", "MD", "GE", "AM", "AZ",
+                    # Asia-Pacific
+                    "AU", "NZ", "JP", "KR", "SG", "HK", "TW", "MN", "VN",
+                    # Middle East high-income
+                    "AE", "SA", "KW", "QA", "BH", "OM", "IL",
+                    # Latin America (developed/upper-income)
+                    "CL", "UY", "AR"
+                ]
+                if country and country.upper() not in ALLOWED_COUNTRIES:
+                    continue
+                # If country is missing/None, allow it
+                if not (is_english(channel_title) or is_english(channel_description)):
+                    continue
+                desc_low = channel_description.lower()
+                BLACKLIST_KEYWORDS = [
+                    "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
+                ]
+                if any(bk.lower() in desc_low for bk in BLACKLIST_KEYWORDS):
+                    continue
+                # Selling clue heuristics: selling phrases
+                selling_phrases = [
+                    "course", "coaching", "mentorship", "lead magnet", "skool", "membership", "masterclass",
+                    "webinar", "consulting", "enroll", "join my program", "apply now", "enroll now", "sign up",
+                    "free training", "program", "bootcamp", "challenge", "academy", "mastermind", "cohort",
+                    "book a call", "strategy call", "free class", "training program"
+                ]
+                for phrase in selling_phrases:
+                    if phrase in desc_low:
+                        selling_clue = True
+                        break
+                # Also look for selling language in the channel title
+                title_low = channel_title.lower()
+                if not selling_clue:
                     for phrase in selling_phrases:
-                        if phrase in desc_low:
+                        if phrase in title_low:
                             selling_clue = True
                             break
-                    # Also look for selling language in the channel title
-                    title_low = channel_title.lower()
-                    if not selling_clue:
-                        for phrase in selling_phrases:
-                            if phrase in title_low:
-                                selling_clue = True
-                                break
-                    # Platform anchor detection (channel_description and most recent non-short video description)
-                    platform_anchors = [
-                        "teachable.com","kajabi.com","thinkific.com","gumroad.com","patreon.com","skool.com",
-                        "stan.store","linktr.ee","beacons.ai","calendly.com","clickfunnels.com","systeme.io",
-                        "kartra.com","samcart.com","podia.com","shopify.com","myshopify.com","buymeacoffee.com",
-                        "ko-fi.com","udemy.com","coursera.org","substack.com","typeform.com","paypal.me",
-                        "stripe.com","square.site","bigcartel.com","eventbrite.com"
-                    ]
-                    for anchor in platform_anchors:
-                        if anchor in desc_low:
-                            selling_clue = True
-                            break
-                    # Fetch uploads playlist and recent videos
-                    uploads_playlist_id = get_uploads_playlist_id(ch)
-                    if not uploads_playlist_id:
+                # Platform anchor detection (channel_description and most recent non-short video description)
+                platform_anchors = [
+                    "teachable.com","kajabi.com","thinkific.com","gumroad.com","patreon.com","skool.com",
+                    "stan.store","linktr.ee","beacons.ai","calendly.com","clickfunnels.com","systeme.io",
+                    "kartra.com","samcart.com","podia.com","shopify.com","myshopify.com","buymeacoffee.com",
+                    "ko-fi.com","udemy.com","coursera.org","substack.com","typeform.com","paypal.me",
+                    "stripe.com","square.site","bigcartel.com","eventbrite.com"
+                ]
+                for anchor in platform_anchors:
+                    if anchor in desc_low:
+                        selling_clue = True
+                        break
+                # Fetch uploads playlist and recent videos
+                uploads_playlist_id = get_uploads_playlist_id(ch)
+                if not uploads_playlist_id:
+                    continue
+                recent_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=20)
+                video_ids = [v["id"] for v in recent_videos if v.get("id")]
+                videos_details_map = get_videos_details_batch(youtube, video_ids)
+                # Filter out shorts and non-English, also check for platform anchors in recent video description
+                non_shorts_video_data = []
+                most_recent_video_desc = ""
+                for idx, v in enumerate(recent_videos):
+                    vid = v.get("id")
+                    title = v.get("title", "")
+                    published_at = v.get("publishedAt", "")
+                    detail = videos_details_map.get(vid, {})
+                    iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
+                    match = re.match(r'PT((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)S)?', iso_dur)
+                    hours = int(match.group('h')) if match and match.group('h') else 0
+                    minutes = int(match.group('m')) if match and match.group('m') else 0
+                    seconds = int(match.group('s')) if match and match.group('s') else 0
+                    total_seconds = hours * 3600 + minutes * 60 + seconds
+                    if is_short_video(title, total_seconds):
                         continue
-                    recent_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=20)
-                    video_ids = [v["id"] for v in recent_videos if v.get("id")]
-                    videos_details_map = get_videos_details_batch(youtube, video_ids)
-                    # Filter out shorts and non-English, also check for platform anchors in recent video description
-                    non_shorts_video_data = []
-                    most_recent_video_desc = ""
-                    for idx, v in enumerate(recent_videos):
-                        vid = v.get("id")
-                        title = v.get("title", "")
-                        published_at = v.get("publishedAt", "")
-                        detail = videos_details_map.get(vid, {})
-                        iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
-                        match = re.match(r'PT((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)S)?', iso_dur)
-                        hours = int(match.group('h')) if match and match.group('h') else 0
-                        minutes = int(match.group('m')) if match and match.group('m') else 0
-                        seconds = int(match.group('s')) if match and match.group('s') else 0
-                        total_seconds = hours * 3600 + minutes * 60 + seconds
-                        if is_short_video(title, total_seconds):
-                            continue
-                        if not is_english(title):
-                            continue
+                    if not is_english(title):
+                        continue
+                    views = 0
+                    try:
+                        views = int(detail.get('statistics', {}).get('viewCount', 0))
+                    except:
                         views = 0
-                        try:
-                            views = int(detail.get('statistics', {}).get('viewCount', 0))
-                        except:
-                            views = 0
-                        non_shorts_video_data.append((title, views, total_seconds, vid, published_at))
-                        # Only check the most recent non-short video description for platform anchors
-                        if most_recent_video_desc == "" and isinstance(detail.get("snippet",{}).get("description",""), str):
-                            most_recent_video_desc = detail.get("snippet",{}).get("description","")
-                    # Check for platform anchors in most recent non-short video description
-                    if most_recent_video_desc:
-                        desc_video_low = most_recent_video_desc.lower()
-                        for anchor in platform_anchors:
-                            if anchor in desc_video_low:
-                                selling_clue = True
-                                break
-                    # If selling clue found via platform anchor, set rating high immediately
-                    if selling_clue:
-                        rating = 10
-                    else:
-                        rating = None
-                    non_shorts_video_data = non_shorts_video_data[:15]
-                    recent_titles = [x[0] for x in non_shorts_video_data]
-                    video_ids_nonshorts = [x[3] for x in non_shorts_video_data]
-                    published_ats = [x[4] for x in non_shorts_video_data]
-                    # recency: at least 2 non-shorts within last 180 days
-                    recent_nonshorts = [pub for pub in published_ats if pub and is_recent(pub)]
-                    if len(recent_nonshorts) < 2:
-                        continue
-                    # avg views for 3 most recent non-shorts
-                    non_shorts_top3 = non_shorts_video_data[:3]
-                    if non_shorts_top3:
-                        avg_views = sum(x[1] for x in non_shorts_top3) // len(non_shorts_top3)
-                    else:
-                        avg_views = 0
-                    # Require at least a 300 floor for average views (no % of subs)
-                    if avg_views < 300:
-                        continue
-                    titles_low = " ".join(recent_titles).lower()
-                    if any(bk.lower() in titles_low for bk in BLACKLIST_KEYWORDS):
-                        continue
-                    # Positive signal: selling phrases in recent titles
-                    if not selling_clue:
-                        for phrase in selling_phrases:
-                            if phrase in titles_low:
-                                selling_clue = True
-                                break
-                # Already filtered: skip redundant collected_channels and sheet checks
-                    # If rating not set by platform/selling clue, use OpenAI
-                    if rating is None:
-                        rating = rate_lead_with_openai(channel_title, channel_description, avg_views, "|".join(recent_titles[:15]))
-                        print(f"[Rate] {channel_title} -> rating {rating}")
-                        if rating is None:
-                            rating = 4
-                        if rating < 4:
-                            continue
-                    # Extract sample video info
-                    sample_idx = 0
-                    sample_video_title = recent_titles[sample_idx] if recent_titles else ""
-                    sample_video_id = video_ids_nonshorts[sample_idx] if video_ids_nonshorts else ""
-                    sample_published_at = published_ats[sample_idx] if published_ats else ""
-                    all_links = re.findall(r'(https?://[^\s]+)', channel_description)
-                    bio_link = '||'.join(all_links) if all_links else ""
-                    email = None
-                    for single in (all_links or [])[:3]:
-                        email = scrape_website_for_email(single)
-                        if email:
+                    non_shorts_video_data.append((title, views, total_seconds, vid, published_at))
+                    # Only check the most recent non-short video description for platform anchors
+                    if most_recent_video_desc == "" and isinstance(detail.get("snippet",{}).get("description",""), str):
+                        most_recent_video_desc = detail.get("snippet",{}).get("description","")
+                # Check for platform anchors in most recent non-short video description
+                if most_recent_video_desc:
+                    desc_video_low = most_recent_video_desc.lower()
+                    for anchor in platform_anchors:
+                        if anchor in desc_video_low:
+                            selling_clue = True
                             break
-                    # Sort non_shorts_video_data by published date descending and pick the most recent for sample
-                    def parse_dt_safe(dtstr):
-                        try:
-                            return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
-                        except Exception:
-                            return datetime.min
-                    non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
-                    sample_video_title = non_shorts_video_data_sorted[0][0] if non_shorts_video_data_sorted else ""
-                    sample_video_id = non_shorts_video_data_sorted[0][3] if non_shorts_video_data_sorted else ""
-                    sample_published_at = non_shorts_video_data_sorted[0][4] if non_shorts_video_data_sorted else ""
-                    qualified_leads.append({
-                        "Channel Name": channel_title,
-                        "Channel ID": channel_id,
-                        "Subscribers": subs_count,
-                        "Country": country,
-                        "Channel URL": f"https://www.youtube.com/channel/{channel_id}",
-                        "Last Video Published": sample_published_at,
-                        "Sample Video Title": sample_video_title,
-                        "Source Keyword": search_keyword,
-                        "Email": email or "No",
-                        "Average Views (3 Recent Non-Shorts)": avg_views,
-                        "Rating": rating,
-                        "YouTube Bio": channel_description,
-                        "Bio Links": bio_link,
-                        "Recent Titles (15 Non-Shorts)": "|".join(recent_titles[:15]),
-                        "Selling": "",
-                        "Target Audience": "",
-                        "One-Line Pitch": "",
-                        "Trigger Video Title": sample_video_title,
-                        "Trigger Video URL": f"https://www.youtube.com/watch?v={sample_video_id}" if sample_video_id else ""
-                    })
-                    collected_channels.add(channel_id)
-                    # Track in-memory qualified count only; sheet appends are now immediate
-                    num_new_leads_this_run += 1
-                    print(f"[Qualified+] {channel_title} | Rating {rating}")
-                    found_good_lead = True
-                    title_keyword_lead_count += 1
+                # If selling clue found via platform anchor, set rating high immediately
+                if selling_clue:
+                    rating = 10
+                else:
+                    rating = None
+                non_shorts_video_data = non_shorts_video_data[:15]
+                recent_titles = [x[0] for x in non_shorts_video_data]
+                video_ids_nonshorts = [x[3] for x in non_shorts_video_data]
+                published_ats = [x[4] for x in non_shorts_video_data]
+                # recency: at least 2 non-shorts within last 180 days
+                recent_nonshorts = [pub for pub in published_ats if pub and is_recent(pub)]
+                if len(recent_nonshorts) < 2:
+                    continue
+                # avg views for 3 most recent non-shorts
+                non_shorts_top3 = non_shorts_video_data[:3]
+                if non_shorts_top3:
+                    avg_views = sum(x[1] for x in non_shorts_top3) // len(non_shorts_top3)
+                else:
+                    avg_views = 0
+                # Require at least a 300 floor for average views (no % of subs)
+                if avg_views < 300:
+                    continue
+                titles_low = " ".join(recent_titles).lower()
+                if any(bk.lower() in titles_low for bk in BLACKLIST_KEYWORDS):
+                    continue
+                # Positive signal: selling phrases in recent titles
+                if not selling_clue:
+                    for phrase in selling_phrases:
+                        if phrase in titles_low:
+                            selling_clue = True
+                            break
+                channel_url_str = f"https://www.youtube.com/channel/{channel_id}" if channel_id else ""
+                # Check both Channel ID and Channel URL in global set
+                already_in_sheet = (str(channel_id) in existing_ids_global) or (channel_url_str in existing_ids_global)
+                if (channel_id in collected_channels) or already_in_sheet:
+                    continue
+                # If rating not set by platform/selling clue, use OpenAI
+                if rating is None:
+                    rating = rate_lead_with_openai(channel_title, channel_description, avg_views, "|".join(recent_titles[:15]))
+                    print(f"[Rate] {channel_title} -> rating {rating}")
+                    if rating is None:
+                        rating = 7
+                    if rating < 7:
+                        continue
+                # Extract sample video info
+                sample_idx = 0
+                sample_video_title = recent_titles[sample_idx] if recent_titles else ""
+                sample_video_id = video_ids_nonshorts[sample_idx] if video_ids_nonshorts else ""
+                sample_published_at = published_ats[sample_idx] if published_ats else ""
+                all_links = re.findall(r'(https?://[^\s]+)', channel_description)
+                bio_link = '||'.join(all_links) if all_links else ""
+                email = None
+                for single in (all_links or [])[:3]:
+                    email = scrape_website_for_email(single)
+                    if email:
+                        break
+                # Sort non_shorts_video_data by published date descending and pick the most recent for sample
+                def parse_dt_safe(dtstr):
+                    try:
+                        return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
+                    except Exception:
+                        return datetime.min
+                non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
+                sample_video_title = non_shorts_video_data_sorted[0][0] if non_shorts_video_data_sorted else ""
+                sample_video_id = non_shorts_video_data_sorted[0][3] if non_shorts_video_data_sorted else ""
+                sample_published_at = non_shorts_video_data_sorted[0][4] if non_shorts_video_data_sorted else ""
+                qualified_leads.append({
+                    "Channel Name": channel_title,
+                    "Channel ID": channel_id,
+                    "Subscribers": subs_count,
+                    "Country": country,
+                    "Channel URL": f"https://www.youtube.com/channel/{channel_id}",
+                    "Last Video Published": sample_published_at,
+                    "Sample Video Title": sample_video_title,
+                    "Source Keyword": search_keyword,
+                    "Email": email or "No",
+                    "Average Views (3 Recent Non-Shorts)": avg_views,
+                    "Rating": rating,
+                    "YouTube Bio": channel_description,
+                    "Bio Links": bio_link,
+                    "Recent Titles (15 Non-Shorts)": "|".join(recent_titles[:15]),
+                    "Selling": "",
+                    "Target Audience": "",
+                    "One-Line Pitch": "",
+                    "Trigger Video Title": sample_video_title,
+                    "Trigger Video URL": f"https://www.youtube.com/watch?v={sample_video_id}" if sample_video_id else ""
+                })
+                collected_channels.add(channel_id)
+                num_new_leads_this_run += 1
+                print(f"[Qualified+] {channel_title} | Rating {rating}")
+                found_good_lead = True
+                title_keyword_lead_count += 1
+                # After adding, check if we will overshoot after saving
+                if (unique_appended_this_run + len(qualified_leads)) >= TARGET_LEADS:
+                    # Only keep enough leads to reach TARGET_LEADS
+                    leads_needed = TARGET_LEADS - unique_appended_this_run
+                    if leads_needed < len(qualified_leads):
+                        qualified_leads[:] = qualified_leads[:leads_needed]
                     added_now = save_all_state_periodically()
-                    # After saving, just break if we hit the target (logging is done by the guard above)
+                    added_now = added_now or 0
+                    stop_scraping = True
                     break
-                    time.sleep(DELAY_BETWEEN_REQUESTS)
-            # After processing all channel_ids, check if we hit MAX_CHANNELS_PER_KEYWORD
-            if title_keyword_lead_count >= MAX_CHANNELS_PER_KEYWORD:
-                break
-        # After the for page_num in range(2) loop, break out early if we hit MAX_CHANNELS_PER_KEYWORD
-        if title_keyword_lead_count >= MAX_CHANNELS_PER_KEYWORD:
-            print(f"[Limit] Reached MAX_CHANNELS_PER_KEYWORD ({MAX_CHANNELS_PER_KEYWORD}) for keyword '{video_title_keyword}'. Moving to next keyword.")
-            continue
+                if len(qualified_leads) % AUTO_SAVE_EVERY == 0:
+                    added_now = save_all_state_periodically()
+                    added_now = added_now or 0
+                    if unique_appended_this_run >= TARGET_LEADS:
+                        stop_scraping = True
+                        break
+                if unique_appended_this_run >= TARGET_LEADS:
+                    stop_scraping = True
+                    break
+                time.sleep(DELAY_BETWEEN_REQUESTS)
         # Mark keyword as exhausted if no lead found
         if title_keyword_lead_count == 0:
             exhausted_keywords.add(video_title_keyword)
