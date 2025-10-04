@@ -157,83 +157,97 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Generate a list of YouTube video title keywords using OpenAI (gpt-4o-mini).
-    Fully crash-proof version: handles empty responses, bad JSON, or API errors gracefully.
-    Returns a list (may be empty) and never raises JSONDecodeError.
+    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with structured JSON output.
+    Uses your detailed example prompt to guide the model and enforces a JSON schema to guarantee valid output.
+    Retries up to 3 times on failure, returns [] if all attempts fail.
     """
-    n = random.randint(n_min, n_max)
+    import json, time, random
+
+    n_target = random.randint(n_min, n_max)
+
+    schema = {
+        "name": "keyword_list",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "keywords": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": n_min,
+                    "maxItems": n_max
+                }
+            },
+            "required": ["keywords"],
+            "additionalProperties": False
+        }
+    }
+
     prompt = """
 Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
 Also include less mainstream or unexpected niches (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
 Each title should be realistic, engaging, and assume the creator is already monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
 Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
-Return ONLY a valid JSON array of strings.
-"""
-    max_attempts = 3
-    backoff = 1
+Return ONLY a valid JSON object with a 'keywords' array of strings.
 
-    for attempt in range(1, max_attempts + 1):
+Examples:
+1. "Earning from Pottery Workshops Online"
+2. "Nail Art Side Hustle: Selling Tutorials & Kits"
+3. "How My Journaling Courses Bring in Monthly Income"
+4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
+5. "Car Detailing Coaching Calls That Pay My Bills"
+6. "Making Money Teaching Guitar Lessons Online"
+7. "Tarot Reading Clients That Support My Full-Time Income"
+8. "Woodworking Profits: Selling DIY Plans"
+9. "How I Monetize My Meal Prep Classes"
+10. "Turning Event Planning Tips Into Paid Consultations"
+"""
+
+    attempts, backoff = 3, 1
+    for i in range(1, attempts + 1):
         try:
-            resp = openai_client.chat.completions.create(
+            resp = openai_client.responses.create(
                 model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-                max_tokens=800
+                input=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_schema", "json_schema": schema},
+                max_output_tokens=800,
             )
-        except Exception as e:
-            print(f"[OpenAI Keywords] API call failed (attempt {attempt}): {e}")
-            if attempt < max_attempts:
-                time.sleep(backoff)
-                backoff *= 2
-                continue
-            else:
+
+            content = getattr(resp, "output_text", None)
+            if not content:
+                chunks = getattr(resp, "output", []) or []
+                if chunks and getattr(chunks[0], "content", None):
+                    part = chunks[0].content[0]
+                    if hasattr(part, "text"):
+                        content = part.text
+            content = (content or "").strip()
+
+            if not content:
+                print(f"[OpenAI Keywords] Empty response on attempt {i}.")
+                if i < attempts:
+                    time.sleep(backoff); backoff *= 2
+                    continue
                 return []
 
-        # Try to safely extract the content
-        content = ""
-        try:
-            if hasattr(resp, "choices") and resp.choices:
-                message_obj = getattr(resp.choices[0], "message", None)
-                if message_obj and hasattr(message_obj, "content"):
-                    content = message_obj.content or ""
-                elif isinstance(resp.choices[0], dict):
-                    content = resp.choices[0].get("message", {}).get("content", "")
-            elif isinstance(resp, dict):
-                content = resp.get("choices", [{}])[0].get("message", {}).get("content", "")
+            try:
+                data = json.loads(content)
+                keywords = data.get("keywords", [])
+                if isinstance(keywords, list) and keywords:
+                    return [k for k in keywords if isinstance(k, str)]
+                else:
+                    print(f"[OpenAI Keywords] No valid keywords found (attempt {i}). Raw:", content)
+            except Exception as e:
+                print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
+                print("[OpenAI Keywords Raw Response]", content)
+
         except Exception as e:
-            print(f"[OpenAI Keywords] Error extracting message content (attempt {attempt}): {e}")
-            content = ""
+            print(f"[OpenAI Keywords] Attempt {i} failed: {e}")
 
-        content = (content or "").strip()
-        if not content:
-            print(f"[OpenAI Keywords] Empty response content on attempt {attempt}.")
-            if attempt < max_attempts:
-                time.sleep(backoff)
-                backoff *= 2
-                continue
-            return []
-
-        # Try to parse JSON safely
-        try:
-            keywords = json.loads(content)
-            if isinstance(keywords, list):
-                return keywords
-            else:
-                print(f"[OpenAI Keywords] Response not a list (attempt {attempt}). Raw:", content)
-        except json.JSONDecodeError as e:
-            print(f"[OpenAI Keywords] JSON decode failed (attempt {attempt}): {e}")
-            print("[OpenAI Keywords Raw Response]", content)
-        except Exception as e:
-            print(f"[OpenAI Keywords] Unexpected parse error (attempt {attempt}): {e}")
-            print("[OpenAI Keywords Raw Response]", content)
-
-        # Retry if failed
-        if attempt < max_attempts:
-            time.sleep(backoff)
-            backoff *= 2
+        if i < attempts:
+            time.sleep(backoff); backoff *= 2
             continue
         else:
-            print("[OpenAI Keywords] All attempts failed, returning empty list.")
+            print("[OpenAI Keywords] All attempts failed. Returning [].")
             return []
 
     return []
