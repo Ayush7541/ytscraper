@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timezone
 import requests
 
+existing_ids_global = set()
 # Always define this at the very top
 unique_added_this_run = 0
 # Tracks number of unique leads actually appended to Google Sheet this run
@@ -313,7 +314,7 @@ def column_number_to_letter(n):
 def save_leads():
     """Append qualified leads to Google Sheet (deduping by Channel ID if present, else by Channel URL).
        Does NOT write or modify the header row. Maps values to the sheet's header order."""
-    global existing_ids_global, num_new_leads_this_run, EXISTING_KEY_FIELD
+    global existing_ids_global, num_new_leads_this_run, EXISTING_KEY_FIELD, unique_appended_this_run
 
     if not qualified_leads:
         print("[Save] No qualified leads to save.")
@@ -456,7 +457,9 @@ def save_leads():
 
         # normalize keys (strip + lowercase)
         norm_existing_keys = {str(k).strip().lower() for k in existing_keys if k}
-        existing_ids_global = {str(k).strip().lower() for k in existing_ids_global} if existing_ids_global else set()
+        normalized_global = {str(k).strip().lower() for k in existing_ids_global} if existing_ids_global else set()
+        existing_ids_global.clear()
+        existing_ids_global.update(normalized_global)
         existing_ids_global.update(norm_existing_keys)
 
         EXISTING_KEY_FIELD = "id" if use_channel_id else "url"
