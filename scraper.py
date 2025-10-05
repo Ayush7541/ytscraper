@@ -385,8 +385,12 @@ def save_leads():
         else:
             lead_key_value = str(lead.get("Channel URL", "")).strip()
 
-        # Skip if no key or already present
-        if not lead_key_value or lead_key_value in existing_keys:
+        # Normalize the key
+        lead_key_value_norm = str(lead_key_value).strip().lower()
+        # Skip if no key or already present in Raw or in global (all sheets)
+        if not lead_key_value_norm or \
+           lead_key_value_norm in {str(k).strip().lower() for k in existing_keys} or \
+           lead_key_value_norm in {str(k).strip().lower() for k in existing_ids_global}:
             continue
 
         # Build row aligned to the sheet header using FIELD_MAPPING
@@ -445,9 +449,15 @@ def save_leads():
         SHEET.update(rows_to_add_padded, range_name=cell_range, value_input_option="RAW")
 
         print(f"[Save] Added {len(rows_to_add_padded)} new leads to Google Sheet.")
-        # Update global cache to include the newly added keys
+        # merge new Raw-sheet keys into the global set, without throwing away other sheets
         existing_keys.update(added_keys)
-        existing_ids_global = set(existing_keys)
+
+        # normalize keys (strip + lowercase)
+        norm_existing_keys = {str(k).strip().lower() for k in existing_keys if k}
+        global existing_ids_global
+        existing_ids_global = {str(k).strip().lower() for k in existing_ids_global} if existing_ids_global else set()
+        existing_ids_global.update(norm_existing_keys)
+
         EXISTING_KEY_FIELD = "id" if use_channel_id else "url"
         global unique_appended_this_run
         unique_appended_this_run += len(rows_to_add_padded)
@@ -686,9 +696,10 @@ try:
                 if not ch_id:
                     continue
                 channel_url_str = f"https://www.youtube.com/channel/{ch_id}"
-                # Check both Channel ID and Channel URL in global set
-                already_in_sheet = (str(ch_id) in existing_ids_global) or (channel_url_str in existing_ids_global)
-                if (ch_id in collected_channels) or already_in_sheet:
+                cid_norm = str(ch_id).strip().lower()
+                curl_norm = str(channel_url_str).strip().lower()
+                already_in_sheet = (cid_norm in existing_ids_global) or (curl_norm in existing_ids_global)
+                if (cid_norm in {c.lower() for c in collected_channels}) or already_in_sheet:
                     continue
                 if ch_id not in channel_id_to_video_item:
                     channel_ids.append(ch_id)
@@ -853,8 +864,10 @@ try:
                             break
                 channel_url_str = f"https://www.youtube.com/channel/{channel_id}" if channel_id else ""
                 # Check both Channel ID and Channel URL in global set
-                already_in_sheet = (str(channel_id) in existing_ids_global) or (channel_url_str in existing_ids_global)
-                if (channel_id in collected_channels) or already_in_sheet:
+                cid_norm = str(channel_id).strip().lower()
+                curl_norm = str(channel_url_str).strip().lower()
+                already_in_sheet = (cid_norm in existing_ids_global) or (curl_norm in existing_ids_global)
+                if (cid_norm in {c.lower() for c in collected_channels}) or already_in_sheet:
                     continue
                 # If rating not set by platform/selling clue, use OpenAI
                 if rating is None:
