@@ -67,7 +67,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "sk-proj-zodOEdwzJNPCq8quN7-u0z_
 
 # Parameters
 MIN_SUBS = 5000
-MAX_SUBS = 350000
+MAX_SUBS = 150000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
 TARGET_LEADS = 60              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
@@ -167,8 +167,10 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
 
     prompt = """
 Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
-Also include less mainstream or unexpected niches (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
-Each title should be realistic, engaging, and assume the creator is already monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
+Also include less mainstream, underrated, or unexpected niches beyond these examples (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
+Prioritize hobby or passion-driven niches where creators are likely small, enthusiastic, and not yet monetizing fully. Examples of such hobby niches: calligraphy, pottery, journaling, bullet journaling, model building, Lego creations, bonsai/urban gardening, baking, cake decorating, pet training, amateur photography, DIY crafts, knitting, crocheting, board games, tabletop RPGs, musical instruments, tarot, astrology, creative writing, poetry, homebrewing, miniature painting, soap making, candle making.
+You can invent realistic niches not mentioned above, prioritizing small-scale creators who are likely to need help growing their channel. 
+Each title should be realistic, engaging, and assume the creator is monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
 Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
 Return ONLY a valid JSON array of strings.
 
