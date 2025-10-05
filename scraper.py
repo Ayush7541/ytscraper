@@ -508,7 +508,6 @@ api_index = 0
 
 # Load state if exists
 load_state()
-global existing_ids_global, EXISTING_KEY_FIELD
 
 # Fetch existing keys (Channel ID and Channel URL) from all relevant sheets for global deduplication
 try:
