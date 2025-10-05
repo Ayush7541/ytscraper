@@ -861,8 +861,8 @@ try:
                     rating = rate_lead_with_openai(channel_title, channel_description, avg_views, "|".join(recent_titles[:15]))
                     print(f"[Rate] {channel_title} -> rating {rating}")
                     if rating is None:
-                        rating = 7
-                    if rating < 7:
+                        rating = 4
+                    if rating < 4:
                         continue
                 # Extract sample video info
                 sample_idx = 0
@@ -912,14 +912,8 @@ try:
                 print(f"[Qualified+] {channel_title} | Rating {rating}")
                 found_good_lead = True
                 title_keyword_lead_count += 1
-                # After adding, check if we will overshoot after saving
-                if (unique_appended_this_run + len(qualified_leads)) >= TARGET_LEADS:
-                    # Only keep enough leads to reach TARGET_LEADS
-                    leads_needed = TARGET_LEADS - unique_appended_this_run
-                    if leads_needed < len(qualified_leads):
-                        qualified_leads[:] = qualified_leads[:leads_needed]
-                    added_now = save_all_state_periodically()
-                    added_now = added_now or 0
+                # After adding, check if we reached the target leads
+                if unique_appended_this_run >= TARGET_LEADS:
                     stop_scraping = True
                     break
                 if len(qualified_leads) % AUTO_SAVE_EVERY == 0:
