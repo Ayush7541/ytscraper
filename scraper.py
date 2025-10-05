@@ -508,9 +508,9 @@ api_index = 0
 
 # Load state if exists
 load_state()
+global existing_ids_global, EXISTING_KEY_FIELD
 
 # Fetch existing keys (Channel ID and Channel URL) from all relevant sheets for global deduplication
-global existing_ids_global, EXISTING_KEY_FIELD
 try:
     # Get all relevant sheets
     SHEET_BOOK = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE")
