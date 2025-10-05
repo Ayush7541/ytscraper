@@ -456,7 +456,6 @@ def save_leads():
 
         # normalize keys (strip + lowercase)
         norm_existing_keys = {str(k).strip().lower() for k in existing_keys if k}
-        global existing_ids_global
         existing_ids_global = {str(k).strip().lower() for k in existing_ids_global} if existing_ids_global else set()
         existing_ids_global.update(norm_existing_keys)
 
