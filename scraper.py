@@ -167,25 +167,35 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
-Also include less mainstream, underrated, or unexpected niches beyond these examples (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
-Prioritize hobby or passion-driven niches where creators are likely small, enthusiastic, and not yet monetizing fully. Examples of such hobby niches: calligraphy, pottery, journaling, bullet journaling, model building, Lego creations, bonsai/urban gardening, baking, cake decorating, pet training, amateur photography, DIY crafts, knitting, crocheting, board games, tabletop RPGs, musical instruments, tarot, astrology, creative writing, poetry, homebrewing, miniature painting, soap making, candle making.
-You can invent realistic niches not mentioned above, prioritizing small-scale creators who are likely to need help growing their channel. 
-Each title should be realistic, engaging, and assume the creator is monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
-Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
+Generate 25–30 diverse and realistic YouTube creator video titles from a wide range of skill-building, growth, or transformation-focused niches (fitness, nutrition, dance, mindset, journaling, cooking, music, photography, productivity, communication, self-improvement, yoga, language learning, public speaking, etc.).
+Also include moderately popular, creative, and hobby-style niches that attract passionate creators who teach and share (for example: calligraphy, pottery, journaling, bullet journaling, baking, cake decorating, pet training, amateur photography, DIY crafts, bonsai/urban gardening, creative writing, poetry, tarot, astrology, soap making, candle making, musical instruments, painting, drawing, board games, tabletop RPGs, etc.).
+Avoid heavy craftsmanship or tool-dependent fields like woodworking, leather craft, resin art, or vintage restoration that are hard to scale into educational programs.
+
+Prioritize creators who are **skilled, consistent, and passionate**, but not obviously business-oriented.
+These are creators who make content because they love teaching or helping others — not because they’re focused on monetization.
+They should already have some followers and produce quality educational or tutorial-style videos, but without talking about “money,” “clients,” “sales,” or “business.”
+
+Avoid any video titles that contain or imply monetization, business, or income-related language.
+Specifically avoid words or ideas related to:
+“money,” “income,” “profit,” “revenue,” “clients,” “sales,” “marketing,” “agency,” “hustle,” “affiliate,” “dropshipping,” “make money,” “side hustle,” “business,” “entrepreneur,” or “coaching program.”
+
+Each title should sound like a real YouTube upload — personal, helpful, or inspiring.
+Use natural language and realistic tone (e.g., “How I Improved My Posture at Home” or “My 5-Minute Morning Journal Routine”).
+You can mix formats such as tutorials, day-in-the-life, personal journeys, or progress updates.
+
 Return ONLY a valid JSON array of strings.
 
 Examples:
-1. "Earning from Pottery Workshops Online"
-2. "Nail Art Side Hustle: Selling Tutorials & Kits"
-3. "How My Journaling Courses Bring in Monthly Income"
-4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
-5. "Car Detailing Coaching Calls That Pay My Bills"
-6. "Making Money Teaching Guitar Lessons Online"
-7. "Tarot Reading Clients That Support My Full-Time Income"
-8. "Woodworking Profits: Selling DIY Plans"
-9. "How I Monetize My Meal Prep Classes"
-10. "Turning Event Planning Tips Into Paid Consultations"
+1. "How I Fixed My Mobility With 10 Minutes a Day"
+2. "My Daily Journaling Routine for Focus and Clarity"
+3. "Singing Warm-Ups That Changed My Voice"
+4. "Cooking Healthy Meals Without Complicated Recipes"
+5. "Photography Tips That Instantly Improved My Shots"
+6. "Breathwork Exercises to Calm Anxiety"
+7. "3 Dance Drills That Boost My Balance"
+8. "Simple Guitar Practice Routine for Busy Beginners"
+9. "Learning Spanish Through Daily Stories"
+10. "Morning Stretch Flow for Productivity and Energy"
 """
 
     attempts, backoff = 3, 1
@@ -246,6 +256,9 @@ Recent Video Titles (pipe separated): {titles_pipe}
 Average Views per Video: {avg_views}
 
 If the YouTube bio or recent video titles contain non-English text (such as Spanish, Hindi, or any language other than English), give a rating less than 5.
+
+When considering monetization, only penalize channels that are selling or promoting paid courses, coaching, masterclasses, or similar educational products—these should receive a low rating (1–2). Do NOT penalize creators who monetize through Patreon, affiliate links, merch, donations, or ad revenue; these should not affect the rating.
+
 Consider presence of selling language, call-to-actions, professionalism, and view counts.
 Respond with a single integer between 0 and 10 and nothing else.
 """
