@@ -67,7 +67,7 @@ API_KEYS = [
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "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"
 
 # Parameters
-MIN_SUBS = 5000
+MIN_SUBS = 20000
 MAX_SUBS = 150000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
 TARGET_LEADS = 60              # collect 15 qualified leads (rating >= 7)
@@ -171,6 +171,8 @@ Generate 25–30 diverse and realistic YouTube creator video titles from a wide 
 Also include moderately popular, creative, and hobby-style niches that attract passionate creators who teach and share (for example: calligraphy, pottery, journaling, bullet journaling, baking, cake decorating, pet training, amateur photography, DIY crafts, bonsai/urban gardening, creative writing, poetry, tarot, astrology, soap making, candle making, musical instruments, painting, drawing, board games, tabletop RPGs, etc.).
 Avoid heavy craftsmanship or tool-dependent fields like woodworking, leather craft, resin art, or vintage restoration that are hard to scale into educational programs.
 
+Avoid girl-centric or overly feminine niches such as makeup, skincare, fashion, nail art, lifestyle vlogs, relationship advice, or beauty routines. Focus instead on skill-based, passion, or creativity-oriented niches that appeal broadly to all genders.
+
 Prioritize creators who are **skilled, consistent, and passionate**, but not obviously business-oriented.
 These are creators who make content because they love teaching or helping others — not because they’re focused on monetization.
 They should already have some followers and produce quality educational or tutorial-style videos, but without talking about “money,” “clients,” “sales,” or “business.”
@@ -257,7 +259,12 @@ Average Views per Video: {avg_views}
 
 If the YouTube bio or recent video titles contain non-English text (such as Spanish, Hindi, or any language other than English), give a rating less than 5.
 
-When considering monetization, only penalize channels that are selling or promoting paid courses, coaching, masterclasses, or similar educational products—these should receive a low rating (1–2). Do NOT penalize creators who monetize through Patreon, affiliate links, merch, donations, or ad revenue; these should not affect the rating.
+Avoid channels that are **companies, startups, software tools, agencies, or brands** rather than individual creators.
+Also avoid channels that are **girl-centric** or heavily focused on beauty, makeup, skincare, fashion, lifestyle vlogs, or relationship content. These should receive a very low rating (0–3) since they are not educational or skill-development focused.
+These should receive a very low rating (0–3), since they are unlikely to be personal creators who teach or build an audience-based business.
+
+When considering monetization, only penalize channels that are selling or promoting paid courses, coaching, masterclasses, or similar educational products — these should receive a low rating (1–2).
+Do NOT penalize creators who monetize through Patreon, affiliate links, merch, donations, or ad revenue; these should not affect the rating.
 
 Consider presence of selling language, call-to-actions, professionalism, and view counts.
 Respond with a single integer between 0 and 10 and nothing else.
