@@ -8,7 +8,7 @@ import time
 SHEET_KEY = "1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE"  # Replace with your sheet key
 RAW_TAB_NAME = "Raw Leads"
 INVALID_TAB_NAME = "Invalid Leads"
-MV_API_KEY = "Jlgl2wmPBFbF5kIsETdZsbabl"
+MV_API_KEY = "kMJzNxpD8LJy8zDLqU7QVXrWL"
 SLACK_WEBHOOK = "https://hooks.slack.com/services/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"
 
 # === GOOGLE SHEETS SETUP ===
