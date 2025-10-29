@@ -830,8 +830,12 @@ try:
                 if not (is_english(channel_title) or is_english(channel_description)):
                     continue
                 desc_low = channel_description.lower()
-                # Detect textual selling mentions in bio
-                TEXT_SELLING_TERMS = ["coaching", "apply", "book a call", "program", "enroll", "1:1"]
+                # Detect textual selling mentions in bio (expanded high-ticket terms)
+                TEXT_SELLING_TERMS = [
+                    "coaching", "mentorship", "mentor", "apply", "book a call", "program", "enroll",
+                    "masterclass", "training", "bootcamp", "workshop", "academy", "1:1", "apply now",
+                    "strategy session", "consulting", "consultant", "join my program", "course", "premium"
+                ]
                 if any(term in desc_low for term in TEXT_SELLING_TERMS):
                     print(f"[Filter] {channel_title} textual selling mention in bio.")
                     continue
