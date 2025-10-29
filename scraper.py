@@ -153,22 +153,57 @@ def scrape_website_for_email(url):
 
 
 # --- High-ticket detection helpers ---
-HIGH_TICKET_PHRASES = [
-    "coaching", "mentorship", "course", "masterclass", "bootcamp",
-    "program", "enroll", "apply now", "join my program", "book a call",
-    "calendar", "strategy session", "cohort", "mastermind", "academy"
-]
 HIGH_TICKET_PLATFORMS = [
-    "teachable.com", "thinkific.com", "kajabi.com", "skool.com",
-    "systeme.io", "kartra.com", "clickfunnels.com", "podia.com",
-    "samcart.com", "udemy.com", "learnworlds.com", "memberful.com"
+    "skool.com", "calendly.com", "kajabi.com", "teachable.com", "thinkific.com",
+    "podia.com", "systeme.io", "kartra.com", "clickfunnels.com"
 ]
-PRICE_SIGNALS = ["$197", "$297", "$497", "$997", "$1997", "$2000", "$149", "$99", "$499"]
+
+HIGH_TICKET_PHRASES = [
+    "coaching", "mentorship", "masterclass", "apply", "book a call",
+    "strategy session", "bootcamp", "enroll", "program", "academy"
+]
 LOW_TICKET_SAFE = ["gumroad.com", "etsy.com", "ko-fi.com", "buymeacoffee.com", "patreon.com", "stan.store", "gumroadapp.com"]
 
-def looks_high_ticket(url):
-    """Return True if the given URL (or the page it points to) looks like a high-ticket/course/coaching page.
+# Aggregator domains for recursion
+AGGREGATOR_DOMAINS = ["linktr.ee", "beacons.ai", "bio.link"]
+
+def decode_youtube_redirect(url):
+    """
+    Decode a youtube.com/redirect?...q= URL or /redirect?...q= URL to its real destination, or return original if not a redirect.
+    """
+    from urllib.parse import urlparse, parse_qs, unquote
+    # Accept both absolute and relative forms
+    try:
+        if url.startswith("/redirect?") or "youtube.com/redirect" in url:
+            parsed = urlparse(url)
+            qs = parse_qs(parsed.query)
+            decoded = qs.get("q", [""])[0]
+            if decoded:
+                return unquote(decoded)
+    except Exception:
+        pass
+    return url
+
+def extract_prices(text):
+    """Extract all price-like patterns from text and return list of floats (USD-equivalent if possible)."""
+    # Match patterns like $199, €299, £1000, $1,997, $2,000 etc. (allow comma or dot as thousands separator)
+    matches = re.findall(r'[\$€£]\s?[\d,]+(?:\.\d{2})?', text)
+    prices = []
+    for m in matches:
+        # Strip currency, spaces, then parse number
+        val = re.sub(r'[^\d.,]', '', m)
+        val = val.replace(',', '')
+        try:
+            prices.append(float(val))
+        except Exception:
+            continue
+    return prices
+
+def looks_high_ticket(url, _rec_level=0):
+    """
+    Return True if the given URL (or the page it points to) looks like a high-ticket/course/coaching page.
     Conservative: prefers false negatives over false positives. Skips obvious low-ticket domains.
+    Recurses into aggregator pages (linktr.ee, beacons.ai, bio.link) up to 2 levels deep.
     """
     try:
         if not url or not url.startswith("http"):
@@ -177,25 +212,45 @@ def looks_high_ticket(url):
         # Skip known low-ticket storefronts
         if any(d in low for d in LOW_TICKET_SAFE):
             return False
-        # Quick platform check in the URL
+        # Quick platform check in the URL (only use HIGH_TICKET_PLATFORMS for URL/domain)
         if any(p in low for p in HIGH_TICKET_PLATFORMS):
             return True
         resp = safe_request_get(url, timeout=8)
         if not resp or resp.status_code != 200 or not getattr(resp, 'text', None):
             return False
-        # Deep scan for link aggregators (linktr.ee, beacons.ai)
-        if ("linktr.ee" in low or "beacons.ai" in low) and resp and resp.status_code == 200:
-            inner_links = re.findall(r'https?://[^\s"\'>)]+', resp.text)
-            for inner in inner_links[:10]:
+        # Recursively scan for aggregator domains (up to 2 levels deep)
+        if any(domain in low for domain in AGGREGATOR_DOMAINS) and _rec_level < 2:
+            # Find up to 10 outgoing links, decode redirects, recursively check
+            soup = BeautifulSoup(resp.text, "html.parser")
+            found_links = []
+            for a in soup.find_all("a", href=True):
+                href = a['href']
+                decoded = decode_youtube_redirect(href)
+                if decoded.startswith("http"):
+                    found_links.append(decoded)
+            # If not enough, fallback to regex
+            if len(found_links) < 3:
+                found_links += [decode_youtube_redirect(m) for m in re.findall(r'https?://[^\s"\'>)]+', resp.text)]
+            # Only keep unique links
+            seen = set()
+            outgoing = []
+            for l in found_links:
+                if l not in seen:
+                    outgoing.append(l)
+                    seen.add(l)
+            for inner in outgoing[:10]:
                 try:
-                    if looks_high_ticket(inner):
+                    if looks_high_ticket(inner, _rec_level=_rec_level+1):
                         return True
                 except Exception:
                     continue
+        # Scan page text for high-ticket phrases
         text = BeautifulSoup(resp.text, "html.parser").get_text(" ", strip=True).lower()
         if any(p in text for p in HIGH_TICKET_PHRASES):
             return True
-        if any(p.lower() in text for p in PRICE_SIGNALS):
+        # Dynamic price detection: extract all currency-number patterns and flag if any >= 200
+        prices = extract_prices(text)
+        if any(price >= 200 for price in prices):
             return True
         return False
     except Exception:
@@ -830,6 +885,81 @@ try:
                 if not (is_english(channel_title) or is_english(channel_description)):
                     continue
                 desc_low = channel_description.lower()
+
+                # === NEW: Scan channel bio text for direct URLs and check for high-ticket offers ===
+                # This runs before About-page scraping.
+                bio_urls = re.findall(r'(https?://[^\s]+)', channel_description)
+                checked_count = 0
+                for url in bio_urls:
+                    # Decode YouTube redirect links
+                    real_url = decode_youtube_redirect(url)
+                    url_low = real_url.lower()
+                    if any(domain in url_low for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"]):
+                        continue
+                    try:
+                        if looks_high_ticket(real_url):
+                            selling_clue = True
+                            print(f"[Filter] {channel_title} high-ticket link detected in bio: {real_url}")
+                            break
+                    except Exception:
+                        continue
+                    checked_count += 1
+                    if checked_count >= 5:
+                        break
+
+
+                # === NEW: Scrape YouTube About page for banner links (ytInitialData version) ===
+                about_urls = []
+                # Add robust About-page scraping with try/except, fallback, and rate-limiting
+                about_retries = 0
+                while about_retries < 3:
+                    try:
+                        handle = snippet.get("customUrl", "") or channel_title.replace(" ", "")
+                        about_page_url = f"https://www.youtube.com/channel/{channel_id}/about"
+                        resp_about = safe_request_get(about_page_url, timeout=8)
+                        if not resp_about or resp_about.status_code != 200 or not resp_about.text:
+                            raise Exception("No valid About page response")
+                        html_text = resp_about.text
+                        soup_about = BeautifulSoup(html_text, "html.parser")
+                        match = re.search(r'ytInitialData\s*=\s*(\{.*?\});', html_text, re.DOTALL)
+                        if match:
+                            try:
+                                yt_json = json.loads(match.group(1))
+                                header_links = yt_json.get("header", {}).get("c4TabbedHeaderRenderer", {}).get("headerLinks", {})
+                                all_links = []
+                                for sec in ["primaryLinks", "secondaryLinks"]:
+                                    for item in header_links.get(sec, []) or []:
+                                        url = item.get("navigationEndpoint", {}).get("urlEndpoint", {}).get("url", "")
+                                        if url:
+                                            all_links.append(url)
+                                for href in all_links:
+                                    decoded = decode_youtube_redirect(href)
+                                    if decoded.startswith("http"):
+                                        about_urls.append(decoded)
+                            except Exception as e:
+                                print(f"[AboutPageScrape] Failed to parse ytInitialData JSON: {e}")
+                        else:
+                            # Fallback to anchor-based scraping if ytInitialData not found
+                            for a_tag in soup_about.find_all("a", href=True):
+                                href = a_tag['href']
+                                decoded = decode_youtube_redirect(href)
+                                if decoded.startswith("http"):
+                                    about_urls.append(decoded)
+                        # Deep-scan extracted about page links
+                        for about_link in about_urls[:5]:
+                            low_link = about_link.lower()
+                            if any(domain in low_link for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"]):
+                                continue
+                            if looks_high_ticket(about_link):
+                                selling_clue = True
+                                print(f"[Filter] {channel_title} high-ticket link detected in About page: {about_link}")
+                                break
+                        break  # Success, break retry loop
+                    except Exception as e:
+                        about_retries += 1
+                        print(f"[AboutPageScrape] Error processing About page for {channel_title}: {e}")
+                        if about_retries < 3:
+                            time.sleep(2 * about_retries)
                 # Detect textual selling mentions in bio (expanded high-ticket terms)
                 TEXT_SELLING_TERMS = [
                     "coaching", "mentorship", "mentor", "apply", "book a call", "program", "enroll",
@@ -862,15 +992,8 @@ try:
                         if phrase in title_low:
                             selling_clue = True
                             break
-                # Platform anchor detection (channel_description and most recent non-short video description)
-                platform_anchors = [
-                    "teachable.com","kajabi.com","thinkific.com","gumroad.com","patreon.com","skool.com",
-                    "stan.store","linktr.ee","beacons.ai","calendly.com","clickfunnels.com","systeme.io",
-                    "kartra.com","samcart.com","podia.com","shopify.com","myshopify.com","buymeacoffee.com",
-                    "ko-fi.com","udemy.com","coursera.org","substack.com","typeform.com","paypal.me",
-                    "stripe.com","square.site","bigcartel.com","eventbrite.com"
-                ]
-                for anchor in platform_anchors:
+                # Platform anchor detection (channel_description for high-ticket platform domains only)
+                for anchor in HIGH_TICKET_PLATFORMS:
                     if anchor in desc_low:
                         selling_clue = True
                         break
@@ -878,10 +1001,65 @@ try:
                 uploads_playlist_id = get_uploads_playlist_id(ch)
                 if not uploads_playlist_id:
                     continue
+                # === ENHANCEMENT: Compute avg_views using last 5 videos (not just non-shorts), and scan their descriptions for links ===
+                # Fetch last 5 video IDs from uploads playlist
+                last5_playlist_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=5)
+                last5_ids = [v["id"] for v in last5_playlist_videos if v.get("id")]
+                last5_details_map = get_videos_details_batch(youtube, last5_ids)
+                # Get statistics/contentDetails for last 5, filter out shorts (<=60s), compute avg_views
+                non_short_last5 = []
+                from datetime import timedelta
+                def parse_iso8601_duration(iso):
+                    # Parse ISO 8601 duration (PT#H#M#S)
+                    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', iso)
+                    h, m, s = 0, 0, 0
+                    if match:
+                        h = int(match.group(1) or 0)
+                        m = int(match.group(2) or 0)
+                        s = int(match.group(3) or 0)
+                    return h * 3600 + m * 60 + s
+                video_desc_links = []
+                for v in last5_playlist_videos:
+                    vid = v.get("id")
+                    detail = last5_details_map.get(vid, {})
+                    title = detail.get("snippet", {}).get("title", v.get("title", ""))
+                    iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
+                    total_seconds = parse_iso8601_duration(iso_dur)
+                    # Only keep non-shorts
+                    if total_seconds > 60 and "#shorts" not in (title or "").lower():
+                        try:
+                            views = int(detail.get('statistics', {}).get('viewCount', 0))
+                        except:
+                            views = 0
+                        non_short_last5.append((title, views, total_seconds, vid, detail.get("snippet", {}).get("publishedAt", "")))
+                    # === ENHANCEMENT: Scan video description for links (for each of last 5 videos) ===
+                    desc = detail.get("snippet", {}).get("description", "")
+                    found_urls = re.findall(r'(https?://[^\s]+)', desc)
+                    for found_url in found_urls:
+                        decoded_url = decode_youtube_redirect(found_url)
+                        url_low = decoded_url.lower()
+                        # Skip social media
+                        if any(domain in url_low for domain in [
+                            "instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"
+                        ]):
+                            continue
+                        # Run high-ticket detection
+                        try:
+                            if looks_high_ticket(decoded_url):
+                                print(f"[Filter] {channel_title} high-ticket clue in video description link: {decoded_url}")
+                                selling_clue = True
+                        except Exception:
+                            continue
+                        video_desc_links.append(decoded_url)
+                # Compute average view count across non-short last 5
+                avg_views = 0
+                if non_short_last5:
+                    avg_views = sum(x[1] for x in non_short_last5) // len(non_short_last5)
+                # Now, continue with legacy logic for 15 most recent non-shorts for titles etc.
                 recent_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=20)
                 video_ids = [v["id"] for v in recent_videos if v.get("id")]
                 videos_details_map = get_videos_details_batch(youtube, video_ids)
-                # Filter out shorts and non-English, also check for platform anchors in recent video description
+                # Filter out shorts and non-English
                 non_shorts_video_data = []
                 most_recent_video_desc = ""
                 for idx, v in enumerate(recent_videos):
@@ -890,12 +1068,11 @@ try:
                     published_at = v.get("publishedAt", "")
                     detail = videos_details_map.get(vid, {})
                     iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
-                    match = re.match(r'PT((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)S)?', iso_dur)
-                    hours = int(match.group('h')) if match and match.group('h') else 0
-                    minutes = int(match.group('m')) if match and match.group('m') else 0
-                    seconds = int(match.group('s')) if match and match.group('s') else 0
-                    total_seconds = hours * 3600 + minutes * 60 + seconds
-                    if is_short_video(title, total_seconds):
+                    total_seconds = parse_iso8601_duration(iso_dur)
+                    # Exclude Shorts: any video <= 60s by ISO 8601 duration
+                    if total_seconds <= 60:
+                        continue
+                    if "#shorts" in (title or "").lower():
                         continue
                     if not is_english(title):
                         continue
@@ -905,13 +1082,14 @@ try:
                     except:
                         views = 0
                     non_shorts_video_data.append((title, views, total_seconds, vid, published_at))
-                    # Only check the most recent non-short video description for platform anchors
+                    # Only check the most recent non-short video description for later scan
                     if most_recent_video_desc == "" and isinstance(detail.get("snippet",{}).get("description",""), str):
                         most_recent_video_desc = detail.get("snippet",{}).get("description","")
-                # Check for platform anchors in most recent non-short video description
+
+                # Ensure recent video descriptions are scanned for high-ticket platform domains (after About-page scan)
                 if most_recent_video_desc:
                     desc_video_low = most_recent_video_desc.lower()
-                    for anchor in platform_anchors:
+                    for anchor in HIGH_TICKET_PLATFORMS:
                         if anchor in desc_video_low:
                             selling_clue = True
                             break
@@ -928,12 +1106,16 @@ try:
                 recent_nonshorts = [pub for pub in published_ats if pub and is_recent(pub)]
                 if len(recent_nonshorts) < 2:
                     continue
-                # avg views for 3 most recent non-shorts
-                non_shorts_top3 = non_shorts_video_data[:3]
-                if non_shorts_top3:
-                    avg_views = sum(x[1] for x in non_shorts_top3) // len(non_shorts_top3)
-                else:
-                    avg_views = 0
+                # If avg_views not set above (shouldn't happen), fallback to previous logic
+                if avg_views == 0:
+                    non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
+                    avg_sample = non_shorts_video_data_sorted[:5]
+                    if len(avg_sample) >= 3:
+                        avg_views = sum(x[1] for x in avg_sample[:3]) // 3
+                    elif avg_sample:
+                        avg_views = sum(x[1] for x in avg_sample) // len(avg_sample)
+                    else:
+                        avg_views = 0
                 # Require at least a 300 floor for average views (no % of subs)
                 if avg_views < 300:
                     continue
@@ -968,31 +1150,30 @@ try:
                 sample_published_at = published_ats[sample_idx] if published_ats else ""
                 all_links = re.findall(r'(https?://[^\s]+)', channel_description)
                 bio_link = '||'.join(all_links) if all_links else ""
-# Also extract links from the most recent non-short video description (if present)
+                # Also extract links from the most recent non-short video description (if present)
                 video_links = re.findall(r'(https?://[^\s]+)', most_recent_video_desc or "")
-# Combine links (bio first, then video links). Limit checks for speed.
-                combined_links = (all_links or []) + (video_links or [])
-
-# Quick high-ticket detection by visiting external links (limit to first 5 links)
+                # Combine links (bio first, then video links, then links from last 5 video descriptions). Limit checks for speed.
+                combined_links = (all_links or []) + (video_links or []) + (video_desc_links or [])
+                # Quick high-ticket detection by visiting external links (limit to first 5 links, decode redirects)
                 high_ticket_found = False
                 suspicious_link = None
                 for link in combined_links[:5]:
+                    real_link = decode_youtube_redirect(link)
                     try:
-                        if looks_high_ticket(link):
+                        if looks_high_ticket(real_link):
                             high_ticket_found = True
-                            suspicious_link = link
+                            suspicious_link = real_link
                             break
                     except Exception:
                         continue
-
                 if high_ticket_found:
                     print(f"[Filter] Skipping {channel_title} - high-ticket offer detected in external link: {suspicious_link}")
                     continue
-
-# If not high-ticket, attempt to scrape an email from the first few bio links (unchanged behavior)
+                # If not high-ticket, attempt to scrape an email from the first few bio links (decode redirects)
                 email = None
                 for single in (all_links or [])[:3]:
-                    email = scrape_website_for_email(single)
+                    real_single = decode_youtube_redirect(single)
+                    email = scrape_website_for_email(real_single)
                     if email:
                         break
                 # Sort non_shorts_video_data by published date descending and pick the most recent for sample
