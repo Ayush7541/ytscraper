@@ -152,6 +152,56 @@ def scrape_website_for_email(url):
         return None
 
 
+# --- High-ticket detection helpers ---
+HIGH_TICKET_PHRASES = [
+    "coaching", "mentorship", "course", "masterclass", "bootcamp",
+    "program", "enroll", "apply now", "join my program", "book a call",
+    "calendar", "strategy session", "cohort", "mastermind", "academy"
+]
+HIGH_TICKET_PLATFORMS = [
+    "teachable.com", "thinkific.com", "kajabi.com", "skool.com",
+    "systeme.io", "kartra.com", "clickfunnels.com", "podia.com",
+    "samcart.com", "udemy.com", "learnworlds.com", "memberful.com"
+]
+PRICE_SIGNALS = ["$197", "$297", "$497", "$997", "$1997", "$2000", "$149", "$99", "$499"]
+LOW_TICKET_SAFE = ["gumroad.com", "etsy.com", "ko-fi.com", "buymeacoffee.com", "patreon.com", "stan.store", "gumroadapp.com"]
+
+def looks_high_ticket(url):
+    """Return True if the given URL (or the page it points to) looks like a high-ticket/course/coaching page.
+    Conservative: prefers false negatives over false positives. Skips obvious low-ticket domains.
+    """
+    try:
+        if not url or not url.startswith("http"):
+            return False
+        low = url.lower()
+        # Skip known low-ticket storefronts
+        if any(d in low for d in LOW_TICKET_SAFE):
+            return False
+        # Quick platform check in the URL
+        if any(p in low for p in HIGH_TICKET_PLATFORMS):
+            return True
+        resp = safe_request_get(url, timeout=8)
+        if not resp or resp.status_code != 200 or not getattr(resp, 'text', None):
+            return False
+        # Deep scan for link aggregators (linktr.ee, beacons.ai)
+        if ("linktr.ee" in low or "beacons.ai" in low) and resp and resp.status_code == 200:
+            inner_links = re.findall(r'https?://[^\s"\'>)]+', resp.text)
+            for inner in inner_links[:10]:
+                try:
+                    if looks_high_ticket(inner):
+                        return True
+                except Exception:
+                    continue
+        text = BeautifulSoup(resp.text, "html.parser").get_text(" ", strip=True).lower()
+        if any(p in text for p in HIGH_TICKET_PHRASES):
+            return True
+        if any(p.lower() in text for p in PRICE_SIGNALS):
+            return True
+        return False
+    except Exception:
+        return False
+
+
 
 # ---------- OpenAI interactions ----------
 
@@ -265,6 +315,8 @@ These should receive a very low rating (0–3), since they are unlikely to be pe
 
 When considering monetization, only penalize channels that are selling or promoting paid courses, coaching, masterclasses, or similar educational products — these should receive a low rating (1–2).
 Do NOT penalize creators who monetize through Patreon, affiliate links, merch, donations, or ad revenue; these should not affect the rating.
+
+When rating, also consider that a high rating means the channel is NOT selling any high-ticket product or coaching (over $100). Prioritize creators who teach or share skills naturally without commercial intent.
 
 Consider presence of selling language, call-to-actions, professionalism, and view counts.
 Respond with a single integer between 0 and 10 and nothing else.
@@ -778,6 +830,11 @@ try:
                 if not (is_english(channel_title) or is_english(channel_description)):
                     continue
                 desc_low = channel_description.lower()
+                # Detect textual selling mentions in bio
+                TEXT_SELLING_TERMS = ["coaching", "apply", "book a call", "program", "enroll", "1:1"]
+                if any(term in desc_low for term in TEXT_SELLING_TERMS):
+                    print(f"[Filter] {channel_title} textual selling mention in bio.")
+                    continue
                 BLACKLIST_KEYWORDS = [
                     "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
                 ]
@@ -907,6 +964,28 @@ try:
                 sample_published_at = published_ats[sample_idx] if published_ats else ""
                 all_links = re.findall(r'(https?://[^\s]+)', channel_description)
                 bio_link = '||'.join(all_links) if all_links else ""
+# Also extract links from the most recent non-short video description (if present)
+                video_links = re.findall(r'(https?://[^\s]+)', most_recent_video_desc or "")
+# Combine links (bio first, then video links). Limit checks for speed.
+                combined_links = (all_links or []) + (video_links or [])
+
+# Quick high-ticket detection by visiting external links (limit to first 5 links)
+                high_ticket_found = False
+                suspicious_link = None
+                for link in combined_links[:5]:
+                    try:
+                        if looks_high_ticket(link):
+                            high_ticket_found = True
+                            suspicious_link = link
+                            break
+                    except Exception:
+                        continue
+
+                if high_ticket_found:
+                    print(f"[Filter] Skipping {channel_title} - high-ticket offer detected in external link: {suspicious_link}")
+                    continue
+
+# If not high-ticket, attempt to scrape an email from the first few bio links (unchanged behavior)
                 email = None
                 for single in (all_links or [])[:3]:
                     email = scrape_website_for_email(single)
@@ -961,7 +1040,7 @@ try:
                 if unique_appended_this_run >= TARGET_LEADS:
                     stop_scraping = True
                     break
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                time.sleep(DELAY_BETWEEN_REQUESTS * random.uniform(0.8, 1.3))
         # Mark keyword as exhausted if no lead found
         if title_keyword_lead_count == 0:
             exhausted_keywords.add(video_title_keyword)
