@@ -1128,7 +1128,7 @@ try:
                     print(f"[Rate] {channel_title} -> rating {rating}")
                     if rating is None:
                         rating = 4
-                    if rating < 4:
+                    if rating < 3:
                         continue
                 # Extract sample video info
                 sample_idx = 0
