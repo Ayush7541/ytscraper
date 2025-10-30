@@ -199,6 +199,8 @@ def extract_prices(text):
             continue
     return prices
 
+HIGH_TICKET_PRICE_THRESHOLD = 1000
+
 def looks_high_ticket(url, _rec_level=0):
     """
     Return True if the given URL (or the page it points to) looks like a high-ticket/course/coaching page.
@@ -248,9 +250,9 @@ def looks_high_ticket(url, _rec_level=0):
         text = BeautifulSoup(resp.text, "html.parser").get_text(" ", strip=True).lower()
         if any(p in text for p in HIGH_TICKET_PHRASES):
             return True
-        # Dynamic price detection: extract all currency-number patterns and flag if any >= 200
+        # Dynamic price detection: extract all currency-number patterns and flag if any >= HIGH_TICKET_PRICE_THRESHOLD
         prices = extract_prices(text)
-        if any(price >= 200 for price in prices):
+        if any(price >= HIGH_TICKET_PRICE_THRESHOLD for price in prices):
             return True
         return False
     except Exception:
@@ -737,12 +739,20 @@ BLACKLIST_KEYWORDS = [
     "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
 ]
 
+
 def is_short_video(title, duration_seconds):
     if "#shorts" in (title or "").lower():
         return True
     if duration_seconds is not None and duration_seconds <= 60:
         return True
     return False
+
+def parse_dt_safe(dtstr):
+    """Safely parse YouTube datetime strings like '2023-05-14T15:22:00Z' into datetime objects."""
+    try:
+        return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
+    except Exception:
+        return datetime.min
 
 def save_all_state_periodically():
     added = 0
@@ -909,6 +919,7 @@ try:
 
 
                 # === NEW: Scrape YouTube About page for banner links (ytInitialData version) ===
+                RETAIL_DOMAINS = ["canon.", "amazon.", "ebay.", "bhphotovideo.", "bestbuy.", "walmart.", "shopify.", "etsy."]
                 about_urls = []
                 # Add robust About-page scraping with try/except, fallback, and rate-limiting
                 about_retries = 0
@@ -920,7 +931,7 @@ try:
                         if not resp_about or resp_about.status_code != 200 or not resp_about.text:
                             raise Exception("No valid About page response")
                         html_text = resp_about.text
-                        soup_about = BeautifulSoup(html_text, "html.parser")
+                        # Only extract from ytInitialData (headerLinks)
                         match = re.search(r'ytInitialData\s*=\s*(\{.*?\});', html_text, re.DOTALL)
                         if match:
                             try:
@@ -938,17 +949,12 @@ try:
                                         about_urls.append(decoded)
                             except Exception as e:
                                 print(f"[AboutPageScrape] Failed to parse ytInitialData JSON: {e}")
-                        else:
-                            # Fallback to anchor-based scraping if ytInitialData not found
-                            for a_tag in soup_about.find_all("a", href=True):
-                                href = a_tag['href']
-                                decoded = decode_youtube_redirect(href)
-                                if decoded.startswith("http"):
-                                    about_urls.append(decoded)
+                        # Remove fallback extraction (anchor tags and regex)
                         # Deep-scan extracted about page links
+                        print(f"[AboutLinks] {channel_title} visible links: {about_urls}")
                         for about_link in about_urls[:5]:
                             low_link = about_link.lower()
-                            if any(domain in low_link for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"]):
+                            if any(domain in low_link for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"] + RETAIL_DOMAINS):
                                 continue
                             if looks_high_ticket(about_link):
                                 selling_clue = True
@@ -1032,25 +1038,6 @@ try:
                         except:
                             views = 0
                         non_short_last5.append((title, views, total_seconds, vid, detail.get("snippet", {}).get("publishedAt", "")))
-                    # === ENHANCEMENT: Scan video description for links (for each of last 5 videos) ===
-                    desc = detail.get("snippet", {}).get("description", "")
-                    found_urls = re.findall(r'(https?://[^\s]+)', desc)
-                    for found_url in found_urls:
-                        decoded_url = decode_youtube_redirect(found_url)
-                        url_low = decoded_url.lower()
-                        # Skip social media
-                        if any(domain in url_low for domain in [
-                            "instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"
-                        ]):
-                            continue
-                        # Run high-ticket detection
-                        try:
-                            if looks_high_ticket(decoded_url):
-                                print(f"[Filter] {channel_title} high-ticket clue in video description link: {decoded_url}")
-                                selling_clue = True
-                        except Exception:
-                            continue
-                        video_desc_links.append(decoded_url)
                 # Compute average view count across non-short last 5
                 avg_views = 0
                 if non_short_last5:
@@ -1152,23 +1139,24 @@ try:
                 bio_link = '||'.join(all_links) if all_links else ""
                 # Also extract links from the most recent non-short video description (if present)
                 video_links = re.findall(r'(https?://[^\s]+)', most_recent_video_desc or "")
-                # Combine links (bio first, then video links, then links from last 5 video descriptions). Limit checks for speed.
-                combined_links = (all_links or []) + (video_links or []) + (video_desc_links or [])
-                # Quick high-ticket detection by visiting external links (limit to first 5 links, decode redirects)
-                high_ticket_found = False
-                suspicious_link = None
-                for link in combined_links[:5]:
-                    real_link = decode_youtube_redirect(link)
-                    try:
-                        if looks_high_ticket(real_link):
-                            high_ticket_found = True
-                            suspicious_link = real_link
-                            break
-                    except Exception:
+                # Combine links (bio first, then video links). Limit checks for speed.
+                if not selling_clue:
+                    combined_links = (all_links or []) + (video_links or [])
+                    # Quick high-ticket detection by visiting external links (limit to first 5 links, decode redirects)
+                    high_ticket_found = False
+                    suspicious_link = None
+                    for link in combined_links[:5]:
+                        real_link = decode_youtube_redirect(link)
+                        try:
+                            if looks_high_ticket(real_link):
+                                high_ticket_found = True
+                                suspicious_link = real_link
+                                break
+                        except Exception:
+                            continue
+                    if high_ticket_found:
+                        print(f"[Filter] Skipping {channel_title} - high-ticket offer detected in external link: {suspicious_link}")
                         continue
-                if high_ticket_found:
-                    print(f"[Filter] Skipping {channel_title} - high-ticket offer detected in external link: {suspicious_link}")
-                    continue
                 # If not high-ticket, attempt to scrape an email from the first few bio links (decode redirects)
                 email = None
                 for single in (all_links or [])[:3]:
@@ -1177,11 +1165,6 @@ try:
                     if email:
                         break
                 # Sort non_shorts_video_data by published date descending and pick the most recent for sample
-                def parse_dt_safe(dtstr):
-                    try:
-                        return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
-                    except Exception:
-                        return datetime.min
                 non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
                 sample_video_title = non_shorts_video_data_sorted[0][0] if non_shorts_video_data_sorted else ""
                 sample_video_id = non_shorts_video_data_sorted[0][3] if non_shorts_video_data_sorted else ""
