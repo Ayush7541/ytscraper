@@ -1219,6 +1219,11 @@ try:
                     continue
                 # Positive signal: selling phrases in recent titles
                 if not selling_clue:
+                    selling_phrases = [
+                        "course", "coaching", "enroll", "academy", "program",
+                        "class", "masterclass", "bootcamp", "mentorship",
+                        "learn", "training", "join now", "sign up"
+                    ]
                     for phrase in selling_phrases:
                         if phrase in titles_low:
                             selling_clue = True
