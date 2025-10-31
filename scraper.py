@@ -898,18 +898,59 @@ try:
 
                 # === NEW: Scan channel bio text for direct URLs and check for high-ticket offers ===
                 # This runs before About-page scraping.
-                bio_urls = re.findall(r'(https?://[^\s]+)', channel_description)
-                checked_count = 0
-                for url in bio_urls:
+                # Refined extraction: match http(s) URLs and bare domains, skip emails and trailing punctuation.
+                import urllib.parse
+                # 1. Extract all http(s) URLs
+                bio_urls = re.findall(r'(https?://[^\s\'"<>),;]+)', channel_description or "") or []
+                # 2. Extract bare domains (no http/https), but not emails
+                bare_domains = re.findall(
+                    r'(?<!@)\b(?:www\.)?[a-zA-Z0-9-]+\.(?:com|net|org|io|co|ai|app|me|store|academy|site|dev|us|uk)(?:/[^\s\'"<>),;]*)?', channel_description or ""
+                )
+                # Remove duplicates and those already starting with http
+                bare_domains = [d for d in bare_domains if not d.startswith("http")]
+                # 3. Remove trailing punctuation from each
+                def trim_punct(u):
+                    return u.rstrip('.,;:!?)\'"')
+                bio_urls = [trim_punct(u) for u in bio_urls]
+                bare_domains = [trim_punct(u) for u in bare_domains]
+                # 4. Prepend https:// to bare domains
+                normalized_domains = []
+                for d in bare_domains:
+                    if not d.lower().startswith("http"):
+                        normalized_domains.append("https://" + d)
+                # 5. Merge and dedupe, decode YouTube redirect, normalize scheme, validate URLs
+                all_bio_links = list(dict.fromkeys(bio_urls + normalized_domains))
+                normalized_bio_links = []
+                for url in all_bio_links:
                     # Decode YouTube redirect links
                     real_url = decode_youtube_redirect(url)
-                    url_low = real_url.lower()
+                    # Prepend https:// if missing scheme
+                    if not re.match(r'^https?://', real_url, re.I):
+                        real_url = "https://" + real_url
+                    # Validate using urllib.parse
+                    try:
+                        parsed = urllib.parse.urlparse(real_url)
+                        if not parsed.netloc:
+                            continue
+                        # Skip emails
+                        if "@" in parsed.netloc:
+                            continue
+                        # Remove trailing punctuation again
+                        real_url = trim_punct(real_url)
+                        normalized_bio_links.append(real_url)
+                    except Exception:
+                        continue
+                # Only keep unique
+                normalized_bio_links = list(dict.fromkeys(normalized_bio_links))
+                checked_count = 0
+                for url in normalized_bio_links:
+                    url_low = url.lower()
                     if any(domain in url_low for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"]):
                         continue
                     try:
-                        if looks_high_ticket(real_url):
+                        if looks_high_ticket(url):
                             selling_clue = True
-                            print(f"[Filter] {channel_title} high-ticket link detected in bio: {real_url}")
+                            print(f"[Filter] {channel_title} high-ticket link detected in bio: {url}")
                             break
                     except Exception:
                         continue
@@ -921,8 +962,10 @@ try:
                 # === NEW: Scrape YouTube About page for banner links (ytInitialData version) ===
                 RETAIL_DOMAINS = ["canon.", "amazon.", "ebay.", "bhphotovideo.", "bestbuy.", "walmart.", "shopify.", "etsy."]
                 about_urls = []
+                normalized_about_links = []
                 # Add robust About-page scraping with try/except, fallback, and rate-limiting
                 about_retries = 0
+                yt_json = None
                 while about_retries < 3:
                     try:
                         handle = snippet.get("customUrl", "") or channel_title.replace(" ", "")
@@ -945,14 +988,58 @@ try:
                                             all_links.append(url)
                                 for href in all_links:
                                     decoded = decode_youtube_redirect(href)
-                                    if decoded.startswith("http"):
-                                        about_urls.append(decoded)
+                                    # Normalize if missing scheme
+                                    if not re.match(r'^https?://', decoded, re.I):
+                                        decoded = "https://" + decoded
+                                    normalized_about_links.append(decoded)
                             except Exception as e:
                                 print(f"[AboutPageScrape] Failed to parse ytInitialData JSON: {e}")
-                        # Remove fallback extraction (anchor tags and regex)
+                        # Fallback: if header_links were not found or about_urls empty, search for any nested urlEndpoints
+                        if (not normalized_about_links) and yt_json:
+                            def find_url_endpoints(obj):
+                                found = []
+                                if isinstance(obj, dict):
+                                    if "urlEndpoint" in obj and isinstance(obj["urlEndpoint"], dict):
+                                        url = obj["urlEndpoint"].get("url", "")
+                                        if url:
+                                            found.append(url)
+                                    for v in obj.values():
+                                        found.extend(find_url_endpoints(v))
+                                elif isinstance(obj, list):
+                                    for item in obj:
+                                        found.extend(find_url_endpoints(item))
+                                return found
+                            fallback_links = find_url_endpoints(yt_json)
+                            # Normalize and dedupe
+                            for href in fallback_links:
+                                decoded = decode_youtube_redirect(href)
+                                if not re.match(r'^https?://', decoded, re.I):
+                                    decoded = "https://" + decoded
+                                if decoded not in normalized_about_links:
+                                    normalized_about_links.append(decoded)
+                        # Final fallback: regex scan all hrefs if no links found yet
+                        if not normalized_about_links:
+                            regex_links = re.findall(r'href=["\'](https?://[^\s"\']+)["\']', html_text)
+                            for href in regex_links:
+                                decoded = decode_youtube_redirect(href)
+                                if not re.match(r'^https?://', decoded, re.I):
+                                    decoded = "https://" + decoded
+                                try:
+                                    parsed = urllib.parse.urlparse(decoded)
+                                    if not parsed.netloc:
+                                        continue
+                                    if "@" in parsed.netloc:
+                                        continue
+                                    normalized_about_links.append(decoded.rstrip('.,;:!?)\'"'))
+                                except Exception:
+                                    continue
+                            # Deduplicate
+                            normalized_about_links = list(dict.fromkeys(normalized_about_links))
+                            if normalized_about_links:
+                                print(f"[AboutPageFallback] {channel_title} regex-based links found: {normalized_about_links}")
                         # Deep-scan extracted about page links
-                        print(f"[AboutLinks] {channel_title} visible links: {about_urls}")
-                        for about_link in about_urls[:5]:
+                        print(f"[AboutLinks] {channel_title} visible links: {normalized_about_links}")
+                        for about_link in normalized_about_links[:5]:
                             low_link = about_link.lower()
                             if any(domain in low_link for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"] + RETAIL_DOMAINS):
                                 continue
@@ -966,11 +1053,32 @@ try:
                         print(f"[AboutPageScrape] Error processing About page for {channel_title}: {e}")
                         if about_retries < 3:
                             time.sleep(2 * about_retries)
+                # === Merge About links with normalized bio links for high-ticket scanning ===
+                all_links = []
+                # Normalize and dedupe all About links (decode redirects, add https:// if missing, validate netloc)
+                import urllib.parse
+                about_links_final = []
+                for url in normalized_about_links:
+                    decoded = decode_youtube_redirect(url)
+                    if not re.match(r'^https?://', decoded, re.I):
+                        decoded = "https://" + decoded
+                    try:
+                        parsed = urllib.parse.urlparse(decoded)
+                        if not parsed.netloc:
+                            continue
+                        if "@" in parsed.netloc:
+                            continue
+                        about_links_final.append(decoded.rstrip('.,;:!?)\'"'))
+                    except Exception:
+                        continue
+                # Merge bio and about links (deduped)
+                all_links = list(dict.fromkeys(normalized_bio_links + about_links_final))
                 # Detect textual selling mentions in bio (expanded high-ticket terms)
                 TEXT_SELLING_TERMS = [
-                    "coaching", "mentorship", "mentor", "apply", "book a call", "program", "enroll",
+                    "coaching", "mentorship", "mentor", "book a call", "program", "enroll",
                     "masterclass", "training", "bootcamp", "workshop", "academy", "1:1", "apply now",
-                    "strategy session", "consulting", "consultant", "join my program", "course", "premium"
+                    "strategy session", "consulting", "consultant", "join my program", "course", "premium",
+                    "bundle"
                 ]
                 if any(term in desc_low for term in TEXT_SELLING_TERMS):
                     print(f"[Filter] {channel_title} textual selling mention in bio.")
@@ -980,21 +1088,21 @@ try:
                 ]
                 if any(bk.lower() in desc_low for bk in BLACKLIST_KEYWORDS):
                     continue
-                # Selling clue heuristics: selling phrases
-                selling_phrases = [
-                    "course", "coaching", "mentorship", "lead magnet", "skool", "membership", "masterclass",
-                    "webinar", "consulting", "enroll", "join my program", "apply now", "enroll now", "sign up",
+                # Selling clue heuristics: selling phrases (expanded)
+                SELLING_PHRASES = [
+                    "course", "coaching", "mentorship", "lead magnet", "skool", "masterclass",
+                    "webinar", "consulting", "enroll", "join my program", "enroll now", "sign up",
                     "free training", "program", "bootcamp", "challenge", "academy", "mastermind", "cohort",
-                    "book a call", "strategy call", "free class", "training program"
+                    "book a call", "strategy call", "free class", "training program", "bundle", "training"
                 ]
-                for phrase in selling_phrases:
+                for phrase in SELLING_PHRASES:
                     if phrase in desc_low:
                         selling_clue = True
                         break
                 # Also look for selling language in the channel title
                 title_low = channel_title.lower()
                 if not selling_clue:
-                    for phrase in selling_phrases:
+                    for phrase in SELLING_PHRASES:
                         if phrase in title_low:
                             selling_clue = True
                             break
@@ -1135,8 +1243,8 @@ try:
                 sample_video_title = recent_titles[sample_idx] if recent_titles else ""
                 sample_video_id = video_ids_nonshorts[sample_idx] if video_ids_nonshorts else ""
                 sample_published_at = published_ats[sample_idx] if published_ats else ""
-                all_links = re.findall(r'(https?://[^\s]+)', channel_description)
-                bio_link = '||'.join(all_links) if all_links else ""
+                # For output: join all normalized bio links (including normalized bare domains)
+                bio_link = '||'.join(normalized_bio_links) if normalized_bio_links else ""
                 # Also extract links from the most recent non-short video description (if present)
                 video_links = re.findall(r'(https?://[^\s]+)', most_recent_video_desc or "")
                 # Combine links (bio first, then video links). Limit checks for speed.
