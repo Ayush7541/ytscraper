@@ -59,8 +59,9 @@ API_KEYS = [
     "AIzaSyDe7axLxXM73cBwgWVIiExaxFPo504cTPA",
     "AIzaSyDhe5odit54OSGWZ4BxDw4-5WO76uYBffE",
     "AIzaSyB2p8GXoG_AOm9TEDmqpoQiHoyO7IIe3eU",
-    "AIzaSyC2m0NfOQKRuqDPhGucSw22ih3TrYbVoVY"
-
+    "AIzaSyC2m0NfOQKRuqDPhGucSw22ih3TrYbVoVY",
+    "AIzaSyA8cBjcsrJQCtbh0fID0BUDdAZB8jwG5vI",
+    "AIzaSyC3ziU3IdKt91DFt5XGE4HVepSYs4PDlA4"
 ]
 
 # OpenAI key via env var preferred
