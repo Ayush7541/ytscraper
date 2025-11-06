@@ -1,5 +1,3 @@
-consecutive_quota_errors = 0
-stop_scraping = False
 import random
 import time
 import sys
@@ -155,43 +153,108 @@ def scrape_website_for_email(url):
         return None
 
 
-def looks_high_ticket_simple(text):
+# --- High-ticket detection helpers ---
+HIGH_TICKET_PLATFORMS = [
+    "skool.com", "calendly.com", "kajabi.com", "teachable.com", "thinkific.com",
+    "podia.com", "systeme.io", "kartra.com", "clickfunnels.com"
+]
+
+HIGH_TICKET_PHRASES = [
+    "coaching", "mentorship", "masterclass", "apply", "book a call",
+    "strategy session", "bootcamp", "enroll", "program", "academy"
+]
+LOW_TICKET_SAFE = ["gumroad.com", "etsy.com", "ko-fi.com", "buymeacoffee.com", "patreon.com", "stan.store", "gumroadapp.com"]
+
+# Aggregator domains for recursion
+AGGREGATOR_DOMAINS = ["linktr.ee", "beacons.ai", "bio.link"]
+
+def decode_youtube_redirect(url):
     """
-    Conservative high-ticket detector for scraper old: 
-    - Accepts a string (bio text or URL).
-    - Returns True if it contains platform anchors, high-ticket phrases, or explicit price >= $1000.
+    Decode a youtube.com/redirect?...q= URL or /redirect?...q= URL to its real destination, or return original if not a redirect.
+    """
+    from urllib.parse import urlparse, parse_qs, unquote
+    # Accept both absolute and relative forms
+    try:
+        if url.startswith("/redirect?") or "youtube.com/redirect" in url:
+            parsed = urlparse(url)
+            qs = parse_qs(parsed.query)
+            decoded = qs.get("q", [""])[0]
+            if decoded:
+                return unquote(decoded)
+    except Exception:
+        pass
+    return url
+
+def extract_prices(text):
+    """Extract all price-like patterns from text and return list of floats (USD-equivalent if possible)."""
+    # Match patterns like $199, €299, £1000, $1,997, $2,000 etc. (allow comma or dot as thousands separator)
+    matches = re.findall(r'[\$€£]\s?[\d,]+(?:\.\d{2})?', text)
+    prices = []
+    for m in matches:
+        # Strip currency, spaces, then parse number
+        val = re.sub(r'[^\d.,]', '', m)
+        val = val.replace(',', '')
+        try:
+            prices.append(float(val))
+        except Exception:
+            continue
+    return prices
+
+HIGH_TICKET_PRICE_THRESHOLD = 1000
+
+def looks_high_ticket(url, _rec_level=0):
+    """
+    Return True if the given URL (or the page it points to) looks like a high-ticket/course/coaching page.
+    Conservative: prefers false negatives over false positives. Skips obvious low-ticket domains.
+    Recurses into aggregator pages (linktr.ee, beacons.ai, bio.link) up to 2 levels deep.
     """
     try:
-        if not text:
+        if not url or not url.startswith("http"):
             return False
-        low = str(text).lower()
-        # Quick domain/platform anchors
-        anchors = [
-            "skool.com","kajabi.com","teachable.com","thinkific.com","podia.com",
-            "systeme.io","kartra.com","clickfunnels.com","calendly.com","skool",
-            "stan.store","stanstore"
-        ]
-        for a in anchors:
-            if a in low:
-                return True
-        # Selling phrases
-        phrases = [
-            "coaching", "mentorship", "masterclass", "apply", "book a call",
-            "strategy session", "bootcamp", "enroll", "program", "academy",
-            "membership", "masterclass", "one-on-one", "1:1", "private coaching"
-        ]
-        for p in phrases:
-            if p in low:
-                return True
-        # Price detection: $1,000 or more patterns
-        money_matches = re.findall(r'[\$€£]\s?[\d,]+(?:\.\d{2})?', low)
-        for m in money_matches:
-            num = re.sub(r'[^\d.]', '', m).replace(',', '')
-            try:
-                if float(num) >= 1000:
-                    return True
-            except:
-                continue
+        low = url.lower()
+        # Skip known low-ticket storefronts
+        if any(d in low for d in LOW_TICKET_SAFE):
+            return False
+        # Quick platform check in the URL (only use HIGH_TICKET_PLATFORMS for URL/domain)
+        if any(p in low for p in HIGH_TICKET_PLATFORMS):
+            return True
+        resp = safe_request_get(url, timeout=8)
+        if not resp or resp.status_code != 200 or not getattr(resp, 'text', None):
+            return False
+        # Recursively scan for aggregator domains (up to 2 levels deep)
+        if any(domain in low for domain in AGGREGATOR_DOMAINS) and _rec_level < 2:
+            # Find up to 10 outgoing links, decode redirects, recursively check
+            soup = BeautifulSoup(resp.text, "html.parser")
+            found_links = []
+            for a in soup.find_all("a", href=True):
+                href = a['href']
+                decoded = decode_youtube_redirect(href)
+                if decoded.startswith("http"):
+                    found_links.append(decoded)
+            # If not enough, fallback to regex
+            if len(found_links) < 3:
+                found_links += [decode_youtube_redirect(m) for m in re.findall(r'https?://[^\s"\'>)]+', resp.text)]
+            # Only keep unique links
+            seen = set()
+            outgoing = []
+            for l in found_links:
+                if l not in seen:
+                    outgoing.append(l)
+                    seen.add(l)
+            for inner in outgoing[:10]:
+                try:
+                    if looks_high_ticket(inner, _rec_level=_rec_level+1):
+                        return True
+                except Exception:
+                    continue
+        # Scan page text for high-ticket phrases
+        text = BeautifulSoup(resp.text, "html.parser").get_text(" ", strip=True).lower()
+        if any(p in text for p in HIGH_TICKET_PHRASES):
+            return True
+        # Dynamic price detection: extract all currency-number patterns and flag if any >= HIGH_TICKET_PRICE_THRESHOLD
+        prices = extract_prices(text)
+        if any(price >= HIGH_TICKET_PRICE_THRESHOLD for price in prices):
+            return True
         return False
     except Exception:
         return False
@@ -212,87 +275,37 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-You are an expert YouTube researcher helping a growth operator find creators who teach real, monetizable skills.
+Generate 25–30 diverse and realistic YouTube creator video titles from a wide range of skill-building, growth, or transformation-focused niches (fitness, nutrition, dance, mindset, journaling, cooking, music, photography, productivity, communication, self-improvement, yoga, language learning, public speaking, etc.).
+Also include moderately popular, creative, and hobby-style niches that attract passionate creators who teach and share (for example: calligraphy, pottery, journaling, bullet journaling, baking, cake decorating, pet training, amateur photography, DIY crafts, bonsai/urban gardening, creative writing, poetry, tarot, astrology, soap making, candle making, musical instruments, painting, drawing, board games, tabletop RPGs, etc.).
+Avoid heavy craftsmanship or tool-dependent fields like woodworking, leather craft, resin art, or vintage restoration that are hard to scale into educational programs.
 
-Your job: generate a large, diverse list of realistic YouTube video titles that represent creators whose audiences would pay for coaching, courses, or Skool communities.
+Avoid girl-centric or overly feminine niches such as makeup, skincare, fashion, nail art, lifestyle vlogs, relationship advice, or beauty routines. Focus instead on skill-based, passion, or creativity-oriented niches that appeal broadly to all genders.
 
-These should be creators who teach, share, or demonstrate *a skill, method, or transformation* — not vloggers or entertainers.
+Prioritize creators who are **skilled, consistent, and passionate**, but not obviously business-oriented.
+These are creators who make content because they love teaching or helping others — not because they’re focused on monetization.
+They should already have some followers and produce quality educational or tutorial-style videos, but without talking about “money,” “clients,” “sales,” or “business.”
 
-Return ONLY a valid JSON array of objects.
-Each object must have these keys:
-{
-  "title": "string — a realistic YouTube video title (6–12 words)",
-  "niche": "string — short phrase naming the creator's main niche",
-  "problem_solved": "string — short line describing the transformation or skill taught",
-  "audience_profile": "string — who would pay for this (e.g. beginners, hobbyists, freelancers, men 20-35, etc.)",
-  "monetization_fit": "one of ['course','skool_community','coaching','template_pack','membership','unknown']",
-  "is_local_service": true/false (true if it depends on in-person/local delivery)
-}
+Avoid any video titles that contain or imply monetization, business, or income-related language.
+Specifically avoid words or ideas related to:
+“money,” “income,” “profit,” “revenue,” “clients,” “sales,” “marketing,” “agency,” “hustle,” “affiliate,” “dropshipping,” “make money,” “side hustle,” “business,” “entrepreneur,” or “coaching program.”
 
-### GUIDELINES
+Each title should sound like a real YouTube upload — personal, helpful, or inspiring.
+Use natural language and realistic tone (e.g., “How I Improved My Posture at Home” or “My 5-Minute Morning Journal Routine”).
+You can mix formats such as tutorials, day-in-the-life, personal journeys, or progress updates.
 
-1. **Core idea:** Pick niches where you could easily build a digital product or Skool community.
-   - Anything where people learn, practice, or improve a skill.
-   - Anything where people want transformation (health, mindset, performance, relationships, creative mastery).
-   - Avoid vloggers, podcasts, pure entertainment, or local service businesses.
+Return ONLY a valid JSON array of strings.
 
-2. **Diversity requirement:** 
-   - Don’t stick to the same 20–30 niches. Cover hundreds of possible fields across *arts, skills, hobbies, professions, and self-improvement topics*.
-   - Go beyond the classic “health, wealth, relationships” categories. Include blue ocean niches where other growth operators rarely look — areas of genuine passion, creativity, and niche mastery that still have monetizable audiences.
-   - Example categories to sample from:
-     - Arts & Creative: calligraphy, journaling, drawing, painting, pottery, woodworking, crocheting, knitting, embroidery, resin art, candle making, soap making.
-     - Music & Performance: guitar, piano, singing, music production, songwriting, DJing, dance, acting, public speaking.
-     - Digital Skills: video editing, 3D printing, graphic design, animation, coding, app development, Photoshop, filmmaking.
-     - Personal Growth: masculinity, mindset, fitness, meditation, productivity, confidence, habits, discipline, dating, breathwork.
-     - Animals & Nature: dog training, horse care, aquarium setup, gardening, bonsai, aquascaping, permaculture, homesteading.
-     - Food & Lifestyle (educational): sourdough baking, meal prep, barista skills, nutrition, fermentation, vegan cooking.
-     - Education & Communication: language learning, pronunciation, public speaking, teaching skills, storytelling, coaching communication.
-     - Handcraft & Repair: leatherwork, jewelry making, electronics repair, bike maintenance, car detailing, knife making, DIY home repair.
-     - Niche Professions: UX/UI, freelancing, photography, drone cinematography, Shopify, eBay flipping, niche e-commerce, course creation, digital marketing (ethical).
-     - Spiritual & Esoteric (educational only): tarot reading, astrology, manifestation, energy work, meditation, yoga teaching.
-     - Blue Ocean Niches (uncommon but monetizable):
-         - Memory improvement, handwriting analysis, lucid dreaming, creative journaling, emotional release, minimalism, decluttering, ethical hacking, drone repair, sound healing, intuitive eating, vocal toning, self-defense, woodworking restoration, AI voiceover tutorials, kinetic typography, AR/VR art, board game design, homestead architecture, mapmaking, foraging, mushroom cultivation, survival skills, somatic movement, philosophy simplification, life journaling, and historical re-enactment education.
-
-3. **Bad/Skip niches:** 
-   - Local-only services (plumbing, real estate, solar, pest control, salons, construction).
-   - Medical or regulated services (doctors, dentists, therapists, clinics, pharmacies).
-   - Lifestyle vlogs, general podcasts, entertainment/news channels.
-   - Influencer or fashion/beauty content.
-   - Anything that can’t scale digitally.
-
-4. **Content style:**
-   - Natural, real YouTube titles like:
-     - “How I Fixed My Dog’s Separation Anxiety”
-     - “Sourdough Starter Guide for Absolute Beginners”
-     - “My Bullet Journaling System for Focus & Clarity”
-     - “How I Learned 3D Printing in 30 Days”
-     - “5 Mistakes New Woodworkers Make (and How to Avoid Them)”
-     - “Learn Tarot Card Meanings the Simple Way”
-     - “Guitar Warmups That Changed My Playing Forever”
-     - “From Couch to Confident: Men’s Self-Mastery Routine”
-   - Avoid clickbait or overly salesy tone.
-
-5. **Monetization relevance:**
-   - The creator should be *teaching or demonstrating* something their audience wants to master.
-   - Their audience should logically pay for structured learning, accountability, templates, or coaching.
-   - Assume these creators could afford $200–$500/month in software & tools.
-
-6. **Output Requirements:**
-   - Return 60–100 unique JSON objects.
-   - Ensure at least 70% have `"is_local_service": false`.
-   - Spread evenly across at least 10 broad categories, including at least 10 blue ocean niches.
-   - Avoid duplicate or highly similar niches.
-
-### EXAMPLE OUTPUT
-[
-  {"title":"How I Tamed My Reactive Dog in 3 Weeks","niche":"dog training","problem_solved":"stop barking and leash aggression","audience_profile":"pet owners who want obedient dogs","monetization_fit":"course","is_local_service":false},
-  {"title":"My Journaling Routine for Mental Clarity","niche":"journaling","problem_solved":"reduce anxiety and build focus","audience_profile":"young professionals and students","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Mastering Hand-Carved Furniture from Scratch","niche":"woodworking","problem_solved":"build furniture with hand tools","audience_profile":"DIY hobbyists and aspiring craftsmen","monetization_fit":"course","is_local_service":false},
-  {"title":"How to Read Tarot Cards for Beginners","niche":"tarot reading","problem_solved":"understand symbolism and intuition","audience_profile":"spiritual learners","monetization_fit":"membership","is_local_service":false},
-  {"title":"Learn Crochet Patterns in 7 Days","niche":"crocheting","problem_solved":"make wearable patterns easily","audience_profile":"craft lovers, homemakers","monetization_fit":"course","is_local_service":false},
-  {"title":"Lucid Dreaming Techniques for Beginners","niche":"lucid dreaming","problem_solved":"control your dreams consciously","audience_profile":"spiritual self-explorers and meditators","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Foraging Wild Edible Plants in Your Area","niche":"foraging","problem_solved":"identify and safely harvest wild foods","audience_profile":"nature enthusiasts and survivalists","monetization_fit":"course","is_local_service":false}
-]
+Examples:
+1. "How I Fixed My Mobility With 10 Minutes a Day"
+2. "My Daily Journaling Routine for Focus and Clarity"
+3. "Singing Warm-Ups That Changed My Voice"
+4. "Cooking Healthy Meals Without Complicated Recipes"
+5. "Photography Tips That Instantly Improved My Shots"
+6. "Breathwork Exercises to Calm Anxiety"
+7. "3 Dance Drills That Boost My Balance"
+8. "Simple Guitar Practice Routine for Busy Beginners"
+9. "Learning Spanish Through Daily Stories"
+10. "Morning Stretch Flow for Productivity and Energy"
 """
 
     attempts, backoff = 3, 1
@@ -353,6 +366,16 @@ Recent Video Titles (pipe separated): {titles_pipe}
 Average Views per Video: {avg_views}
 
 If the YouTube bio or recent video titles contain non-English text (such as Spanish, Hindi, or any language other than English), give a rating less than 5.
+
+Avoid channels that are **companies, startups, software tools, agencies, or brands** rather than individual creators.
+Also avoid channels that are **girl-centric** or heavily focused on beauty, makeup, skincare, fashion, lifestyle vlogs, or relationship content. These should receive a very low rating (0–3) since they are not educational or skill-development focused.
+These should receive a very low rating (0–3), since they are unlikely to be personal creators who teach or build an audience-based business.
+
+When considering monetization, only penalize channels that are selling or promoting paid courses, coaching, masterclasses, or similar educational products — these should receive a low rating (1–2).
+Do NOT penalize creators who monetize through Patreon, affiliate links, merch, donations, or ad revenue; these should not affect the rating.
+
+When rating, also consider that a high rating means the channel is NOT selling any high-ticket product or coaching (over $100). Prioritize creators who teach or share skills naturally without commercial intent.
+
 Consider presence of selling language, call-to-actions, professionalism, and view counts.
 Respond with a single integer between 0 and 10 and nothing else.
 """
@@ -717,12 +740,20 @@ BLACKLIST_KEYWORDS = [
     "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
 ]
 
+
 def is_short_video(title, duration_seconds):
     if "#shorts" in (title or "").lower():
         return True
     if duration_seconds is not None and duration_seconds <= 60:
         return True
     return False
+
+def parse_dt_safe(dtstr):
+    """Safely parse YouTube datetime strings like '2023-05-14T15:22:00Z' into datetime objects."""
+    try:
+        return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
+    except Exception:
+        return datetime.min
 
 def save_all_state_periodically():
     added = 0
@@ -752,12 +783,8 @@ try:
     random.shuffle(openai_title_keywords)
     exhausted_keywords = set()
     # Main loop: ensure we never overshoot TARGET_LEADS, stop immediately when reached
-    consecutive_quota_errors = 0
     stop_scraping = False
     while unique_appended_this_run < TARGET_LEADS and not stop_scraping:
-        if stop_scraping:
-            print("Stopping scraper as all API keys are exhausted.")
-            break
         # Pick a video title keyword not exhausted
         remaining = [k for k in openai_title_keywords if k not in exhausted_keywords]
         if not remaining:
@@ -787,34 +814,14 @@ try:
                     order='relevance',
                     relevanceLanguage='en'
                 ).execute()
-                consecutive_quota_errors = 0
             except HttpError as e:
-                err_text = str(e)
                 print(f"[YouTube API] HttpError on key idx {api_index}: {e}")
-                if "quotaExceeded" in err_text or "dailyLimitExceeded" in err_text or "quota" in err_text.lower():
+                if "quotaExceeded" in str(e):
                     api_index = (api_index + 1) % len(youtube_clients)
-                    print(f"[YouTube API] quotaExceeded on key idx {api_index}. Switching to next API key (index {api_index})")
-                    consecutive_quota_errors += 1
-
-                    if consecutive_quota_errors >= len(youtube_clients):
-                        print("[YouTube API] All API keys likely exhausted. Stopping scraper and saving state.")
-                        try:
-                            send_slack_message(":warning: Scraper stopped — all YouTube API keys exhausted.")
-                        except Exception:
-                            pass
-                        try:
-                            save_all_state_periodically()
-                        except Exception:
-                            print("Warning: could not save state before stopping.")
-                        stop_scraping = True
-                        break
-
-                    time.sleep(DELAY_BETWEEN_REQUESTS * 3)
-                    continue
-                else:
-                    print(f"[YouTube API] Non-quota HttpError: {e}")
-                    time.sleep(DELAY_BETWEEN_REQUESTS * 2)
-                    continue
+                    print(f"[YouTube API] Switching to next API key (index {api_index})")
+                    youtube = youtube_clients[api_index]
+                time.sleep(DELAY_BETWEEN_REQUESTS * 2)
+                continue
             except Exception as e:
                 print(f"[YouTube API] General error: {e}")
                 time.sleep(DELAY_BETWEEN_REQUESTS * 2)
@@ -889,53 +896,266 @@ try:
                 if not (is_english(channel_title) or is_english(channel_description)):
                     continue
                 desc_low = channel_description.lower()
+
+                # === NEW: Scan channel bio text for direct URLs and check for high-ticket offers ===
+                # This runs before About-page scraping.
+                # Refined extraction: match http(s) URLs and bare domains, skip emails and trailing punctuation.
+                import urllib.parse
+                # 1. Extract all http(s) URLs
+                bio_urls = re.findall(r'(https?://[^\s\'"<>),;]+)', channel_description or "") or []
+                # 2. Extract bare domains (no http/https), but not emails
+                bare_domains = re.findall(
+                    r'(?<!@)\b(?:www\.)?[a-zA-Z0-9-]+\.(?:com|net|org|io|co|ai|app|me|store|academy|site|dev|us|uk)(?:/[^\s\'"<>),;]*)?', channel_description or ""
+                )
+                # Remove duplicates and those already starting with http
+                bare_domains = [d for d in bare_domains if not d.startswith("http")]
+                # 3. Remove trailing punctuation from each
+                def trim_punct(u):
+                    return u.rstrip('.,;:!?)\'"')
+                bio_urls = [trim_punct(u) for u in bio_urls]
+                bare_domains = [trim_punct(u) for u in bare_domains]
+                # 4. Prepend https:// to bare domains
+                normalized_domains = []
+                for d in bare_domains:
+                    if not d.lower().startswith("http"):
+                        normalized_domains.append("https://" + d)
+                # 5. Merge and dedupe, decode YouTube redirect, normalize scheme, validate URLs
+                all_bio_links = list(dict.fromkeys(bio_urls + normalized_domains))
+                normalized_bio_links = []
+                for url in all_bio_links:
+                    # Decode YouTube redirect links
+                    real_url = decode_youtube_redirect(url)
+                    # Prepend https:// if missing scheme
+                    if not re.match(r'^https?://', real_url, re.I):
+                        real_url = "https://" + real_url
+                    # Validate using urllib.parse
+                    try:
+                        parsed = urllib.parse.urlparse(real_url)
+                        if not parsed.netloc:
+                            continue
+                        # Skip emails
+                        if "@" in parsed.netloc:
+                            continue
+                        # Remove trailing punctuation again
+                        real_url = trim_punct(real_url)
+                        normalized_bio_links.append(real_url)
+                    except Exception:
+                        continue
+                # Only keep unique
+                normalized_bio_links = list(dict.fromkeys(normalized_bio_links))
+                checked_count = 0
+                for url in normalized_bio_links:
+                    url_low = url.lower()
+                    if any(domain in url_low for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"]):
+                        continue
+                    try:
+                        if looks_high_ticket(url):
+                            selling_clue = True
+                            print(f"[Filter] {channel_title} high-ticket link detected in bio: {url}")
+                            break
+                    except Exception:
+                        continue
+                    checked_count += 1
+                    if checked_count >= 5:
+                        break
+
+
+                # === NEW: Scrape YouTube About page for banner links (ytInitialData version) ===
+                RETAIL_DOMAINS = ["canon.", "amazon.", "ebay.", "bhphotovideo.", "bestbuy.", "walmart.", "shopify.", "etsy."]
+                about_urls = []
+                normalized_about_links = []
+                # Add robust About-page scraping with try/except, fallback, and rate-limiting
+                about_retries = 0
+                yt_json = None
+                while about_retries < 3:
+                    try:
+                        handle = snippet.get("customUrl", "") or channel_title.replace(" ", "")
+                        about_page_url = f"https://www.youtube.com/channel/{channel_id}/about"
+                        resp_about = safe_request_get(about_page_url, timeout=8)
+                        if not resp_about or resp_about.status_code != 200 or not resp_about.text:
+                            raise Exception("No valid About page response")
+                        html_text = resp_about.text
+                        # Only extract from ytInitialData (headerLinks)
+                        match = re.search(r'ytInitialData\s*=\s*(\{.*?\});', html_text, re.DOTALL)
+                        if match:
+                            try:
+                                yt_json = json.loads(match.group(1))
+                                header_links = yt_json.get("header", {}).get("c4TabbedHeaderRenderer", {}).get("headerLinks", {})
+                                all_links = []
+                                for sec in ["primaryLinks", "secondaryLinks"]:
+                                    for item in header_links.get(sec, []) or []:
+                                        url = item.get("navigationEndpoint", {}).get("urlEndpoint", {}).get("url", "")
+                                        if url:
+                                            all_links.append(url)
+                                for href in all_links:
+                                    decoded = decode_youtube_redirect(href)
+                                    # Normalize if missing scheme
+                                    if not re.match(r'^https?://', decoded, re.I):
+                                        decoded = "https://" + decoded
+                                    normalized_about_links.append(decoded)
+                            except Exception as e:
+                                print(f"[AboutPageScrape] Failed to parse ytInitialData JSON: {e}")
+                        # Fallback: if header_links were not found or about_urls empty, search for any nested urlEndpoints
+                        if (not normalized_about_links) and yt_json:
+                            def find_url_endpoints(obj):
+                                found = []
+                                if isinstance(obj, dict):
+                                    if "urlEndpoint" in obj and isinstance(obj["urlEndpoint"], dict):
+                                        url = obj["urlEndpoint"].get("url", "")
+                                        if url:
+                                            found.append(url)
+                                    for v in obj.values():
+                                        found.extend(find_url_endpoints(v))
+                                elif isinstance(obj, list):
+                                    for item in obj:
+                                        found.extend(find_url_endpoints(item))
+                                return found
+                            fallback_links = find_url_endpoints(yt_json)
+                            # Normalize and dedupe
+                            for href in fallback_links:
+                                decoded = decode_youtube_redirect(href)
+                                if not re.match(r'^https?://', decoded, re.I):
+                                    decoded = "https://" + decoded
+                                if decoded not in normalized_about_links:
+                                    normalized_about_links.append(decoded)
+                        # Final fallback: regex scan all hrefs if no links found yet
+                        if not normalized_about_links:
+                            regex_links = re.findall(r'href=["\'](https?://[^\s"\']+)["\']', html_text)
+                            for href in regex_links:
+                                decoded = decode_youtube_redirect(href)
+                                if not re.match(r'^https?://', decoded, re.I):
+                                    decoded = "https://" + decoded
+                                try:
+                                    parsed = urllib.parse.urlparse(decoded)
+                                    if not parsed.netloc:
+                                        continue
+                                    if "@" in parsed.netloc:
+                                        continue
+                                    normalized_about_links.append(decoded.rstrip('.,;:!?)\'"'))
+                                except Exception:
+                                    continue
+                            # Deduplicate
+                            normalized_about_links = list(dict.fromkeys(normalized_about_links))
+                            if normalized_about_links:
+                                print(f"[AboutPageFallback] {channel_title} regex-based links found: {normalized_about_links}")
+                        # Deep-scan extracted about page links
+                        print(f"[AboutLinks] {channel_title} visible links: {normalized_about_links}")
+                        for about_link in normalized_about_links[:5]:
+                            low_link = about_link.lower()
+                            if any(domain in low_link for domain in ["instagram.com", "facebook.com", "twitter.com", "x.com", "linkedin.com", "tiktok.com", "youtube.com"] + RETAIL_DOMAINS):
+                                continue
+                            if looks_high_ticket(about_link):
+                                selling_clue = True
+                                print(f"[Filter] {channel_title} high-ticket link detected in About page: {about_link}")
+                                break
+                        break  # Success, break retry loop
+                    except Exception as e:
+                        about_retries += 1
+                        print(f"[AboutPageScrape] Error processing About page for {channel_title}: {e}")
+                        if about_retries < 3:
+                            time.sleep(2 * about_retries)
+                # === Merge About links with normalized bio links for high-ticket scanning ===
+                all_links = []
+                # Normalize and dedupe all About links (decode redirects, add https:// if missing, validate netloc)
+                import urllib.parse
+                about_links_final = []
+                for url in normalized_about_links:
+                    decoded = decode_youtube_redirect(url)
+                    if not re.match(r'^https?://', decoded, re.I):
+                        decoded = "https://" + decoded
+                    try:
+                        parsed = urllib.parse.urlparse(decoded)
+                        if not parsed.netloc:
+                            continue
+                        if "@" in parsed.netloc:
+                            continue
+                        about_links_final.append(decoded.rstrip('.,;:!?)\'"'))
+                    except Exception:
+                        continue
+                # Merge bio and about links (deduped)
+                all_links = list(dict.fromkeys(normalized_bio_links + about_links_final))
+                # Detect textual selling mentions in bio (expanded high-ticket terms)
+                TEXT_SELLING_TERMS = [
+                    "coaching", "mentorship", "mentor", "book a call", "program", "enroll",
+                    "masterclass", "training", "bootcamp", "workshop", "academy", "1:1", "apply now",
+                    "strategy session", "consulting", "consultant", "join my program", "course", "premium",
+                    "bundle"
+                ]
+                if any(term in desc_low for term in TEXT_SELLING_TERMS):
+                    print(f"[Filter] {channel_title} textual selling mention in bio.")
+                    continue
                 BLACKLIST_KEYWORDS = [
                     "CRM", "automation platform", "marketing agency", "white-label software", "software tool"
                 ]
                 if any(bk.lower() in desc_low for bk in BLACKLIST_KEYWORDS):
                     continue
-                # Selling clue heuristics: selling phrases
-                selling_phrases = [
-                    "course", "coaching", "mentorship", "lead magnet", "skool", "membership", "masterclass",
-                    "webinar", "consulting", "enroll", "join my program", "apply now", "enroll now", "sign up",
+                # Selling clue heuristics: selling phrases (expanded)
+                SELLING_PHRASES = [
+                    "course", "coaching", "mentorship", "lead magnet", "skool", "masterclass",
+                    "webinar", "consulting", "enroll", "join my program", "enroll now", "sign up",
                     "free training", "program", "bootcamp", "challenge", "academy", "mastermind", "cohort",
-                    "book a call", "strategy call", "free class", "training program"
+                    "book a call", "strategy call", "free class", "training program", "bundle", "training"
                 ]
-                for phrase in selling_phrases:
+                for phrase in SELLING_PHRASES:
                     if phrase in desc_low:
                         selling_clue = True
                         break
                 # Also look for selling language in the channel title
                 title_low = channel_title.lower()
                 if not selling_clue:
-                    for phrase in selling_phrases:
+                    for phrase in SELLING_PHRASES:
                         if phrase in title_low:
                             selling_clue = True
                             break
-                # Platform anchor detection (channel_description and most recent non-short video description)
-                platform_anchors = [
-                    "teachable.com","kajabi.com","thinkific.com","gumroad.com","patreon.com","skool.com",
-                    "stan.store","linktr.ee","beacons.ai","calendly.com","clickfunnels.com","systeme.io",
-                    "kartra.com","samcart.com","podia.com","shopify.com","myshopify.com","buymeacoffee.com",
-                    "ko-fi.com","udemy.com","coursera.org","substack.com","typeform.com","paypal.me",
-                    "stripe.com","square.site","bigcartel.com","eventbrite.com"
-                ]
-                for anchor in platform_anchors:
+                # Platform anchor detection (channel_description for high-ticket platform domains only)
+                for anchor in HIGH_TICKET_PLATFORMS:
                     if anchor in desc_low:
                         selling_clue = True
                         break
-                # NEW: skip channels that already advertise high-ticket offers in bio/description
-                if looks_high_ticket_simple(channel_description):
-                    print(f"[Skip] Channel '{channel_title}' skipped — bio/description shows high-ticket signals.")
-                    continue
                 # Fetch uploads playlist and recent videos
                 uploads_playlist_id = get_uploads_playlist_id(ch)
                 if not uploads_playlist_id:
                     continue
+                # === ENHANCEMENT: Compute avg_views using last 5 videos (not just non-shorts), and scan their descriptions for links ===
+                # Fetch last 5 video IDs from uploads playlist
+                last5_playlist_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=5)
+                last5_ids = [v["id"] for v in last5_playlist_videos if v.get("id")]
+                last5_details_map = get_videos_details_batch(youtube, last5_ids)
+                # Get statistics/contentDetails for last 5, filter out shorts (<=60s), compute avg_views
+                non_short_last5 = []
+                from datetime import timedelta
+                def parse_iso8601_duration(iso):
+                    # Parse ISO 8601 duration (PT#H#M#S)
+                    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', iso)
+                    h, m, s = 0, 0, 0
+                    if match:
+                        h = int(match.group(1) or 0)
+                        m = int(match.group(2) or 0)
+                        s = int(match.group(3) or 0)
+                    return h * 3600 + m * 60 + s
+                video_desc_links = []
+                for v in last5_playlist_videos:
+                    vid = v.get("id")
+                    detail = last5_details_map.get(vid, {})
+                    title = detail.get("snippet", {}).get("title", v.get("title", ""))
+                    iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
+                    total_seconds = parse_iso8601_duration(iso_dur)
+                    # Only keep non-shorts
+                    if total_seconds > 60 and "#shorts" not in (title or "").lower():
+                        try:
+                            views = int(detail.get('statistics', {}).get('viewCount', 0))
+                        except:
+                            views = 0
+                        non_short_last5.append((title, views, total_seconds, vid, detail.get("snippet", {}).get("publishedAt", "")))
+                # Compute average view count across non-short last 5
+                avg_views = 0
+                if non_short_last5:
+                    avg_views = sum(x[1] for x in non_short_last5) // len(non_short_last5)
+                # Now, continue with legacy logic for 15 most recent non-shorts for titles etc.
                 recent_videos = get_recent_videos_from_playlist(youtube, uploads_playlist_id, max_results=20)
                 video_ids = [v["id"] for v in recent_videos if v.get("id")]
                 videos_details_map = get_videos_details_batch(youtube, video_ids)
-                # Filter out shorts and non-English, also check for platform anchors in recent video description
+                # Filter out shorts and non-English
                 non_shorts_video_data = []
                 most_recent_video_desc = ""
                 for idx, v in enumerate(recent_videos):
@@ -944,12 +1164,11 @@ try:
                     published_at = v.get("publishedAt", "")
                     detail = videos_details_map.get(vid, {})
                     iso_dur = detail.get('contentDetails', {}).get('duration', 'PT0S')
-                    match = re.match(r'PT((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)S)?', iso_dur)
-                    hours = int(match.group('h')) if match and match.group('h') else 0
-                    minutes = int(match.group('m')) if match and match.group('m') else 0
-                    seconds = int(match.group('s')) if match and match.group('s') else 0
-                    total_seconds = hours * 3600 + minutes * 60 + seconds
-                    if is_short_video(title, total_seconds):
+                    total_seconds = parse_iso8601_duration(iso_dur)
+                    # Exclude Shorts: any video <= 60s by ISO 8601 duration
+                    if total_seconds <= 60:
+                        continue
+                    if "#shorts" in (title or "").lower():
                         continue
                     if not is_english(title):
                         continue
@@ -959,13 +1178,14 @@ try:
                     except:
                         views = 0
                     non_shorts_video_data.append((title, views, total_seconds, vid, published_at))
-                    # Only check the most recent non-short video description for platform anchors
+                    # Only check the most recent non-short video description for later scan
                     if most_recent_video_desc == "" and isinstance(detail.get("snippet",{}).get("description",""), str):
                         most_recent_video_desc = detail.get("snippet",{}).get("description","")
-                # Check for platform anchors in most recent non-short video description
+
+                # Ensure recent video descriptions are scanned for high-ticket platform domains (after About-page scan)
                 if most_recent_video_desc:
                     desc_video_low = most_recent_video_desc.lower()
-                    for anchor in platform_anchors:
+                    for anchor in HIGH_TICKET_PLATFORMS:
                         if anchor in desc_video_low:
                             selling_clue = True
                             break
@@ -982,12 +1202,16 @@ try:
                 recent_nonshorts = [pub for pub in published_ats if pub and is_recent(pub)]
                 if len(recent_nonshorts) < 2:
                     continue
-                # avg views for 3 most recent non-shorts
-                non_shorts_top3 = non_shorts_video_data[:3]
-                if non_shorts_top3:
-                    avg_views = sum(x[1] for x in non_shorts_top3) // len(non_shorts_top3)
-                else:
-                    avg_views = 0
+                # If avg_views not set above (shouldn't happen), fallback to previous logic
+                if avg_views == 0:
+                    non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
+                    avg_sample = non_shorts_video_data_sorted[:5]
+                    if len(avg_sample) >= 3:
+                        avg_views = sum(x[1] for x in avg_sample[:3]) // 3
+                    elif avg_sample:
+                        avg_views = sum(x[1] for x in avg_sample) // len(avg_sample)
+                    else:
+                        avg_views = 0
                 # Require at least a 300 floor for average views (no % of subs)
                 if avg_views < 300:
                     continue
@@ -996,6 +1220,11 @@ try:
                     continue
                 # Positive signal: selling phrases in recent titles
                 if not selling_clue:
+                    selling_phrases = [
+                        "course", "coaching", "enroll", "academy", "program",
+                        "class", "masterclass", "bootcamp", "mentorship",
+                        "learn", "training", "join now", "sign up"
+                    ]
                     for phrase in selling_phrases:
                         if phrase in titles_low:
                             selling_clue = True
@@ -1013,26 +1242,43 @@ try:
                     print(f"[Rate] {channel_title} -> rating {rating}")
                     if rating is None:
                         rating = 4
-                    if rating < 4:
+                    if rating < 3:
                         continue
                 # Extract sample video info
                 sample_idx = 0
                 sample_video_title = recent_titles[sample_idx] if recent_titles else ""
                 sample_video_id = video_ids_nonshorts[sample_idx] if video_ids_nonshorts else ""
                 sample_published_at = published_ats[sample_idx] if published_ats else ""
-                all_links = re.findall(r'(https?://[^\s]+)', channel_description)
-                bio_link = '||'.join(all_links) if all_links else ""
+                # For output: join all normalized bio links (including normalized bare domains)
+                bio_link = '||'.join(normalized_bio_links) if normalized_bio_links else ""
+                # Also extract links from the most recent non-short video description (if present)
+                video_links = re.findall(r'(https?://[^\s]+)', most_recent_video_desc or "")
+                # Combine links (bio first, then video links). Limit checks for speed.
+                if not selling_clue:
+                    combined_links = (all_links or []) + (video_links or [])
+                    # Quick high-ticket detection by visiting external links (limit to first 5 links, decode redirects)
+                    high_ticket_found = False
+                    suspicious_link = None
+                    for link in combined_links[:5]:
+                        real_link = decode_youtube_redirect(link)
+                        try:
+                            if looks_high_ticket(real_link):
+                                high_ticket_found = True
+                                suspicious_link = real_link
+                                break
+                        except Exception:
+                            continue
+                    if high_ticket_found:
+                        print(f"[Filter] Skipping {channel_title} - high-ticket offer detected in external link: {suspicious_link}")
+                        continue
+                # If not high-ticket, attempt to scrape an email from the first few bio links (decode redirects)
                 email = None
                 for single in (all_links or [])[:3]:
-                    email = scrape_website_for_email(single)
+                    real_single = decode_youtube_redirect(single)
+                    email = scrape_website_for_email(real_single)
                     if email:
                         break
                 # Sort non_shorts_video_data by published date descending and pick the most recent for sample
-                def parse_dt_safe(dtstr):
-                    try:
-                        return datetime.strptime(dtstr, "%Y-%m-%dT%H:%M:%SZ")
-                    except Exception:
-                        return datetime.min
                 non_shorts_video_data_sorted = sorted(non_shorts_video_data, key=lambda x: parse_dt_safe(x[4]), reverse=True)
                 sample_video_title = non_shorts_video_data_sorted[0][0] if non_shorts_video_data_sorted else ""
                 sample_video_id = non_shorts_video_data_sorted[0][3] if non_shorts_video_data_sorted else ""
@@ -1076,7 +1322,7 @@ try:
                 if unique_appended_this_run >= TARGET_LEADS:
                     stop_scraping = True
                     break
-                time.sleep(DELAY_BETWEEN_REQUESTS)
+                time.sleep(DELAY_BETWEEN_REQUESTS * random.uniform(0.8, 1.3))
         # Mark keyword as exhausted if no lead found
         if title_keyword_lead_count == 0:
             exhausted_keywords.add(video_title_keyword)
