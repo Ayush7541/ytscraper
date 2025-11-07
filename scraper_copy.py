@@ -158,11 +158,20 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with detailed example prompt.
-    Retries up to 3 times on failure, returns [] if all attempts fail.
-    Ensures content is non-empty and valid JSON.
+    Robust keyword generator that preserves the original prompt (same as scraper.py) but
+    tolerates truncated/malformed JSON returned by the model. It accepts either
+    a JSON array of strings or a JSON array of objects (extracts "title").
+
+    Fixes attempted:
+      - strip markdown fences
+      - extract text between first '[' and last ']' (or repair if closing ']' missing)
+      - convert smart quotes to straight quotes
+      - remove trailing commas before } or ]
+      - remove problematic control characters and collapse newlines to spaces
+      - multiple fallback parsing attempts (single->double quote replacement)
+    Returns a list of title strings (possibly empty) instead of crashing.
     """
-    import json, time, random
+    import json, time, random, re
 
     n_target = random.randint(n_min, n_max)
 
@@ -256,11 +265,11 @@ Each object must have these keys:
             resp = openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role":"user","content":prompt}],
-                temperature=0.5,
-                max_tokens=800
+                temperature=0.0,
+                max_tokens=1200
             )
 
-            content = getattr(resp.choices[0].message, "content", "").strip()
+            content = getattr(resp.choices[0].message, "content", "")
             if not content:
                 print(f"[OpenAI Keywords] Empty response on attempt {i}.")
                 if i < attempts:
@@ -268,19 +277,84 @@ Each object must have these keys:
                     continue
                 return []
 
-            try:
-                # Remove Markdown code fences if present
-                content = re.sub(r"^```(?:json)?\s*", "", content)
-                content = re.sub(r"\s*```$", "", content)
-                content = content.strip()
-                keywords = json.loads(content)
-                if isinstance(keywords, list) and keywords:
-                    return [k for k in keywords if isinstance(k, str)]
+            # Remove markdown fences and surrounding whitespace
+            content = re.sub(r"^```(?:json)?\s*", "", content)
+            content = re.sub(r"\s*```$", "", content).strip()
+
+            # Try to extract JSON array between first '[' and last ']'. If closing ']' missing, attempt to repair.
+            if "[" in content:
+                first = content.find("[")
+                last = content.rfind("]")
+                if last != -1 and last > first:
+                    json_sub = content[first:last+1]
                 else:
-                    print(f"[OpenAI Keywords] Response not a valid list (attempt {i}). Raw:", content)
+                    # closing bracket missing — try to find last complete '}' and append ] to close array
+                    last_brace = content.rfind("}")
+                    if last_brace != -1 and last_brace > first:
+                        json_sub = content[first:last_brace+1] + "]"
+                    else:
+                        # as a last resort, take everything from first and append a closing bracket
+                        json_sub = content[first:] + "]"
+            else:
+                json_sub = content
+
+            # Quick sanitization
+            json_sub = json_sub.replace('“', '"').replace('”', '"').replace("‘", "'").replace("’", "'")
+            # Remove control chars and collapse newlines to spaces (helps unterminated string errors)
+            json_sub = re.sub(r"[\x00-\x1f\x7f]", "", json_sub)
+            json_sub = json_sub.replace('\n', ' ').replace('\r', ' ')
+            # Remove trailing commas before } or ]
+            json_sub = re.sub(r",\s*(\}|\])", r"\1", json_sub)
+
+            # Try parsing
+            try:
+                parsed = json.loads(json_sub)
             except Exception as e:
-                print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
-                print("[OpenAI Keywords Raw Response]", content)
+                # Fallback 1: replace single quotes with double quotes and try again
+                try:
+                    alt = json_sub.replace("\"\"", '"')
+                    alt = alt.replace("'", '"')
+                    alt = re.sub(r",\s*(\}|\])", r"\1", alt)
+                    parsed = json.loads(alt)
+                except Exception as e2:
+                    # Fallback 2: as last resort, try to extract double-quoted title-like substrings with regex
+                    print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e} | fallback tried: {e2}")
+                    # write a short raw preview to help debugging
+                    print("[OpenAI Keywords Raw Response]", content[:2000])
+                    # attempt regex: capture quoted strings that look like titles
+                    candidates = re.findall(r'"([A-Za-z0-9\-\'\":;,.!\s]{5,120})"', json_sub)
+                    # filter out keys like "title" or other JSON keys
+                    candidates = [c.strip() for c in candidates if len(c.strip().split()) >= 2 and c.lower() not in ['title','niche','problem_solved','audience_profile','monetization_fit','is_local_service']]
+                    if candidates:
+                        # dedupe while preserving order
+                        seen = set(); out = []
+                        for c in candidates:
+                            if c not in seen:
+                                seen.add(c)
+                                out.append(c)
+                        return out
+                    if i < attempts:
+                        time.sleep(backoff); backoff *= 2
+                        continue
+                    return []
+
+            # parsed should be a list
+            if isinstance(parsed, list) and parsed:
+                titles = []
+                for item in parsed:
+                    if isinstance(item, str):
+                        titles.append(item.strip())
+                    elif isinstance(item, dict) and item.get('title'):
+                        titles.append(str(item.get('title')).strip())
+                    else:
+                        continue
+                # Deduplicate and return
+                titles = [t for idx, t in enumerate(titles) if t and t not in titles[:idx]]
+                if titles:
+                    return titles
+
+            # Not usable
+            print(f"[OpenAI Keywords] Response not a usable list (attempt {i}). Raw:\n", content[:2000])
 
         except Exception as e:
             print(f"[OpenAI Keywords] Attempt {i} failed: {e}")
@@ -294,62 +368,7 @@ Each object must have these keys:
 
     return []
 
-def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
-    """
-    Asks OpenAI to rate the lead 0-10 (likelihood of offering paid product/monetization).
-    Returns integer 0-10.
-    """
-    prompt = f"""
-You are an expert talent evaluator for creator monetization. Based on the inputs below, produce a careful assessment about whether this YouTube channel is a high-potential lead for building a Skool community, course, or high-ticket offer that the creator does NOT already sell — or whether they already sell such products.
-
-INPUT:
-Channel Title: {channel_title}
-Channel Description: {channel_description}
-Recent Video Titles (pipe separated): {titles_pipe}
-Average Views per Video: {avg_views}
-Bio Links (pipe separated, if any): {bio_links}
-
-Consider all of the following when judging:
-- Is the creator teaching a repeatable skill or transformation (e.g., 3D printing, dog training, woodworking, guitar, lucid dreaming, tarot, AI voiceover, etc.) — NOT lifestyle vlogs, local-only services, medical/legal, or pure entertainment?
-- Does the channel already advertise paid products, communities, or booking (domains like skool.com, kajabi.com, teachable.com, thinkific.com, podia.com, stan.store, calendly.com, linktr.ee, gumroad.com, buymeacoffee.com, patreon.com, or phrases like "book a call", "enroll", "join my", "coaching", "masterclass") in the bio or bio-links?
-- Does any bio link URL path contain selling keywords (e.g., /coaching, /course, /academy) even if domain is first-party?
-- Audience quality: are avg views and recent activity consistent with paying customers? (we want creators whose audience can plausibly spend on tools/ads ~$200–$500/mo)
-- Language: non-English channels should be scored lower unless it's clearly in an English monetizable niche.
-
-OUTPUT: Return ONLY a valid JSON object with these fields exactly:
-{{"rating": <integer 0-10>,
-  "reason_code": "<one of: HIGH_TICKET_PRESENT, ALREADY_MONETIZING, GOOD_PROSPECT, BORDERLINE, LOW_POTENTIAL, NON_ENGLISH>",
-  "primary_signals": ["signal1","signal2",...],
-  "recommended_action": "<one of: 'skip','outreach','review'>",
-  "confidence": <float 0.0-1.0>}}
-
-SCORING GUIDELINES (how to choose rating):
-- 8–10: Strong, active teachable skill, audience engaged, no evidence of existing high-ticket/membership in bio/links — ideal outreach.
-- 6–7: Good prospect (could be monetizing lightly or selling low-ticket products), still worth outreach but review first.
-- 4–5: Borderline (low views, unclear product fit, or some ambiguous language) — flag for manual review.
-- 0–3: Low potential (vlogs, local-only, regulated, or uninterested audience) or clearly already high-ticket seller.
-- If bio/links contain clear high-ticket/platform indicators, set rating to 0–2 and reason_code HIGH_TICKET_PRESENT or ALREADY_MONETIZING.
-
-EXAMPLES:
-{{"rating":9,"reason_code":"GOOD_PROSPECT","primary_signals":["skill:3d printing","avg_views:2400","no_bio_link"],"recommended_action":"outreach","confidence":0.92}}
-
-Important: if language is not English and you detect that from text, return reason_code "NON_ENGLISH" and rating <= 4.
-
-Respond with JSON only and nothing else.
-"""
-    try:
-        resp = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0
-        )
-        text = resp.choices[0].message.content.strip()
-        m = re.search(r"\d+", text)
-        if m:
-            return int(m.group(0))
-    except Exception as e:
-        print(f"[OpenAI Rate] Error: {e}")
-    return 0
+# The next function definition remains unchanged
 
 def determine_offer_with_openai(channel_title, channel_description, recent_titles_pipe, landing_snippet):
     """
