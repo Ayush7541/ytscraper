@@ -300,16 +300,42 @@ def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_
     Returns integer 0-10.
     """
     prompt = f"""
-You are an expert evaluator. Rate from 0 to 10 (integer only) how likely this YouTube channel is to offer paid courses, coaching, lead magnets, booking calls, memberships or other paid products based on the information below.
+You are an expert talent evaluator for creator monetization. Based on the inputs below, produce a careful assessment about whether this YouTube channel is a high-potential lead for building a Skool community, course, or high-ticket offer that the creator does NOT already sell — or whether they already sell such products.
 
+INPUT:
 Channel Title: {channel_title}
 Channel Description: {channel_description}
 Recent Video Titles (pipe separated): {titles_pipe}
 Average Views per Video: {avg_views}
+Bio Links (pipe separated, if any): {bio_links}
 
-If the YouTube bio or recent video titles contain non-English text (such as Spanish, Hindi, or any language other than English), give a rating less than 5.
-Consider presence of selling language, call-to-actions, professionalism, and view counts.
-Respond with a single integer between 0 and 10 and nothing else.
+Consider all of the following when judging:
+- Is the creator teaching a repeatable skill or transformation (e.g., 3D printing, dog training, woodworking, guitar, lucid dreaming, tarot, AI voiceover, etc.) — NOT lifestyle vlogs, local-only services, medical/legal, or pure entertainment?
+- Does the channel already advertise paid products, communities, or booking (domains like skool.com, kajabi.com, teachable.com, thinkific.com, podia.com, stan.store, calendly.com, linktr.ee, gumroad.com, buymeacoffee.com, patreon.com, or phrases like "book a call", "enroll", "join my", "coaching", "masterclass") in the bio or bio-links?
+- Does any bio link URL path contain selling keywords (e.g., /coaching, /course, /academy) even if domain is first-party?
+- Audience quality: are avg views and recent activity consistent with paying customers? (we want creators whose audience can plausibly spend on tools/ads ~$200–$500/mo)
+- Language: non-English channels should be scored lower unless it's clearly in an English monetizable niche.
+
+OUTPUT: Return ONLY a valid JSON object with these fields exactly:
+{{"rating": <integer 0-10>,
+  "reason_code": "<one of: HIGH_TICKET_PRESENT, ALREADY_MONETIZING, GOOD_PROSPECT, BORDERLINE, LOW_POTENTIAL, NON_ENGLISH>",
+  "primary_signals": ["signal1","signal2",...],
+  "recommended_action": "<one of: 'skip','outreach','review'>",
+  "confidence": <float 0.0-1.0>}}
+
+SCORING GUIDELINES (how to choose rating):
+- 8–10: Strong, active teachable skill, audience engaged, no evidence of existing high-ticket/membership in bio/links — ideal outreach.
+- 6–7: Good prospect (could be monetizing lightly or selling low-ticket products), still worth outreach but review first.
+- 4–5: Borderline (low views, unclear product fit, or some ambiguous language) — flag for manual review.
+- 0–3: Low potential (vlogs, local-only, regulated, or uninterested audience) or clearly already high-ticket seller.
+- If bio/links contain clear high-ticket/platform indicators, set rating to 0–2 and reason_code HIGH_TICKET_PRESENT or ALREADY_MONETIZING.
+
+EXAMPLES:
+{{"rating":9,"reason_code":"GOOD_PROSPECT","primary_signals":["skill:3d printing","avg_views:2400","no_bio_link"],"recommended_action":"outreach","confidence":0.92}}
+
+Important: if language is not English and you detect that from text, return reason_code "NON_ENGLISH" and rating <= 4.
+
+Respond with JSON only and nothing else.
 """
     try:
         resp = openai_client.chat.completions.create(
