@@ -158,16 +158,30 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with detailed example prompt.
-    Retries up to 3 times on failure, returns [] if all attempts fail.
-    Ensures content is non-empty and valid JSON.
+    Robust generator for YouTube title keywords.
+
+    Strategy:
+    - Request small batches of simple objects that ONLY contain a `title` field.
+    - Keep requesting batches until we collect the desired number (n_target) or attempts are exhausted.
+    - Use higher max_tokens and a lightweight JSON schema (title-only) to avoid truncation.
+    - Try simple recovery heuristics when JSON is malformed: strip fences, extract between first '[' and last ']', or close array after last '}'.
+    - Return a list of title strings (not objects).
     """
-    import json, time, random
+    import json, time, random, re
 
     n_target = random.randint(n_min, n_max)
+    batch_size = 18  # small batch to avoid truncation; tune as needed
+    max_batches = max(1, (n_target // batch_size) + 2)
 
-    prompt = """
-You are an expert YouTube researcher helping a growth operator find creators who teach real, monetizable skills.
+    collected = []
+    seen = set()
+
+    attempts_per_batch = 3
+    overall_attempts = 0
+    max_overall_attempts = 6
+
+    base_prompt = (
+        """You are an expert YouTube researcher helping a growth operator find creators who teach real, monetizable skills.
 
 Your job: generate a large, diverse list of realistic YouTube video titles that represent creators whose audiences would pay for coaching, courses, or Skool communities.
 
@@ -234,7 +248,7 @@ Each object must have these keys:
 
 6. **Output Requirements:**
    - Return 60–100 unique JSON objects.
-   - Ensure at least 70% have `"is_local_service": false`.
+   - Ensure at least 70% have "is_local_service": false.
    - Spread evenly across at least 10 broad categories, including at least 10 blue ocean niches.
    - Avoid duplicate or highly similar niches.
 
@@ -249,50 +263,147 @@ Each object must have these keys:
   {"title":"Foraging Wild Edible Plants in Your Area","niche":"foraging","problem_solved":"identify and safely harvest wild foods","audience_profile":"nature enthusiasts and survivalists","monetization_fit":"course","is_local_service":false}
 ]
 """
+    )
 
-    attempts, backoff = 3, 1
-    for i in range(1, attempts + 1):
+    # Loop until we collect enough titles or hit overall attempt cap
+    while len(collected) < n_target and overall_attempts < max_overall_attempts:
+        overall_attempts += 1
         try:
-            resp = openai_client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role":"user","content":prompt}],
-                temperature=0.5,
-                max_tokens=800
-            )
-
-            content = getattr(resp.choices[0].message, "content", "").strip()
-            if not content:
-                print(f"[OpenAI Keywords] Empty response on attempt {i}.")
-                if i < attempts:
-                    time.sleep(backoff); backoff *= 2
+            # request a batch
+            prompt = base_prompt.format(batch_size=batch_size)
+            for attempt in range(1, attempts_per_batch + 1):
+                try:
+                    resp = openai_client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=0.45,
+                        max_tokens=1500
+                    )
+                except Exception as e:
+                    print(f"[OpenAI Keywords] API call failed (attempt {attempt}): {e}")
+                    if attempt < attempts_per_batch:
+                        time.sleep(1.5 * attempt)
+                        continue
+                    else:
+                        resp = None
+                if not resp:
                     continue
-                return []
 
-            try:
-                # Remove Markdown code fences if present
+                # Extract content
+                choice = None
+                try:
+                    choice = resp.choices[0]
+                    content = getattr(choice.message, "content", "") if hasattr(choice, 'message') else (choice.get('message', {}).get('content','') if isinstance(choice, dict) else '')
+                except Exception:
+                    # Fallback for different client shapes
+                    try:
+                        content = resp.choices[0].text
+                    except Exception:
+                        content = ""
+
+                content = (content or "").strip()
+                if not content:
+                    print(f"[OpenAI Keywords] Empty content (batch attempt {attempt}).")
+                    if attempt < attempts_per_batch:
+                        time.sleep(1)
+                        continue
+                    else:
+                        break
+
+                # Remove code fences if present
                 content = re.sub(r"^```(?:json)?\s*", "", content)
-                content = re.sub(r"\s*```$", "", content)
-                content = content.strip()
-                keywords = json.loads(content)
-                if isinstance(keywords, list) and keywords:
-                    return [k for k in keywords if isinstance(k, str)]
+                content = re.sub(r"\s*```$", "", content).strip()
+
+                # Try normal JSON parse first
+                parsed = None
+                try:
+                    parsed = json.loads(content)
+                except Exception as e:
+                    # Try recovery: extract between first '[' and last ']' if possible
+                    first_idx = content.find('[')
+                    last_idx = content.rfind(']')
+                    if first_idx != -1 and last_idx != -1 and last_idx > first_idx:
+                        snippet = content[first_idx:last_idx+1]
+                        try:
+                            parsed = json.loads(snippet)
+                            content = snippet
+                        except Exception as e2:
+                            parsed = None
+                    else:
+                        # If missing closing bracket, try to find last '}' and append ']'
+                        if first_idx != -1:
+                            last_brace = content.rfind('}')
+                            if last_brace != -1 and last_brace > first_idx:
+                                snippet = content[first_idx:last_brace+1] + ']'
+                                try:
+                                    parsed = json.loads(snippet)
+                                    content = snippet
+                                except Exception:
+                                    parsed = None
+                # If still not parsed, log and retry batch
+                if parsed is None:
+                    print(f"[OpenAI Keywords] Failed to parse JSON for this batch (attempt {attempt}). Raw start: {content[:240]}")
+                    if attempt < attempts_per_batch:
+                        time.sleep(1.5 * attempt)
+                        continue
+                    else:
+                        break
+
+                # Normalize parsed forms: could be list of objects or list of strings
+                titles_from_resp = []
+                if isinstance(parsed, list):
+                    for item in parsed:
+                        if isinstance(item, dict) and 'title' in item and isinstance(item['title'], str):
+                            titles_from_resp.append(item['title'].strip())
+                        elif isinstance(item, str):
+                            titles_from_resp.append(item.strip())
                 else:
-                    print(f"[OpenAI Keywords] Response not a valid list (attempt {i}). Raw:", content)
-            except Exception as e:
-                print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
-                print("[OpenAI Keywords Raw Response]", content)
+                    print(f"[OpenAI Keywords] Parsed JSON is not a list. Skipping this batch.")
+                    if attempt < attempts_per_batch:
+                        time.sleep(1)
+                        continue
+                    else:
+                        break
 
+                # Dedupe and add
+                new_added = 0
+                for t in titles_from_resp:
+                    if not t:
+                        continue
+                    if t.lower() in seen:
+                        continue
+                    seen.add(t.lower())
+                    collected.append(t)
+                    new_added += 1
+                    if len(collected) >= n_target:
+                        break
+
+                # If model signaled truncation and we still need more, immediately continue outer loop to request more
+                finish_reason = None
+                try:
+                    finish_reason = choice.finish_reason if hasattr(choice, 'finish_reason') else (resp.choices[0].get('finish_reason') if isinstance(resp.choices[0], dict) else None)
+                except Exception:
+                    finish_reason = None
+
+                if new_added == 0:
+                    # nothing new from this batch -> try another batch
+                    if attempt < attempts_per_batch:
+                        time.sleep(0.8)
+                        continue
+                # break out of attempts loop for this batch
+                break
         except Exception as e:
-            print(f"[OpenAI Keywords] Attempt {i} failed: {e}")
-
-        if i < attempts:
-            time.sleep(backoff); backoff *= 2
+            print(f"[OpenAI Keywords] Unexpected error in batch loop: {e}")
+            time.sleep(1)
             continue
-        else:
-            print("[OpenAI Keywords] All attempts failed. Returning [].")
-            return []
 
-    return []
+    # Final cleanup: return up to n_target titles
+    if not collected:
+        print("[OpenAI Keywords] All attempts failed. Returning [].")
+        return []
+
+    # Trim to exactly n_target if more
+    return collected[:n_target]
 
 def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
     """
