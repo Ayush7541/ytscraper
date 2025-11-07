@@ -158,252 +158,79 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Robust generator for YouTube title keywords.
-
-    Strategy:
-    - Request small batches of simple objects that ONLY contain a `title` field.
-    - Keep requesting batches until we collect the desired number (n_target) or attempts are exhausted.
-    - Use higher max_tokens and a lightweight JSON schema (title-only) to avoid truncation.
-    - Try simple recovery heuristics when JSON is malformed: strip fences, extract between first '[' and last ']', or close array after last '}'.
-    - Return a list of title strings (not objects).
+    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with detailed example prompt.
+    Retries up to 3 times on failure, returns [] if all attempts fail.
+    Ensures content is non-empty and valid JSON.
     """
-    import json, time, random, re
+    import json, time, random
 
     n_target = random.randint(n_min, n_max)
-    batch_size = 18  # small batch to avoid truncation; tune as needed
-    max_batches = max(1, (n_target // batch_size) + 2)
 
-    collected = []
-    seen = set()
+    prompt = """
+Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
+Also include less mainstream, underrated, or unexpected niches beyond these examples (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
+Prioritize hobby or passion-driven niches where creators are likely small, enthusiastic, and not yet monetizing fully. Examples of such hobby niches: calligraphy, pottery, journaling, bullet journaling, model building, Lego creations, bonsai/urban gardening, baking, cake decorating, pet training, amateur photography, DIY crafts, knitting, crocheting, board games, tabletop RPGs, musical instruments, tarot, astrology, creative writing, poetry, homebrewing, miniature painting, soap making, candle making.
+You can invent realistic niches not mentioned above, prioritizing small-scale creators who are likely to need help growing their channel. 
+Each title should be realistic, engaging, and assume the creator is monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
+Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
+Return ONLY a valid JSON array of strings.
 
-    attempts_per_batch = 3
-    overall_attempts = 0
-    max_overall_attempts = 6
-
-    base_prompt = (
-        """You are an expert YouTube researcher helping a growth operator find creators who teach real, monetizable skills.
-
-Your job: generate a large, diverse list of realistic YouTube video titles that represent creators whose audiences would pay for coaching, courses, or Skool communities.
-
-These should be creators who teach, share, or demonstrate *a skill, method, or transformation* — not vloggers or entertainers.
-
-Return ONLY a valid JSON array of objects.
-Each object must have these keys:
-{
-  "title": "string — a realistic YouTube video title (6–12 words)",
-  "niche": "string — short phrase naming the creator's main niche",
-  "problem_solved": "string — short line describing the transformation or skill taught",
-  "audience_profile": "string — who would pay for this (e.g. beginners, hobbyists, freelancers, men 20-35, etc.)",
-  "monetization_fit": "one of ['course','skool_community','coaching','template_pack','membership','unknown']",
-  "is_local_service": true/false (true if it depends on in-person/local delivery)
-}
-
-### GUIDELINES
-
-1. **Core idea:** Pick niches where you could easily build a digital product or Skool community.
-   - Anything where people learn, practice, or improve a skill.
-   - Anything where people want transformation (health, mindset, performance, relationships, creative mastery).
-   - Avoid vloggers, podcasts, pure entertainment, or local service businesses.
-
-2. **Diversity requirement:** 
-   - Don’t stick to the same 20–30 niches. Cover hundreds of possible fields across *arts, skills, hobbies, professions, and self-improvement topics*.
-   - Go beyond the classic “health, wealth, relationships” categories. Include blue ocean niches where other growth operators rarely look — areas of genuine passion, creativity, and niche mastery that still have monetizable audiences.
-   - Example categories to sample from:
-     - Arts & Creative: calligraphy, journaling, drawing, painting, pottery, woodworking, crocheting, knitting, embroidery, resin art, candle making, soap making.
-     - Music & Performance: guitar, piano, singing, music production, songwriting, DJing, dance, acting, public speaking.
-     - Digital Skills: video editing, 3D printing, graphic design, animation, coding, app development, Photoshop, filmmaking.
-     - Personal Growth: masculinity, mindset, fitness, meditation, productivity, confidence, habits, discipline, dating, breathwork.
-     - Animals & Nature: dog training, horse care, aquarium setup, gardening, bonsai, aquascaping, permaculture, homesteading.
-     - Food & Lifestyle (educational): sourdough baking, meal prep, barista skills, nutrition, fermentation, vegan cooking.
-     - Education & Communication: language learning, pronunciation, public speaking, teaching skills, storytelling, coaching communication.
-     - Handcraft & Repair: leatherwork, jewelry making, electronics repair, bike maintenance, car detailing, knife making, DIY home repair.
-     - Niche Professions: UX/UI, freelancing, photography, drone cinematography, Shopify, eBay flipping, niche e-commerce, course creation, digital marketing (ethical).
-     - Spiritual & Esoteric (educational only): tarot reading, astrology, manifestation, energy work, meditation, yoga teaching.
-     - Blue Ocean Niches (uncommon but monetizable):
-         - Memory improvement, handwriting analysis, lucid dreaming, creative journaling, emotional release, minimalism, decluttering, ethical hacking, drone repair, sound healing, intuitive eating, vocal toning, self-defense, woodworking restoration, AI voiceover tutorials, kinetic typography, AR/VR art, board game design, homestead architecture, mapmaking, foraging, mushroom cultivation, survival skills, somatic movement, philosophy simplification, life journaling, and historical re-enactment education.
-
-3. **Bad/Skip niches:** 
-   - Local-only services (plumbing, real estate, solar, pest control, salons, construction).
-   - Medical or regulated services (doctors, dentists, therapists, clinics, pharmacies).
-   - Lifestyle vlogs, general podcasts, entertainment/news channels.
-   - Influencer or fashion/beauty content.
-   - Anything that can’t scale digitally.
-
-4. **Content style:**
-   - Natural, real YouTube titles like:
-     - “How I Fixed My Dog’s Separation Anxiety”
-     - “Sourdough Starter Guide for Absolute Beginners”
-     - “My Bullet Journaling System for Focus & Clarity”
-     - “How I Learned 3D Printing in 30 Days”
-     - “5 Mistakes New Woodworkers Make (and How to Avoid Them)”
-     - “Learn Tarot Card Meanings the Simple Way”
-     - “Guitar Warmups That Changed My Playing Forever”
-     - “From Couch to Confident: Men’s Self-Mastery Routine”
-   - Avoid clickbait or overly salesy tone.
-
-5. **Monetization relevance:**
-   - The creator should be *teaching or demonstrating* something their audience wants to master.
-   - Their audience should logically pay for structured learning, accountability, templates, or coaching.
-   - Assume these creators could afford $200–$500/month in software & tools.
-
-6. **Output Requirements:**
-   - Return 60–100 unique JSON objects.
-   - Ensure at least 70% have "is_local_service": false.
-   - Spread evenly across at least 10 broad categories, including at least 10 blue ocean niches.
-   - Avoid duplicate or highly similar niches.
-
-### EXAMPLE OUTPUT
-[
-  {"title":"How I Tamed My Reactive Dog in 3 Weeks","niche":"dog training","problem_solved":"stop barking and leash aggression","audience_profile":"pet owners who want obedient dogs","monetization_fit":"course","is_local_service":false},
-  {"title":"My Journaling Routine for Mental Clarity","niche":"journaling","problem_solved":"reduce anxiety and build focus","audience_profile":"young professionals and students","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Mastering Hand-Carved Furniture from Scratch","niche":"woodworking","problem_solved":"build furniture with hand tools","audience_profile":"DIY hobbyists and aspiring craftsmen","monetization_fit":"course","is_local_service":false},
-  {"title":"How to Read Tarot Cards for Beginners","niche":"tarot reading","problem_solved":"understand symbolism and intuition","audience_profile":"spiritual learners","monetization_fit":"membership","is_local_service":false},
-  {"title":"Learn Crochet Patterns in 7 Days","niche":"crocheting","problem_solved":"make wearable patterns easily","audience_profile":"craft lovers, homemakers","monetization_fit":"course","is_local_service":false},
-  {"title":"Lucid Dreaming Techniques for Beginners","niche":"lucid dreaming","problem_solved":"control your dreams consciously","audience_profile":"spiritual self-explorers and meditators","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Foraging Wild Edible Plants in Your Area","niche":"foraging","problem_solved":"identify and safely harvest wild foods","audience_profile":"nature enthusiasts and survivalists","monetization_fit":"course","is_local_service":false}
-]
+Examples:
+1. "Earning from Pottery Workshops Online"
+2. "Nail Art Side Hustle: Selling Tutorials & Kits"
+3. "How My Journaling Courses Bring in Monthly Income"
+4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
+5. "Car Detailing Coaching Calls That Pay My Bills"
+6. "Making Money Teaching Guitar Lessons Online"
+7. "Tarot Reading Clients That Support My Full-Time Income"
+8. "Woodworking Profits: Selling DIY Plans"
+9. "How I Monetize My Meal Prep Classes"
+10. "Turning Event Planning Tips Into Paid Consultations"
 """
-    )
 
-    # Loop until we collect enough titles or hit overall attempt cap
-    while len(collected) < n_target and overall_attempts < max_overall_attempts:
-        overall_attempts += 1
+    attempts, backoff = 3, 1
+    for i in range(1, attempts + 1):
         try:
-            # request a batch
-            prompt = base_prompt.format(batch_size=batch_size)
-            for attempt in range(1, attempts_per_batch + 1):
-                try:
-                    resp = openai_client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[{"role": "user", "content": prompt}],
-                        temperature=0.45,
-                        max_tokens=1500
-                    )
-                except Exception as e:
-                    print(f"[OpenAI Keywords] API call failed (attempt {attempt}): {e}")
-                    if attempt < attempts_per_batch:
-                        time.sleep(1.5 * attempt)
-                        continue
-                    else:
-                        resp = None
-                if not resp:
+            resp = openai_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role":"user","content":prompt}],
+                temperature=0.5,
+                max_tokens=800
+            )
+
+            content = getattr(resp.choices[0].message, "content", "").strip()
+            if not content:
+                print(f"[OpenAI Keywords] Empty response on attempt {i}.")
+                if i < attempts:
+                    time.sleep(backoff); backoff *= 2
                     continue
+                return []
 
-                # Extract content
-                choice = None
-                try:
-                    choice = resp.choices[0]
-                    content = getattr(choice.message, "content", "") if hasattr(choice, 'message') else (choice.get('message', {}).get('content','') if isinstance(choice, dict) else '')
-                except Exception:
-                    # Fallback for different client shapes
-                    try:
-                        content = resp.choices[0].text
-                    except Exception:
-                        content = ""
-
-                content = (content or "").strip()
-                if not content:
-                    print(f"[OpenAI Keywords] Empty content (batch attempt {attempt}).")
-                    if attempt < attempts_per_batch:
-                        time.sleep(1)
-                        continue
-                    else:
-                        break
-
-                # Remove code fences if present
+            try:
+                # Remove Markdown code fences if present
                 content = re.sub(r"^```(?:json)?\s*", "", content)
-                content = re.sub(r"\s*```$", "", content).strip()
-
-                # Try normal JSON parse first
-                parsed = None
-                try:
-                    parsed = json.loads(content)
-                except Exception as e:
-                    # Try recovery: extract between first '[' and last ']' if possible
-                    first_idx = content.find('[')
-                    last_idx = content.rfind(']')
-                    if first_idx != -1 and last_idx != -1 and last_idx > first_idx:
-                        snippet = content[first_idx:last_idx+1]
-                        try:
-                            parsed = json.loads(snippet)
-                            content = snippet
-                        except Exception as e2:
-                            parsed = None
-                    else:
-                        # If missing closing bracket, try to find last '}' and append ']'
-                        if first_idx != -1:
-                            last_brace = content.rfind('}')
-                            if last_brace != -1 and last_brace > first_idx:
-                                snippet = content[first_idx:last_brace+1] + ']'
-                                try:
-                                    parsed = json.loads(snippet)
-                                    content = snippet
-                                except Exception:
-                                    parsed = None
-                # If still not parsed, log and retry batch
-                if parsed is None:
-                    print(f"[OpenAI Keywords] Failed to parse JSON for this batch (attempt {attempt}). Raw start: {content[:240]}")
-                    if attempt < attempts_per_batch:
-                        time.sleep(1.5 * attempt)
-                        continue
-                    else:
-                        break
-
-                # Normalize parsed forms: could be list of objects or list of strings
-                titles_from_resp = []
-                if isinstance(parsed, list):
-                    for item in parsed:
-                        if isinstance(item, dict) and 'title' in item and isinstance(item['title'], str):
-                            titles_from_resp.append(item['title'].strip())
-                        elif isinstance(item, str):
-                            titles_from_resp.append(item.strip())
+                content = re.sub(r"\s*```$", "", content)
+                content = content.strip()
+                keywords = json.loads(content)
+                if isinstance(keywords, list) and keywords:
+                    return [k for k in keywords if isinstance(k, str)]
                 else:
-                    print(f"[OpenAI Keywords] Parsed JSON is not a list. Skipping this batch.")
-                    if attempt < attempts_per_batch:
-                        time.sleep(1)
-                        continue
-                    else:
-                        break
+                    print(f"[OpenAI Keywords] Response not a valid list (attempt {i}). Raw:", content)
+            except Exception as e:
+                print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
+                print("[OpenAI Keywords Raw Response]", content)
 
-                # Dedupe and add
-                new_added = 0
-                for t in titles_from_resp:
-                    if not t:
-                        continue
-                    if t.lower() in seen:
-                        continue
-                    seen.add(t.lower())
-                    collected.append(t)
-                    new_added += 1
-                    if len(collected) >= n_target:
-                        break
-
-                # If model signaled truncation and we still need more, immediately continue outer loop to request more
-                finish_reason = None
-                try:
-                    finish_reason = choice.finish_reason if hasattr(choice, 'finish_reason') else (resp.choices[0].get('finish_reason') if isinstance(resp.choices[0], dict) else None)
-                except Exception:
-                    finish_reason = None
-
-                if new_added == 0:
-                    # nothing new from this batch -> try another batch
-                    if attempt < attempts_per_batch:
-                        time.sleep(0.8)
-                        continue
-                # break out of attempts loop for this batch
-                break
         except Exception as e:
-            print(f"[OpenAI Keywords] Unexpected error in batch loop: {e}")
-            time.sleep(1)
+            print(f"[OpenAI Keywords] Attempt {i} failed: {e}")
+
+        if i < attempts:
+            time.sleep(backoff); backoff *= 2
             continue
+        else:
+            print("[OpenAI Keywords] All attempts failed. Returning [].")
+            return []
 
-    # Final cleanup: return up to n_target titles
-    if not collected:
-        print("[OpenAI Keywords] All attempts failed. Returning [].")
-        return []
-
-    # Trim to exactly n_target if more
-    return collected[:n_target]
+    return []
 
 def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
     """
