@@ -1,0 +1,26 @@
+name: Daily YouTube Scraper Copy
+
+on:
+  schedule:
+    - cron: '30 23 * * *'   # Runs every day at 5:00 AM IST (23:30 UTC)
+  workflow_dispatch:          # Allows manual trigger from the Actions tab
+
+jobs:
+  run-scraper-copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run scraper_copy.py
+        run: python scraper_copy.py
