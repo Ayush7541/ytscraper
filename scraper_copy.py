@@ -70,7 +70,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "sk-proj-zodOEdwzJNPCq8quN7-u0z_
 MIN_SUBS = 5000
 MAX_SUBS = 150000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
-TARGET_LEADS = 500              # collect 15 qualified leads (rating >= 7)
+TARGET_LEADS = 60              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
 AUTO_SAVE_EVERY = 5            # autosave after every N saved leads
 MAX_VIDEOS_PER_PAGE = 50       # YouTube search maxResults (use 50 for broader coverage per call)
@@ -158,105 +158,34 @@ def scrape_website_for_email(url):
 
 def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES_MAX):
     """
-    Robust keyword generator that preserves the original prompt (same as scraper.py) but
-    tolerates truncated/malformed JSON returned by the model. It accepts either
-    a JSON array of strings or a JSON array of objects (extracts "title").
-
-    Fixes attempted:
-      - strip markdown fences
-      - extract text between first '[' and last ']' (or repair if closing ']' missing)
-      - convert smart quotes to straight quotes
-      - remove trailing commas before } or ]
-      - remove problematic control characters and collapse newlines to spaces
-      - multiple fallback parsing attempts (single->double quote replacement)
-    Returns a list of title strings (possibly empty) instead of crashing.
+    Generate YouTube video title keywords using OpenAI (gpt-4o-mini) with detailed example prompt.
+    Retries up to 3 times on failure, returns [] if all attempts fail.
+    Ensures content is non-empty and valid JSON.
     """
-    import json, time, random, re
+    import json, time, random
 
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-You are an expert YouTube researcher helping a growth operator find creators who teach real, monetizable skills.
+Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
+Also include less mainstream, underrated, or unexpected niches beyond these examples (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
+Prioritize hobby or passion-driven niches where creators are likely small, enthusiastic, and not yet monetizing fully. Examples of such hobby niches: calligraphy, pottery, journaling, bullet journaling, model building, Lego creations, bonsai/urban gardening, baking, cake decorating, pet training, amateur photography, DIY crafts, knitting, crocheting, board games, tabletop RPGs, musical instruments, tarot, astrology, creative writing, poetry, homebrewing, miniature painting, soap making, candle making.
+You can invent realistic niches not mentioned above, prioritizing small-scale creators who are likely to need help growing their channel. 
+Each title should be realistic, engaging, and assume the creator is monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
+Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
+Return ONLY a valid JSON array of strings.
 
-Your job: generate a large, diverse list of realistic YouTube video titles that represent creators whose audiences would pay for coaching, courses, or Skool communities.
-
-These should be creators who teach, share, or demonstrate *a skill, method, or transformation* — not vloggers or entertainers.
-
-Return ONLY a valid JSON array of objects.
-Each object must have these keys:
-{
-  "title": "string — a realistic YouTube video title (6–12 words)",
-  "niche": "string — short phrase naming the creator's main niche",
-  "problem_solved": "string — short line describing the transformation or skill taught",
-  "audience_profile": "string — who would pay for this (e.g. beginners, hobbyists, freelancers, men 20-35, etc.)",
-  "monetization_fit": "one of ['course','skool_community','coaching','template_pack','membership','unknown']",
-  "is_local_service": true/false (true if it depends on in-person/local delivery)
-}
-
-### GUIDELINES
-
-1. **Core idea:** Pick niches where you could easily build a digital product or Skool community.
-   - Anything where people learn, practice, or improve a skill.
-   - Anything where people want transformation (health, mindset, performance, relationships, creative mastery).
-   - Avoid vloggers, podcasts, pure entertainment, or local service businesses.
-
-2. **Diversity requirement:** 
-   - Don’t stick to the same 20–30 niches. Cover hundreds of possible fields across *arts, skills, hobbies, professions, and self-improvement topics*.
-   - Go beyond the classic “health, wealth, relationships” categories. Include blue ocean niches where other growth operators rarely look — areas of genuine passion, creativity, and niche mastery that still have monetizable audiences.
-   - Example categories to sample from:
-     - Arts & Creative: calligraphy, journaling, drawing, painting, pottery, woodworking, crocheting, knitting, embroidery, resin art, candle making, soap making.
-     - Music & Performance: guitar, piano, singing, music production, songwriting, DJing, dance, acting, public speaking.
-     - Digital Skills: video editing, 3D printing, graphic design, animation, coding, app development, Photoshop, filmmaking.
-     - Personal Growth: masculinity, mindset, fitness, meditation, productivity, confidence, habits, discipline, dating, breathwork.
-     - Animals & Nature: dog training, horse care, aquarium setup, gardening, bonsai, aquascaping, permaculture, homesteading.
-     - Food & Lifestyle (educational): sourdough baking, meal prep, barista skills, nutrition, fermentation, vegan cooking.
-     - Education & Communication: language learning, pronunciation, public speaking, teaching skills, storytelling, coaching communication.
-     - Handcraft & Repair: leatherwork, jewelry making, electronics repair, bike maintenance, car detailing, knife making, DIY home repair.
-     - Niche Professions: UX/UI, freelancing, photography, drone cinematography, Shopify, eBay flipping, niche e-commerce, course creation, digital marketing (ethical).
-     - Spiritual & Esoteric (educational only): tarot reading, astrology, manifestation, energy work, meditation, yoga teaching.
-     - Blue Ocean Niches (uncommon but monetizable):
-         - Memory improvement, handwriting analysis, lucid dreaming, creative journaling, emotional release, minimalism, decluttering, ethical hacking, drone repair, sound healing, intuitive eating, vocal toning, self-defense, woodworking restoration, AI voiceover tutorials, kinetic typography, AR/VR art, board game design, homestead architecture, mapmaking, foraging, mushroom cultivation, survival skills, somatic movement, philosophy simplification, life journaling, and historical re-enactment education.
-
-3. **Bad/Skip niches:** 
-   - Local-only services (plumbing, real estate, solar, pest control, salons, construction).
-   - Medical or regulated services (doctors, dentists, therapists, clinics, pharmacies).
-   - Lifestyle vlogs, general podcasts, entertainment/news channels.
-   - Influencer or fashion/beauty content.
-   - Anything that can’t scale digitally.
-
-4. **Content style:**
-   - Natural, real YouTube titles like:
-     - “How I Fixed My Dog’s Separation Anxiety”
-     - “Sourdough Starter Guide for Absolute Beginners”
-     - “My Bullet Journaling System for Focus & Clarity”
-     - “How I Learned 3D Printing in 30 Days”
-     - “5 Mistakes New Woodworkers Make (and How to Avoid Them)”
-     - “Learn Tarot Card Meanings the Simple Way”
-     - “Guitar Warmups That Changed My Playing Forever”
-     - “From Couch to Confident: Men’s Self-Mastery Routine”
-   - Avoid clickbait or overly salesy tone.
-
-5. **Monetization relevance:**
-   - The creator should be *teaching or demonstrating* something their audience wants to master.
-   - Their audience should logically pay for structured learning, accountability, templates, or coaching.
-   - Assume these creators could afford $200–$500/month in software & tools.
-
-6. **Output Requirements:**
-   - Return 60–100 unique JSON objects.
-   - Ensure at least 70% have `"is_local_service": false`.
-   - Spread evenly across at least 10 broad categories, including at least 10 blue ocean niches.
-   - Avoid duplicate or highly similar niches.
-
-### EXAMPLE OUTPUT
-[
-  {"title":"How I Tamed My Reactive Dog in 3 Weeks","niche":"dog training","problem_solved":"stop barking and leash aggression","audience_profile":"pet owners who want obedient dogs","monetization_fit":"course","is_local_service":false},
-  {"title":"My Journaling Routine for Mental Clarity","niche":"journaling","problem_solved":"reduce anxiety and build focus","audience_profile":"young professionals and students","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Mastering Hand-Carved Furniture from Scratch","niche":"woodworking","problem_solved":"build furniture with hand tools","audience_profile":"DIY hobbyists and aspiring craftsmen","monetization_fit":"course","is_local_service":false},
-  {"title":"How to Read Tarot Cards for Beginners","niche":"tarot reading","problem_solved":"understand symbolism and intuition","audience_profile":"spiritual learners","monetization_fit":"membership","is_local_service":false},
-  {"title":"Learn Crochet Patterns in 7 Days","niche":"crocheting","problem_solved":"make wearable patterns easily","audience_profile":"craft lovers, homemakers","monetization_fit":"course","is_local_service":false},
-  {"title":"Lucid Dreaming Techniques for Beginners","niche":"lucid dreaming","problem_solved":"control your dreams consciously","audience_profile":"spiritual self-explorers and meditators","monetization_fit":"skool_community","is_local_service":false},
-  {"title":"Foraging Wild Edible Plants in Your Area","niche":"foraging","problem_solved":"identify and safely harvest wild foods","audience_profile":"nature enthusiasts and survivalists","monetization_fit":"course","is_local_service":false}
-]
+Examples:
+1. "Earning from Pottery Workshops Online"
+2. "Nail Art Side Hustle: Selling Tutorials & Kits"
+3. "How My Journaling Courses Bring in Monthly Income"
+4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
+5. "Car Detailing Coaching Calls That Pay My Bills"
+6. "Making Money Teaching Guitar Lessons Online"
+7. "Tarot Reading Clients That Support My Full-Time Income"
+8. "Woodworking Profits: Selling DIY Plans"
+9. "How I Monetize My Meal Prep Classes"
+10. "Turning Event Planning Tips Into Paid Consultations"
 """
 
     attempts, backoff = 3, 1
@@ -265,11 +194,11 @@ Each object must have these keys:
             resp = openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role":"user","content":prompt}],
-                temperature=0.0,
-                max_tokens=1200
+                temperature=0.5,
+                max_tokens=800
             )
 
-            content = getattr(resp.choices[0].message, "content", "")
+            content = getattr(resp.choices[0].message, "content", "").strip()
             if not content:
                 print(f"[OpenAI Keywords] Empty response on attempt {i}.")
                 if i < attempts:
@@ -277,84 +206,19 @@ Each object must have these keys:
                     continue
                 return []
 
-            # Remove markdown fences and surrounding whitespace
-            content = re.sub(r"^```(?:json)?\s*", "", content)
-            content = re.sub(r"\s*```$", "", content).strip()
-
-            # Try to extract JSON array between first '[' and last ']'. If closing ']' missing, attempt to repair.
-            if "[" in content:
-                first = content.find("[")
-                last = content.rfind("]")
-                if last != -1 and last > first:
-                    json_sub = content[first:last+1]
-                else:
-                    # closing bracket missing — try to find last complete '}' and append ] to close array
-                    last_brace = content.rfind("}")
-                    if last_brace != -1 and last_brace > first:
-                        json_sub = content[first:last_brace+1] + "]"
-                    else:
-                        # as a last resort, take everything from first and append a closing bracket
-                        json_sub = content[first:] + "]"
-            else:
-                json_sub = content
-
-            # Quick sanitization
-            json_sub = json_sub.replace('“', '"').replace('”', '"').replace("‘", "'").replace("’", "'")
-            # Remove control chars and collapse newlines to spaces (helps unterminated string errors)
-            json_sub = re.sub(r"[\x00-\x1f\x7f]", "", json_sub)
-            json_sub = json_sub.replace('\n', ' ').replace('\r', ' ')
-            # Remove trailing commas before } or ]
-            json_sub = re.sub(r",\s*(\}|\])", r"\1", json_sub)
-
-            # Try parsing
             try:
-                parsed = json.loads(json_sub)
+                # Remove Markdown code fences if present
+                content = re.sub(r"^```(?:json)?\s*", "", content)
+                content = re.sub(r"\s*```$", "", content)
+                content = content.strip()
+                keywords = json.loads(content)
+                if isinstance(keywords, list) and keywords:
+                    return [k for k in keywords if isinstance(k, str)]
+                else:
+                    print(f"[OpenAI Keywords] Response not a valid list (attempt {i}). Raw:", content)
             except Exception as e:
-                # Fallback 1: replace single quotes with double quotes and try again
-                try:
-                    alt = json_sub.replace("\"\"", '"')
-                    alt = alt.replace("'", '"')
-                    alt = re.sub(r",\s*(\}|\])", r"\1", alt)
-                    parsed = json.loads(alt)
-                except Exception as e2:
-                    # Fallback 2: as last resort, try to extract double-quoted title-like substrings with regex
-                    print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e} | fallback tried: {e2}")
-                    # write a short raw preview to help debugging
-                    print("[OpenAI Keywords Raw Response]", content[:2000])
-                    # attempt regex: capture quoted strings that look like titles
-                    candidates = re.findall(r'"([A-Za-z0-9\-\'\":;,.!\s]{5,120})"', json_sub)
-                    # filter out keys like "title" or other JSON keys
-                    candidates = [c.strip() for c in candidates if len(c.strip().split()) >= 2 and c.lower() not in ['title','niche','problem_solved','audience_profile','monetization_fit','is_local_service']]
-                    if candidates:
-                        # dedupe while preserving order
-                        seen = set(); out = []
-                        for c in candidates:
-                            if c not in seen:
-                                seen.add(c)
-                                out.append(c)
-                        return out
-                    if i < attempts:
-                        time.sleep(backoff); backoff *= 2
-                        continue
-                    return []
-
-            # parsed should be a list
-            if isinstance(parsed, list) and parsed:
-                titles = []
-                for item in parsed:
-                    if isinstance(item, str):
-                        titles.append(item.strip())
-                    elif isinstance(item, dict) and item.get('title'):
-                        titles.append(str(item.get('title')).strip())
-                    else:
-                        continue
-                # Deduplicate and return
-                titles = [t for idx, t in enumerate(titles) if t and t not in titles[:idx]]
-                if titles:
-                    return titles
-
-            # Not usable
-            print(f"[OpenAI Keywords] Response not a usable list (attempt {i}). Raw:\n", content[:2000])
+                print(f"[OpenAI Keywords] JSON parse error (attempt {i}): {e}")
+                print("[OpenAI Keywords Raw Response]", content)
 
         except Exception as e:
             print(f"[OpenAI Keywords] Attempt {i} failed: {e}")
@@ -368,7 +232,36 @@ Each object must have these keys:
 
     return []
 
-# The next function definition remains unchanged
+def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
+    """
+    Asks OpenAI to rate the lead 0-10 (likelihood of offering paid product/monetization).
+    Returns integer 0-10.
+    """
+    prompt = f"""
+You are an expert evaluator. Rate from 0 to 10 (integer only) how likely this YouTube channel is to offer paid courses, coaching, lead magnets, booking calls, memberships or other paid products based on the information below.
+
+Channel Title: {channel_title}
+Channel Description: {channel_description}
+Recent Video Titles (pipe separated): {titles_pipe}
+Average Views per Video: {avg_views}
+
+If the YouTube bio or recent video titles contain non-English text (such as Spanish, Hindi, or any language other than English), give a rating less than 5.
+Consider presence of selling language, call-to-actions, professionalism, and view counts.
+Respond with a single integer between 0 and 10 and nothing else.
+"""
+    try:
+        resp = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role":"user","content":prompt}],
+            temperature=0
+        )
+        text = resp.choices[0].message.content.strip()
+        m = re.search(r"\d+", text)
+        if m:
+            return int(m.group(0))
+    except Exception as e:
+        print(f"[OpenAI Rate] Error: {e}")
+    return 0
 
 def determine_offer_with_openai(channel_title, channel_description, recent_titles_pipe, landing_snippet):
     """
