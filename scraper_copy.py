@@ -58,16 +58,34 @@ except Exception:
 API_KEYS = [
     "AIzaSyDe7axLxXM73cBwgWVIiExaxFPo504cTPA",
     "AIzaSyDhe5odit54OSGWZ4BxDw4-5WO76uYBffE",
+    "AIzaSyCZbEWLcgnThO-cLfzuB411_WyDdPt3cHs",
+    "AIzaSyA8cBjcsrJQCtbh0fID0BUDdAZB8jwG5vI",
+    "AIzaSyC9rwhurm3JL6NkDXzvUWWc079lGsk3Vjk",
     "AIzaSyB2p8GXoG_AOm9TEDmqpoQiHoyO7IIe3eU",
-    "AIzaSyC2m0NfOQKRuqDPhGucSw22ih3TrYbVoVY"
-
+    "AIzaSyC2m0NfOQKRuqDPhGucSw22ih3TrYbVoVY",
+    "AIzaSyCsrVNe2Y91pgROG50s8B90AtVmUzi23R0",
+    "AIzaSyC3ziU3IdKt91DFt5XGE4HVepSYs4PDlA4",
+    "AIzaSyB1UdpVtyo5T0rUgEOlkcxodNYy0bhTwiA",
+    "AIzaSyDOl-KJk6uRKXDE2FWiEMo6zgrJTqBmHDQ",
+    "AIzaSyBpU1kDS1Lu6WBI76PbI50XeUfMxcTEdvY",
+    "AIzaSyAze5ZozA0CX0nkc42PxIL6Rc6jQ4SerH0",
+    "AIzaSyAEG5hUpyQM2BQD1NlsfmvZNPJDmZyW4Vw",
+    "AIzaSyCuza6qvawjdeyAaaHT8USqPOHteJb9nuo",
+    "AIzaSyByyMHMehHrCerrUBKBh2gqe0Dl9hkwDAg",
+    "AIzaSyDIzKvn-JDfhQNovNCi-kXKOq7zWyOZPiA",
+    "AIzaSyDe75esEJsvtjy2s48rVqBkCW2_gbt4isc",
+    "AIzaSyDncyAIOlOjG9pjH8xYRLHWvGSg9srSMnA",
+    "AIzaSyBbKXiBfaP5HgOeXr_hOJcTXPf9XNBOCbU",
+    "AIzaSyA4rs-T12x3yv1XG7HcxDeA3Nb-_jyHuqo",
+    "AIzaSyAwtp--S2i1mW8xjhkWF7U3fAgUou0LvsU",
+    "AIzaSyAqhHPtUol73wQ-b9_VPOTLTZCG7aZ7Qdw"
 ]
 
 # OpenAI key via env var preferred
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "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"
 
 # Parameters
-MIN_SUBS = 8000
+MIN_SUBS = 3000
 MAX_SUBS = 150000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
 TARGET_LEADS = 500              # collect 15 qualified leads (rating >= 7)
@@ -167,25 +185,211 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate 25–30 diverse YouTube creator video titles from all types of niches (gardening, photography, plumbing, cleaning, dancing, cooking, crafts, language learning, fitness, etc.). 
-Also include less mainstream, underrated, or unexpected niches beyond these examples (e.g., calligraphy, pottery, pet training, nail art, journaling, car detailing, tarot reading, woodworking, meal prep, thrift flipping, music teaching, event planning, etc.). 
-Prioritize hobby or passion-driven niches where creators are likely small, enthusiastic, and not yet monetizing fully. Examples of such hobby niches: calligraphy, pottery, journaling, bullet journaling, model building, Lego creations, bonsai/urban gardening, baking, cake decorating, pet training, amateur photography, DIY crafts, knitting, crocheting, board games, tabletop RPGs, musical instruments, tarot, astrology, creative writing, poetry, homebrewing, miniature painting, soap making, candle making.
-You can invent realistic niches not mentioned above, prioritizing small-scale creators who are likely to need help growing their channel. 
-Each title should be realistic, engaging, and assume the creator is monetizing (selling courses, coaching, consulting, paid services, online programs, affiliate, etc.). 
-Every title must signal monetization or income (e.g., making money, clients, billing, profits, classes, services, selling products). 
+Generate 25–30 diverse YouTube creator video titles across a wide range of high-ticket friendly, adult skill niches.
+
+Each title must:
+- Look like a real YouTube video title.
+- Come from creators who teach a skill, transformation, method, or system.
+- Be the type of creator who could realistically monetize with courses, coaching, community, or digital products.
+- Hint at expertise, improvement, or problem-solving.
+- Be in English.
+- Avoid entertainment-only content, “oddly satisfying” content, transformations, and passive watching.
+- Focus on adults, not school students.
+
+IMPORTANT:
+You are NOT limited to only the niche list below.
+You MUST produce titles that fit into any skill niche that is similar, related, adjacent, or thematically aligned with the categories below.
+Use these 20 categories + sub-niches as inspiration, not as a limit.
+
+--------------------------------------------------------------------
+1. ALLOWED CATEGORIES (20 Main Adult Skill Niches, 5 Sub-Niches Each)
+--------------------------------------------------------------------
+
+Rotate heavily among these, and among any adjacent, similar adult skill niches.
+
+A. Smart Home Systems & Home Tech Setup
+- Beginner smart-home wiring & safety fundamentals
+- Home automation with HomeKit, Alexa, or Google
+- Setting up routines, sensors, and automation flows
+- WiFi optimization + network layout for homes
+- Building a personalized smart-home control system
+
+B. Color Grading & Color Science (DaVinci Resolve)
+- Intro to DaVinci nodes and workflow
+- Skin-tone grading and tone-mapping
+- Matching shots across multiple cameras
+- Creative color grades for storytelling
+- Building professional grading templates
+
+C. Audio Engineering & Clean Vocal Processing
+- Recording clean audio in untreated rooms
+- EQ, compression, and de-essing for creators
+- Voice cleanup & noise reduction workflow
+- Setting up audio interfaces and microphones
+- Mixing full dialogue tracks for content creators
+
+D. Podcast Production Systems
+- Building a home podcast studio
+- Multi-camera and multi-mic setups
+- Editing podcasts in Premiere/Resolve
+- Creating podcast branding & identity
+- Repurposing long episodes into short clips
+
+E. Digital Illustration for Adults
+- Anatomy & proportions for beginners
+- Digital brush control & line weight
+- Shading, lighting, and rendering basics
+- Character drawing for adults
+- Building an illustration portfolio
+
+F. Beginner Concept Art Foundations
+- Perspective and environment basics
+- Digital painting fundamentals
+- Thumbnail sketching & ideation
+- Character concept creation
+- Rendering realistic materials
+
+G. VFX for Content Creators
+- Motion tracking & camera solving
+- Compositing and green-screen cleanup
+- Basic explosions, particles, and muzzle flashes
+- Creating sci-fi hologram and interface effects
+- Integrating VFX into talking-head content
+
+H. Music Composition for Creators
+- Writing background music for videos
+- Looping music for shorts & reels
+- Layering instruments for emotion
+- MIDI composing workflows
+- Mixing music for clarity and impact
+
+I. DSLR/Mirrorless Camera Mastery
+- Manual mode fundamentals
+- Choosing lenses & understanding focal lengths
+- Shooting cinematic B-roll
+- Low-light shooting techniques
+- Building a camera kit for beginners
+
+J. Lighting for Video Creators
+- Three-point lighting techniques
+- Softbox, reflector, and bounce lighting
+- RGB lighting setups for mood
+- Backlight and edge-light fundamentals
+- Creating lighting templates for any room
+
+K. Home Studio & Set Design for YouTubers
+- Designing small creator studios
+- Background styling & visual identity
+- Sound treatment on a budget
+- Multi-angle studio workflows
+- Building cinematic home sets
+
+L. Blender for Absolute Beginners
+- 3D modeling fundamentals
+- Shading and nodes basics
+- Lighting 3D scenes
+- Simple animation techniques
+- Rendering with Cycles & Eevee
+
+M. Voice Coaching for Creators
+- Warmups for clear speech
+- Resonance & projection training
+- Eliminating vocal fry, monotone, fillers
+- On-mic performance and pacing
+- Storytelling with voice expression
+
+N. DIY Electronics (Beginner Friendly, Non-Fabrication)
+- Intro to Arduino & microcontrollers
+- Simple LED, sensor, and motor projects
+- Circuit basics for adults
+- Building functional home-use gadgets
+- Programming simple automation logic
+
+O. Creative Coding for Artists
+- Generative art with p5.js
+- Visuals in TouchDesigner
+- Real-time interaction design
+- Shader basics for beginners
+- Projection mapping fundamentals
+
+P. Beginner Game Development
+- Unity basics for adults
+- Simple game mechanics design
+- Level design fundamentals
+- 2D animation workflows
+- Exporting & publishing small games
+
+Q. Candle Making & Aroma Craft (Adult Skill + Business Potential)
+- Wax chemistry & safe melting
+- Scent blending & fragrance notes
+- Wick selection & testing
+- Container, mold, and vessel design
+- Branding & packaging fundamentals
+
+R. Sustainable Home Gardening & Indoor Grow Systems
+- Soil biology basics for indoor gardening
+- Indoor grow-light setup & plant-light matching
+- Designing low-maintenance indoor grow systems
+- Hydroponics & self-watering container systems
+- Pest control, pruning, and plant health troubleshooting
+
+S. Photo Editing & Lightroom Mastery
+- Local adjustments & masking
+- Color profiles & calibration
+- Skin retouching for beginners
+- Preset creation & batch editing
+- Editing workflows for different moods
+
+T. Interior Styling (NOT full interior design)
+- Color palette planning for adults
+- Shelf, desk, and room styling
+- Moodboard creation workflow
+- Minimalist & modern styling principles
+- Styling for small apartments
+
+--------------------------------------------------------------------
+2. EXCLUSIONS (Do NOT Use These Niches)
+--------------------------------------------------------------------
+
+Avoid all titles from channels that focus on:
+- Cleaning, pressure washing, restoration, carpet cleaning, lawn mowing
+- “Oddly satisfying” or transformation content
+- Entertainment, lifestyle, vlogging, routines, reactions
+- Fashion hauls, beauty, makeup, skincare
+- Food recipes without technique focus
+- ASMR, mukbang, pranks, drama, commentary
+- Kids/teen tutoring, academic test prep (IELTS, SAT, math, physics, chemistry)
+- Coding, programming, software engineering
+- Business, entrepreneurship, marketing, money, finance, investing
+- Tarot, astrology, manifestation, spiritual predictions
+- Medical, legal, psychological advice
+
+If viewers watch primarily for entertainment—not to learn a skill—exclude it.
+
+--------------------------------------------------------------------
+3. DIVERSITY REQUIREMENT
+--------------------------------------------------------------------
+
+- Use as many DIFFERENT niches as possible.
+- Do NOT repeat the same sub-niche within a batch.
+- Mix categories widely.
+- Include adjacent niches not listed explicitly (as long as they fit the adult skill requirement).
+- Avoid generating titles that feel like slight variations.
+
+--------------------------------------------------------------------
+4. OUTPUT FORMAT
+--------------------------------------------------------------------
+
 Return ONLY a valid JSON array of strings.
 
-Examples:
-1. "Earning from Pottery Workshops Online"
-2. "Nail Art Side Hustle: Selling Tutorials & Kits"
-3. "How My Journaling Courses Bring in Monthly Income"
-4. "Flipping Thrift Finds Into a $2k/Month Side Hustle"
-5. "Car Detailing Coaching Calls That Pay My Bills"
-6. "Making Money Teaching Guitar Lessons Online"
-7. "Tarot Reading Clients That Support My Full-Time Income"
-8. "Woodworking Profits: Selling DIY Plans"
-9. "How I Monetize My Meal Prep Classes"
-10. "Turning Event Planning Tips Into Paid Consultations"
+Example (do NOT copy these):
+[
+  "5 Speaking Habits That Make You Sound More Confident at Work",
+  "Beginner Sewing: How to Read Your First Pattern Without Confusion",
+  "Knife Skills 101: The Only 3 Cuts Every Home Cook Must Learn",
+  "How to Design a Productive Home Office Layout",
+  "Ear Training for Adults: Hear Chords More Accurately in 10 Minutes"
+]
 """
 
     attempts, backoff = 3, 1
