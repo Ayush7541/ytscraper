@@ -188,98 +188,89 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate 50 YouTube video titles. Each title must implicitly define a complete channel niche.
+Generate YouTube video titles that implicitly define a complete, underexplored channel niche.
 
 CORE REQUIREMENT (NON-NEGOTIABLE)
 Each title must clearly represent:
-- A hyper-specific PRACTICE or CRAFT (not a topic, not a concept, not a mechanism)
+- A hyper-specific PRACTICE or CRAFT (not a topic, concept, identity, or tool)
 - Something people actively do, practice, and try to improve
 - A niche narrow enough that someone could build an entire channel around ONLY this
-- A naturally monetizable skill (course-worthy, coaching-worthy, community-worthy)
+- A skill or practice that can be monetized via courses, communities, coaching, or systems
 
-If a title could belong on a general channel, reject it.
+If a title could belong on a general or saturated channel, discard it.
 
-DEPTH REQUIREMENT (CRITICAL)
+ANTI-EXHAUSTION DIRECTIVE (CRITICAL)
+Avoid niches that are already widely farmed on YouTube, even in sub-form:
+- Generic fitness, weight loss, muscle building
+- Dropshipping, ecommerce basics, Amazon FBA
+- Copywriting, SMMA, agency growth, funnels
+- Productivity, habits, time management
+- Real estate investing
+- Generic mindset or self-improvement
+
+Assume these areas are already exhausted. Do NOT generate variants of them.
+
+Instead, deliberately explore:
+- Second-order skills that SUPPORT a result rather than promise the result
+- Maintenance, optimization, troubleshooting, or recovery practices
+- Skill stacks used by practitioners behind the scenes
+- Niche constraints (age, environment, limitation, context)
+- Practices people discover only AFTER failing at the obvious approach
+
+DEPTH REQUIREMENT
 Go 3–4 levels deeper than the obvious category.
 
-Examples of required depth:
-- Not "podcasting" → "podcast launch strategies for B2B consultants with small audiences"
-- Not "photography" → "natural light product photography for Etsy sellers"
-- Not "writing" → "LinkedIn ghostwriting for fintech executives"
-- Not "public speaking" → "presentation design for academic conference speakers"
+Bad (too confirming):
+- “Trading psychology for beginners”
+- “Strength training for men over 40”
+- “Content creation systems”
 
-Each title must make the exact niche obvious without explanation.
+Good (fresh + specific):
+- “Risk management routines for discretionary swing traders”
+- “Joint-friendly strength progressions for former athletes with injuries”
+- “Editorial decision-making for faceless educational channels”
 
-DIVERSITY REQUIREMENT
-Cast a wide net across completely unrelated worlds. Do not cluster.
+STRUCTURAL DIVERSITY RULE
+Each title must come from a completely different world than the previous one.
+Do not cluster domains.
 
-Possible domains include (do not limit yourself to these):
-- Specialized creative software workflows (audio, video, 3D, design)
-- Niche digital product creation and monetization
-- Platform-specific content strategies (LinkedIn, Twitter, newsletters)
-- Micro-SaaS building and validation practices
-- Alternative investment research methods
-- Emerging tech skill building (AI prompting, no-code, automation)
-- Health optimization protocols for specific professions
-- Parenting strategies for specific child development stages
-- Pet training for specific breeds or behavioral issues
-- Home improvement for specific property types or climates
-- Garden/agriculture niches for urban or small-scale growers
-- Vehicle maintenance for specific makes or enthusiast communities
-- Fashion/style building for specific body types or life stages
-- Career transition strategies for specific industry pivots
-- Relationship skills for specific life contexts (blended families, long-distance, etc.)
-
-Every title should feel like it came from a completely different world than the previous one.
-
-ANTI-COMPETITIVE FILTER (VERY IMPORTANT)
-Avoid oversaturated niches:
-- General fitness, weight loss, muscle building
-- Dropshipping, Amazon FBA, ecommerce basics
-- Generic productivity or time management
-- Broad copywriting or content marketing
-- General real estate investing
-- Basic freelancing or VA work
-- Generic trading or investing advice
-- Broad instrument learning or music theory
-- General meditation or mindfulness
-- Generic language learning methods
-
-Instead, find the underserved subsection:
-- Not "content creation" → "thumbnail split-testing for finance YouTubers under 10k subs"
-- Not "SaaS" → "Stripe billing integration for B2B seat-based pricing models"
-- Not "investing" → "dividend growth screening for early retirement at 45"
-- Not "parenting" → "montessori meal prep routines for working parents of toddlers"
+Explore areas such as:
+- Technical execution practices
+- Physical skill refinement
+- Cognitive or perceptual training
+- Creative production sub-skills
+- Diagnostic or analysis workflows
+- Teaching or explanation systems
+- Practice routines used by professionals but rarely taught directly
 
 WHAT TO AVOID (HARD EXCLUSIONS)
-- Enterprise or institutional roles
-- Credential-required practices
-- Tool-level explanations
-- Self-help, trauma healing, or emotional recovery framing
-- Entertainment or commentary channels
-- One-off hacks instead of ongoing practices
-- Niches with hundreds of established YouTubers already teaching them
-- Previously popular domains: general trading, music instruments, meditation, languages, generic business
+- Tool tutorials or software walkthroughs
+- Credential-locked professions (doctor, therapist, lawyer, etc.)
+- Entertainment, commentary, or reaction content
+- Trauma healing, emotional processing, or therapy framing
+- One-off hacks instead of repeatable practices
+- Niches dominated by gurus and courses already
 
 VALIDATION TEST (APPLY INTERNALLY)
-A title is valid ONLY if the answer is YES to all:
-1. Could someone run a paid Skool community just for people practicing this?
-2. Could a solo creator learn this through doing, without institutional access?
-3. Would someone realistically pay $500+ for a course on this exact thing?
-4. Is this less competitive than the obvious broad category?
-5. Is this a repeatable practice, not just information?
+A title is valid ONLY if all answers are YES:
+1. Could someone practice this weekly for 6–12 months?
+2. Could a paid community exist just for people doing this?
+3. Would this attract practitioners, not spectators?
+4. Is this less competitive than the obvious parent niche?
+5. Does this feel like a “missing manual” skill?
 
-If any answer is "no", discard the title.
+If any answer is NO, discard the title.
 
 OUTPUT RULES
 - Titles ONLY
 - Return ONLY a valid JSON array of strings
 - No numbering, explanations, categories, or markdown
-- Simple, clear language (not clever or poetic)
-- Each title should feel like it came from a channel that talks about ONLY that thing
-- Maximum diversity between titles
+- Clear, literal language (not clever or poetic)
+- Each title should feel like a channel that talks about ONLY that thing
+- Strong diversity between titles
 
-Generate 50 distinct YouTube video titles that meet ALL the rules above."""
+Generate 25–30 distinct YouTube video titles that meet ALL the rules above.
+"""
 
     attempts, backoff = 3, 1
     for i in range(1, attempts + 1):
