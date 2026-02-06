@@ -25,7 +25,7 @@ from docx import Document
 # ---------------- CONFIG ----------------
 
 # ---- SET YOUR YOUTUBE API KEY HERE ----
-YOUTUBE_API_KEY = "AIzaSyB2p8GXoG_AOm9TEDmqpoQiHoyO7IIe3eU"
+YOUTUBE_API_KEY = "AIzaSyD9a4HtKtqAfEFf7NuImdccHtbotuWxJl8"
 
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
@@ -33,19 +33,23 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/channel/UCYyel9YAgwvs07rz5kugU7g"
+    "https://www.youtube.com/channel/UChWSdSRhJWUpq82L2LsVJSA"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
 # Add any websites you want to scrape here
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "",
-        "url": ""
+        "name": "SRM Fishflow Form 1",
+        "url": "https://srm.fishflow.app/widget/form/unvJSsn9MrPIOVqf5b14"
     },
     {
-        "name": "",
-        "url": ""
+        "name": "SRM Fishflow Form 2",
+        "url": "https://srm.fishflow.app/widget/form/Uz07h4LYU0k5f0b4aTPG"
+    },
+    {
+        "name": "SRM Fishflow Form 3",
+        "url": "https://srm.fishflow.app/widget/form/AsbicSxZteiove5fAonq"
     }
 ]
 

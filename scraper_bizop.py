@@ -203,10 +203,10 @@ DEPTH REQUIREMENT (CRITICAL)
 Go 3–4 levels deeper than the obvious category.
 
 Examples of required depth:
-- Not “fitness” → “calisthenics progressions for desk workers over 40”
-- Not “trading” → “swing trading small-cap momentum stocks”
-- Not “piano” → “jazz piano voicings for self-taught players”
-- Not “language learning” → “Spanish conversation practice for intermediate plateau breakers”
+- Not "podcasting" → "podcast launch strategies for B2B consultants with small audiences"
+- Not "photography" → "natural light product photography for Etsy sellers"
+- Not "writing" → "LinkedIn ghostwriting for fintech executives"
+- Not "public speaking" → "presentation design for academic conference speakers"
 
 Each title must make the exact niche obvious without explanation.
 
@@ -214,18 +214,21 @@ DIVERSITY REQUIREMENT
 Cast a wide net across completely unrelated worlds. Do not cluster.
 
 Possible domains include (do not limit yourself to these):
-- Trading and investing sub-practices
-- Instrument learning and music technique
-- Meditation and mindfulness practices
-- Language acquisition methods
-- Physical movement systems
-- Creative production skills
-- Technical building and making
-- Business execution practices
-- Teaching and learning systems
-- Analytical or decision-making frameworks
-- Craft skills and performance disciplines
-- Communication and persuasion training
+- Specialized creative software workflows (audio, video, 3D, design)
+- Niche digital product creation and monetization
+- Platform-specific content strategies (LinkedIn, Twitter, newsletters)
+- Micro-SaaS building and validation practices
+- Alternative investment research methods
+- Emerging tech skill building (AI prompting, no-code, automation)
+- Health optimization protocols for specific professions
+- Parenting strategies for specific child development stages
+- Pet training for specific breeds or behavioral issues
+- Home improvement for specific property types or climates
+- Garden/agriculture niches for urban or small-scale growers
+- Vehicle maintenance for specific makes or enthusiast communities
+- Fashion/style building for specific body types or life stages
+- Career transition strategies for specific industry pivots
+- Relationship skills for specific life contexts (blended families, long-distance, etc.)
 
 Every title should feel like it came from a completely different world than the previous one.
 
@@ -237,11 +240,16 @@ Avoid oversaturated niches:
 - Broad copywriting or content marketing
 - General real estate investing
 - Basic freelancing or VA work
+- Generic trading or investing advice
+- Broad instrument learning or music theory
+- General meditation or mindfulness
+- Generic language learning methods
 
 Instead, find the underserved subsection:
-- Not “weight loss” → “strength training for formerly obese people maintaining fat loss”
-- Not “ecommerce” → “Shopify conversion optimization for health supplement brands”
-- Not “productivity” → “deep work systems for creative freelancers with active clients”
+- Not "content creation" → "thumbnail split-testing for finance YouTubers under 10k subs"
+- Not "SaaS" → "Stripe billing integration for B2B seat-based pricing models"
+- Not "investing" → "dividend growth screening for early retirement at 45"
+- Not "parenting" → "montessori meal prep routines for working parents of toddlers"
 
 WHAT TO AVOID (HARD EXCLUSIONS)
 - Enterprise or institutional roles
@@ -251,6 +259,7 @@ WHAT TO AVOID (HARD EXCLUSIONS)
 - Entertainment or commentary channels
 - One-off hacks instead of ongoing practices
 - Niches with hundreds of established YouTubers already teaching them
+- Previously popular domains: general trading, music instruments, meditation, languages, generic business
 
 VALIDATION TEST (APPLY INTERNALLY)
 A title is valid ONLY if the answer is YES to all:
@@ -260,7 +269,7 @@ A title is valid ONLY if the answer is YES to all:
 4. Is this less competitive than the obvious broad category?
 5. Is this a repeatable practice, not just information?
 
-If any answer is “no”, discard the title.
+If any answer is "no", discard the title.
 
 OUTPUT RULES
 - Titles ONLY
@@ -270,8 +279,7 @@ OUTPUT RULES
 - Each title should feel like it came from a channel that talks about ONLY that thing
 - Maximum diversity between titles
 
-Generate 50 distinct YouTube video titles that meet ALL the rules above.
-"""
+Generate 50 distinct YouTube video titles that meet ALL the rules above."""
 
     attempts, backoff = 3, 1
     for i in range(1, attempts + 1):
@@ -317,88 +325,7 @@ Generate 50 distinct YouTube video titles that meet ALL the rules above.
 
     return []
 
-def rate_lead_with_openai(channel_title, channel_description, avg_views, titles_pipe):
-    """
-    Asks OpenAI to rate the lead 0-10 (likelihood of offering paid product/monetization).
-    Returns integer 0-10.
-    """
-    prompt = f"""Rate this YouTube channel from 0 to 10 (integer only) based on how likely they are to become a good lead for a backend monetization operator who builds funnels, VSLs, Skool communities, email systems, and high-ticket offers on a revenue-share model.
 
-Give a HIGH rating (7–10) if:
-- The creator teaches or shares transformation-based content in Wealth, Health, or Relationship niches.
-- They make educational, how-to, tutorial, or journey-style content.
-- They do NOT appear to be selling anything, do NOT mention funnels, clients, coaching, courses, or monetization.
-- They are not a marketing, copywriting, agency, or funnel-building channel.
-- They seem coachable, early-stage, or still figuring things out.
-
-Give a MID rating (4–6) if:
-- The creator is educational but unclear, inconsistent, or possibly planning to sell something.
-- They have some weak monetization hints but nothing strong.
-- Niche potential is average.
-
-Give a LOW rating (0–3) if:
-- The creator teaches marketing, copywriting, funnels, sales, agency scaling, or “how to make money.”
-- They already sell a course, coaching, or have strong call-to-actions.
-- They are a medical/clinical professional (doctor, therapist, nurse, RD).
-- They are mostly entertainment, vlogs, or non-English content.
-
-Return ONLY a single integer between 0 and 10 with no extra words.
-
-Channel Title: {channel_title}
-Channel Description: {channel_description}
-Recent Video Titles: {titles_pipe}
-Average Views: {avg_views}
-"""
-    try:
-        resp = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0
-        )
-        text = resp.choices[0].message.content.strip()
-        m = re.search(r"\d+", text)
-        if m:
-            return int(m.group(0))
-    except Exception as e:
-        print(f"[OpenAI Rate] Error: {e}")
-    return 0
-
-def determine_offer_with_openai(channel_title, channel_description, recent_titles_pipe, landing_snippet):
-    """
-    Returns a dict with keys: selling_type, target_audience, one_line_pitch.
-    selling_type in [course,membership,skool,appointment,lead_magnet,product,service,None,unknown]
-    """
-    prompt = f"""
-You are an assistant that extracts succinct product/offer info from a YouTube channel.
-
-Input:
-Channel Title: {channel_title}
-Channel Description: {channel_description}
-Recent Video Titles (pipe-separated): {recent_titles_pipe}
-Landing Page Snippet: {landing_snippet}
-
-Output ONLY valid JSON in this exact shape:
-{{"selling_type":"one of [course,membership,skool,appointment,lead_magnet,product,service,saas,agency,None,unknown]",
- "target_audience":"one-line description",
- "one_line_pitch":"single sentence summary"}}
-
-If unclear, use "unknown" or "None" for selling_type and keep other fields short.
-"""
-    try:
-        resp = openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0
-        )
-        content = resp.choices[0].message.content.strip()
-        # extract JSON substring
-        if "{" in content:
-            content = content[content.index("{"):]
-        parsed = json.loads(content)
-        return parsed
-    except Exception as e:
-        print(f"[OpenAI Offer] Error parsing offer info: {e}")
-        return {"selling_type":"unknown","target_audience":"","one_line_pitch":""}
 
 
 # ---------- persistence ----------
@@ -990,12 +917,7 @@ try:
                     continue
                 # If rating not set by platform/selling clue, use OpenAI
                 if rating is None:
-                    rating = rate_lead_with_openai(channel_title, channel_description, avg_views, "|".join(recent_titles[:15]))
-                    print(f"[Rate] {channel_title} -> rating {rating}")
-                    if rating is None:
-                        rating = 4
-                    if rating < 4:
-                        continue
+                    rating = 7  # Static rating; OpenAI rating disabled
                 # Extract sample video info
                 sample_idx = 0
                 sample_video_title = recent_titles[sample_idx] if recent_titles else ""
