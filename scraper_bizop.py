@@ -78,7 +78,23 @@ API_KEYS = [
     "AIzaSyBbKXiBfaP5HgOeXr_hOJcTXPf9XNBOCbU",
     "AIzaSyA4rs-T12x3yv1XG7HcxDeA3Nb-_jyHuqo",
     "AIzaSyAwtp--S2i1mW8xjhkWF7U3fAgUou0LvsU",
-    "AIzaSyAqhHPtUol73wQ-b9_VPOTLTZCG7aZ7Qdw"
+    "AIzaSyAqhHPtUol73wQ-b9_VPOTLTZCG7aZ7Qdw",
+    "AIzaSyAVRUBx76piHJhAKNmGajjzSq38-4jIeIY",
+    "AIzaSyBVUCKpDQr5bRGsUohKqMN2htkbpFt0vps",
+    "AIzaSyBuQuN03xK7MQgyC1cPC6lP-mKu3V6eZA0",
+    "AIzaSyDiML0AskYNvbKYR0NLkpnfQQevxtVOa38",
+    "AIzaSyA3-Spl1bBQbuuBFHth_JpXWk3m-ZRDoWA",
+    "AIzaSyCmsh_XG3EFiLGsEr17UTfdJrbNKaox-RE",
+    "AIzaSyDC9HLYrEOsOzdhxOT6jNjLJjxZwvCv7As",
+    "AIzaSyAwYXZtT8VAMgYg3_0s_O-LXKW9eM68mFI",
+    "AIzaSyCB4w-BCbo52MGJO8AFq2O2OBKQ5GWqex0",
+    "AIzaSyAN1Np_IDn0K1COuDkUkVi6PJmlCxftF5c",
+    "AIzaSyCZcgVFiMajTC2QojZlU1me5y11Kx8oBp8",
+    "AIzaSyApr-317nNb9dspyCL37YS9XwZzWBxnedc",
+    "AIzaSyA0vWbdoi51LqaqeTddy5bn1xnwFlGXMAY",
+    "AIzaSyBiURjbUL7kiq7bxvd6N4SsetFEMuKb6I4",
+    "AIzaSyD9akEQRpwHRq8mxy8__tA1gP7pyOG_30Q",
+    "AIzaSyDDVj89sCKMZe6mwxUW8LdZxR_Z6a-srU0"
 ]
 
 # OpenAI key via env var preferred

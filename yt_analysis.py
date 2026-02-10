@@ -33,23 +33,14 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/channel/UChWSdSRhJWUpq82L2LsVJSA"
+    "https://www.youtube.com/@stayreadyto3dprint"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
-# Add any websites you want to scrape here
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "SRM Fishflow Form 1",
-        "url": "https://srm.fishflow.app/widget/form/unvJSsn9MrPIOVqf5b14"
-    },
-    {
-        "name": "SRM Fishflow Form 2",
-        "url": "https://srm.fishflow.app/widget/form/Uz07h4LYU0k5f0b4aTPG"
-    },
-    {
-        "name": "SRM Fishflow Form 3",
-        "url": "https://srm.fishflow.app/widget/form/AsbicSxZteiove5fAonq"
+        "name": "Stay Ready To 3D Print",
+        "url": "https://www.stayreadyto3dprint.com/"
     }
 ]
 
@@ -189,13 +180,19 @@ def get_comments(youtube, video_id: str) -> List[Dict]:
     next_page = None
 
     while True:
-        res = youtube.commentThreads().list(
-            part="snippet,replies",
-            videoId=video_id,
-            maxResults=100,
-            pageToken=next_page,
-            textFormat="plainText"
-        ).execute()
+        try:
+            res = youtube.commentThreads().list(
+                part="snippet,replies",
+                videoId=video_id,
+                maxResults=100,
+                pageToken=next_page,
+                textFormat="plainText"
+            ).execute()
+        except Exception as e:
+            # Skip videos with disabled comments or permission issues
+            if hasattr(e, "resp") and getattr(e.resp, "status", None) == 403:
+                return []
+            raise
 
         for item in res['items']:
             top = item['snippet']['topLevelComment']['snippet']
@@ -278,14 +275,15 @@ def scrape_websites():
             pass  # fallback to playwright
 
         # ---- Tier 2: Playwright fallback ----
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto(url, timeout=60000)
-            page.wait_for_load_state("networkidle")
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto(url, timeout=60000, wait_until="domcontentloaded")
+                page.wait_for_timeout(3000)
 
-            html = page.content()
-            browser.close()
+                html = page.content()
+                browser.close()
 
             soup = BeautifulSoup(html, "html.parser")
             for tag in soup(["script", "style", "noscript"]):
@@ -293,12 +291,17 @@ def scrape_websites():
 
             text = " ".join(soup.stripped_strings)
 
-            results.append({
-                "source_name": name,
-                "url": url,
-                "method": "playwright",
-                "text": text
-            })
+            if text:
+                results.append({
+                    "source_name": name,
+                    "url": url,
+                    "method": "playwright",
+                    "text": text
+                })
+
+        except Exception:
+            # If playwright also fails (timeout, blocking, etc), skip site
+            continue
 
     return results
 

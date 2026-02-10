@@ -1,7 +1,7 @@
 from openai import OpenAI
 
 # Replace with your key (or use env variable)
-api_key = "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"
+api_key = "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"
 client = OpenAI(api_key=api_key)
 
 try:
