@@ -94,7 +94,23 @@ API_KEYS = [
     "AIzaSyA0vWbdoi51LqaqeTddy5bn1xnwFlGXMAY",
     "AIzaSyBiURjbUL7kiq7bxvd6N4SsetFEMuKb6I4",
     "AIzaSyD9akEQRpwHRq8mxy8__tA1gP7pyOG_30Q",
-    "AIzaSyDDVj89sCKMZe6mwxUW8LdZxR_Z6a-srU0"
+    "AIzaSyDDVj89sCKMZe6mwxUW8LdZxR_Z6a-srU0",
+    "AIzaSyDHHzKtp8VabMy-BxECnxUC1MYHT58JHmo",  # (ayush@loopevery.com)
+    "AIzaSyARJVeTKmKNx7RJUs_-xUvIf_Std2vptdE",  # (ayush@loopevery.com)
+    "AIzaSyCfCBmNCiqa9aoqwaXhSinQXwHJrhLGi_c",  # (ayush@loopivery.com)
+    "AIzaSyAnbiDEwupEVM4st3MjBefaRcLjsbGWmFk",  # (ayush@loopivery.com)
+    "AIzaSyA4KIFnyp1F2p-9P5dWT0y21WAXNb7LjiM",  # (aakash@loopevery.com)
+    "AIzaSyDnKaJjI-PugSu9kxv2jFMvwT8xz0JoMiU",  # (aakash@loopevery.com)
+    "AIzaSyBNCfg0XspQxttCePp4R0rduo9wX0Zg3u0",  # (aakash@loopivery.com)
+    "AIzaSyC7QjuC7_zJjJLMi116XDUGRSqekemxMpE",  # (aakash@loopivery.com)
+    "AIzaSyA4Vdb2KrXjC60NdnYa7INDrvZr6meg83Q",  # (amaan@loopevery.com)
+    "AIzaSyCP8G-JmVlKGa6vn-shSNbFLXCF1sfEpNQ",  # (amaan@loopevery.com)
+    "AIzaSyB4ecwyCeIDPzLk0BnTy6CtNFhMSINQiqs",  # (amaan@loopivery.com)
+    "AIzaSyBdUQ7fjHP0efWD0XF9THf_pxY-W-ND4io",  # (amaan@loopivery.com)
+    "AIzaSyAdKTA1Llc3qD8RCgIlTllT4Hok7IWXSP8",  # (rizwan@loopevery.com)
+    "AIzaSyASLn367rw3IwaaqQ6cW9bwWud1UJZyDnM",  # (rizwan@loopevery.com)
+    "AIzaSyDlO_wzZ3TGKzu6eOA30TVQzew5jaIyUsU",  # (rizwan@loopivery.com)
+    "AIzaSyBptyFiSJx9V-1oJbq2S6fb2p_EIyHcAKs",  # (rizwan@loopivery.com)
 ]
 
 # OpenAI key via env var preferred
@@ -104,7 +120,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "sk-proj-zodOEdwzJNPCq8quN7-u0z_
 MIN_SUBS = 500
 MAX_SUBS = 50000
 MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
-TARGET_LEADS = 1000              # collect 15 qualified leads (rating >= 7)
+TARGET_LEADS = 10000              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
 AUTO_SAVE_EVERY = 5            # autosave after every N saved leads
 MAX_VIDEOS_PER_PAGE = 50       # YouTube search maxResults (use 50 for broader coverage per call)
@@ -204,88 +220,190 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate YouTube video titles that implicitly define a complete, underexplored channel niche.
+Generate YouTube video titles that implicitly define a complete, monetizable channel niche.
+
+CRITICAL OBJECTIVE
+These titles must represent creators who:
+- Have real skill depth
+- Teach structured knowledge or technique
+- Have practitioner authority
+- Likely monetize poorly or inconsistently
+- Would NEED help building funnels, offers, courses, communities, and backend systems
+
+Avoid creators who already understand marketing infrastructure.
 
 CORE REQUIREMENT (NON-NEGOTIABLE)
 Each title must clearly represent:
-- A hyper-specific PRACTICE or CRAFT (not a topic, concept, identity, or tool)
-- Something people actively do, practice, and try to improve
-- A niche narrow enough that someone could build an entire channel around ONLY this
-- A skill or practice that can be monetized via courses, communities, coaching, or systems
-
-If a title could belong on a general or saturated channel, discard it.
-
-ANTI-EXHAUSTION DIRECTIVE (CRITICAL)
-Avoid niches that are already widely farmed on YouTube, even in sub-form:
-- Generic fitness, weight loss, muscle building
-- Dropshipping, ecommerce basics, Amazon FBA
-- Copywriting, SMMA, agency growth, funnels
-- Productivity, habits, time management
-- Real estate investing
-- Generic mindset or self-improvement
-
-Assume these areas are already exhausted. Do NOT generate variants of them.
-
-Instead, deliberately explore:
-- Second-order skills that SUPPORT a result rather than promise the result
-- Maintenance, optimization, troubleshooting, or recovery practices
-- Skill stacks used by practitioners behind the scenes
-- Niche constraints (age, environment, limitation, context)
-- Practices people discover only AFTER failing at the obvious approach
-
-DEPTH REQUIREMENT
-Go 3–4 levels deeper than the obvious category.
-
-Bad (too confirming):
-- “Trading psychology for beginners”
-- “Strength training for men over 40”
-- “Content creation systems”
-
-Good (fresh + specific):
-- “Risk management routines for discretionary swing traders”
-- “Joint-friendly strength progressions for former athletes with injuries”
-- “Editorial decision-making for faceless educational channels”
-
-STRUCTURAL DIVERSITY RULE
-Each title must come from a completely different world than the previous one.
-Do not cluster domains.
-
-Explore areas such as:
-- Technical execution practices
-- Physical skill refinement
-- Cognitive or perceptual training
-- Creative production sub-skills
-- Diagnostic or analysis workflows
-- Teaching or explanation systems
-- Practice routines used by professionals but rarely taught directly
-
-WHAT TO AVOID (HARD EXCLUSIONS)
-- Tool tutorials or software walkthroughs
-- Credential-locked professions (doctor, therapist, lawyer, etc.)
-- Entertainment, commentary, or reaction content
-- Trauma healing, emotional processing, or therapy framing
-- One-off hacks instead of repeatable practices
-- Niches dominated by gurus and courses already
+- A hyper-specific PRACTICE or CRAFT (not a topic, identity, or broad category)
+- Something people actively DO and try to improve
+- Narrow enough to build an entire channel around ONLY that thing
+- A skill that could support a paid course, community, cohort, certification, or coaching model
 
 VALIDATION TEST (APPLY INTERNALLY)
-A title is valid ONLY if all answers are YES:
+Only include the title if ALL answers are YES:
 1. Could someone practice this weekly for 6–12 months?
-2. Could a paid community exist just for people doing this?
+2. Could a paid community exist just for this skill?
 3. Would this attract practitioners, not spectators?
-4. Is this less competitive than the obvious parent niche?
-5. Does this feel like a “missing manual” skill?
+4. Is it less competitive than the obvious parent niche?
+5. Does it feel like a “missing manual” skill?
 
-If any answer is NO, discard the title.
+If any answer is NO, discard it.
+
+STRICTLY AVOID:
+- Funnels
+- Digital marketing
+- Copywriting
+- SMMA
+- Dropshipping
+- Ecommerce strategy
+- Shopify
+- Make money online
+- Crypto speculation
+- Trading signals
+- Productivity guru niches
+- Entertainment
+- Gaming
+- Reaction channels
+- Vlogs
+- Meme content
+- Board games
+- Licensed medical doctors or clinical treatment
+
+DEPTH REQUIREMENT
+Go 2–3 layers deeper than the obvious category.
+
+Bad:
+- Piano lessons
+- Fitness training
+- Investing advice
+- Dating tips
+
+Good:
+- Adult piano finger independence drills
+- Running gait correction for amateur runners
+- Dividend reinvestment discipline systems
+- Conflict debrief frameworks for married couples
+
+STRUCTURAL DIVERSITY RULE
+Each title must come from a completely different domain.
+Maximize industry and skill diversity.
+
+Below are 100 example niche DIRECTIONS to inspire domain diversity.
+Do NOT repeat them verbatim.
+Use them only to understand the TYPE of creators desired.
+
+1. IVF education for couples
+2. Adult beginner piano technique
+3. 3D printer calibration systems
+4. Biblical scripture breakdown
+5. Quran recitation mastery
+6. Torah interpretation teaching
+7. Stoic philosophy application
+8. Memory palace training
+9. Breathwork discipline routines
+10. Cold exposure adaptation
+11. Posture correction drills
+12. Grip strength progression
+13. Running form refinement
+14. Calisthenics skill ladders
+15. Boxing footwork drills
+16. Yoga sequencing instruction
+17. Archery precision training
+18. Knife sharpening craftsmanship
+19. Wood joinery technique
+20. Blacksmithing basics
+21. Leatherworking craft
+22. Home coffee roasting science
+23. Wine palate training
+24. Beekeeping systems
+25. Urban gardening planning
+26. Solar panel DIY setup
+27. Home renovation instruction
+28. Automotive repair education
+29. Motorcycle maintenance
+30. Drone cinematography technique
+31. Calligraphy mastery
+32. Oil painting layering
+33. Watercolor technique drills
+34. Pottery wheel control
+35. Screenwriting structure systems
+36. Songwriting composition drills
+37. Film scoring fundamentals
+38. Photography composition training
+39. Accent reduction coaching
+40. Public speaking anxiety training
+41. Conflict resolution coaching
+42. Masculine leadership in marriage
+43. Feminine polarity expression
+44. Attachment style awareness
+45. Dating standards calibration
+46. Marriage communication rituals
+47. Boundary enforcement practice
+48. Charisma micro-skills
+49. Social dominance calibration
+50. Emotional regulation training
+51. Personal budgeting systems
+52. Dividend investing structure
+53. Salary negotiation drills
+54. Financial discipline for young earners
+55. Debt payoff sprint systems
+56. Retirement planning basics
+57. Cash flow stabilization methods
+58. Habit stacking health systems
+59. Sleep schedule optimization
+60. Focus stamina training
+61. Deep work practice cycles
+62. ADHD structure routines (non-clinical)
+63. Mobility training for desk workers
+64. Walking endurance progression
+65. Parenting discipline coaching
+66. Family systems education
+67. Divorce recovery mentoring
+68. Interfaith relationship navigation
+69. Social confidence building
+70. Voice tonality training
+71. Storytelling compression drills
+72. Leadership presence posture
+73. Reputation management in communities
+74. Micro-expression reading drills
+75. Emotional detachment discipline
+76. Risk tolerance calibration
+77. Wealth tracking systems
+78. Financial mistake post-mortems
+79. Decision journaling systems
+80. Strategic relocation planning
+81. Personal asset mapping
+82. Wilderness survival skills
+83. Off-grid living instruction
+84. Aquaponics setup teaching
+85. Language pronunciation refinement
+86. Speed reading drills
+87. Critical thinking training
+88. Logic reasoning exercises
+89. Chess endgame systems
+90. Mechanical keyboard building
+91. Carpentry finishing technique
+92. Knife skills for chefs
+93. Coffee latte art mastery
+94. Strength training for older beginners
+95. Mobility for martial artists
+96. Ice bath routine structuring
+97. Sunlight exposure discipline
+98. Stress response tracking
+99. Relationship audit frameworks
+100. Trust rebuilding dialogues
 
 OUTPUT RULES
 - Titles ONLY
 - Return ONLY a valid JSON array of strings
-- No numbering, explanations, categories, or markdown
-- Clear, literal language (not clever or poetic)
-- Each title should feel like a channel that talks about ONLY that thing
+- No numbering
+- No markdown
+- No explanation
+- Clear literal language
+- Each title should feel like an entire channel niche
 - Strong diversity between titles
 
-Generate 25–30 distinct YouTube video titles that meet ALL the rules above.
+Generate 25–30 distinct YouTube video titles that meet ALL rules above.
 """
 
     attempts, backoff = 3, 1
