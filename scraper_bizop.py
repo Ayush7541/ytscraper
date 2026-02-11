@@ -117,9 +117,9 @@ API_KEYS = [
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "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"
 
 # Parameters
-MIN_SUBS = 500
-MAX_SUBS = 50000
-MAX_VIDEO_AGE_DAYS = 180       # only consider videos <= 180 days old
+MIN_SUBS = 5000
+MAX_SUBS = 75000
+MAX_VIDEO_AGE_DAYS = 90       # only consider videos <= 180 days old
 TARGET_LEADS = 10000              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
 AUTO_SAVE_EVERY = 5            # autosave after every N saved leads
@@ -240,12 +240,17 @@ Each title must clearly represent:
 - A skill that could support a paid course, community, cohort, certification, or coaching model
 
 VALIDATION TEST (APPLY INTERNALLY)
+
 Only include the title if ALL answers are YES:
-1. Could someone practice this weekly for 6–12 months?
-2. Could a paid community exist just for this skill?
-3. Would this attract practitioners, not spectators?
-4. Is it less competitive than the obvious parent niche?
-5. Does it feel like a “missing manual” skill?
+
+1. Do premium ($1K+) courses already exist in this niche?
+2. Do people pay for 1-on-1 coaching or consulting in this skill?
+3. Is there a clear transformation or measurable before/after result?
+4. Would a paid community add value (accountability, feedback, critique, practice partners)?
+5. Can a credible YouTuber teach this without requiring formal medical or licensed credentials?
+6. Is this evergreen with ongoing demand (not trend-based)?
+7. Can this skill realistically be learned digitally without mandatory in-person supervision?
+8. Does mastering this skill create income potential, career advancement, or meaningful life leverage?
 
 If any answer is NO, discard it.
 
@@ -288,110 +293,210 @@ STRUCTURAL DIVERSITY RULE
 Each title must come from a completely different domain.
 Maximize industry and skill diversity.
 
-Below are 100 example niche DIRECTIONS to inspire domain diversity.
+Below are 200 example niche DIRECTIONS to inspire domain diversity.
 Do NOT repeat them verbatim.
 Use them only to understand the TYPE of creators desired.
 
-1. IVF education for couples
-2. Adult beginner piano technique
-3. 3D printer calibration systems
-4. Biblical scripture breakdown
-5. Quran recitation mastery
-6. Torah interpretation teaching
-7. Stoic philosophy application
-8. Memory palace training
-9. Breathwork discipline routines
-10. Cold exposure adaptation
-11. Posture correction drills
-12. Grip strength progression
-13. Running form refinement
-14. Calisthenics skill ladders
-15. Boxing footwork drills
-16. Yoga sequencing instruction
-17. Archery precision training
-18. Knife sharpening craftsmanship
-19. Wood joinery technique
-20. Blacksmithing basics
-21. Leatherworking craft
-22. Home coffee roasting science
-23. Wine palate training
-24. Beekeeping systems
-25. Urban gardening planning
-26. Solar panel DIY setup
-27. Home renovation instruction
-28. Automotive repair education
-29. Motorcycle maintenance
-30. Drone cinematography technique
-31. Calligraphy mastery
-32. Oil painting layering
-33. Watercolor technique drills
-34. Pottery wheel control
-35. Screenwriting structure systems
-36. Songwriting composition drills
-37. Film scoring fundamentals
-38. Photography composition training
-39. Accent reduction coaching
-40. Public speaking anxiety training
-41. Conflict resolution coaching
-42. Masculine leadership in marriage
-43. Feminine polarity expression
-44. Attachment style awareness
-45. Dating standards calibration
-46. Marriage communication rituals
-47. Boundary enforcement practice
-48. Charisma micro-skills
-49. Social dominance calibration
-50. Emotional regulation training
-51. Personal budgeting systems
-52. Dividend investing structure
-53. Salary negotiation drills
-54. Financial discipline for young earners
-55. Debt payoff sprint systems
-56. Retirement planning basics
-57. Cash flow stabilization methods
-58. Habit stacking health systems
-59. Sleep schedule optimization
-60. Focus stamina training
-61. Deep work practice cycles
-62. ADHD structure routines (non-clinical)
-63. Mobility training for desk workers
-64. Walking endurance progression
-65. Parenting discipline coaching
-66. Family systems education
-67. Divorce recovery mentoring
-68. Interfaith relationship navigation
-69. Social confidence building
-70. Voice tonality training
-71. Storytelling compression drills
-72. Leadership presence posture
-73. Reputation management in communities
-74. Micro-expression reading drills
-75. Emotional detachment discipline
-76. Risk tolerance calibration
-77. Wealth tracking systems
-78. Financial mistake post-mortems
-79. Decision journaling systems
-80. Strategic relocation planning
-81. Personal asset mapping
-82. Wilderness survival skills
-83. Off-grid living instruction
-84. Aquaponics setup teaching
-85. Language pronunciation refinement
-86. Speed reading drills
-87. Critical thinking training
-88. Logic reasoning exercises
-89. Chess endgame systems
-90. Mechanical keyboard building
-91. Carpentry finishing technique
-92. Knife skills for chefs
-93. Coffee latte art mastery
-94. Strength training for older beginners
-95. Mobility for martial artists
-96. Ice bath routine structuring
-97. Sunlight exposure discipline
-98. Stress response tracking
-99. Relationship audit frameworks
-100. Trust rebuilding dialogues
+1. Music production (Ableton, FL Studio, Logic Pro)
+2. Mixing and mastering (professional audio engineering)
+3. Singing and vocal technique (range, tone, breath control)
+4. Voice acting and character voices
+5. Voice deepening and vocal masculinization
+6. Accent coaching and accent reduction
+7. Podcast production and audio storytelling
+8. Sound design (for games, film, podcasts)
+9. Beat making (hip-hop, lo-fi, trap production)
+10. Guitar mastery (fingerstyle, jazz, classical, shred)
+11. Piano technique and musicality (classical, jazz, contemporary)
+12. Bass guitar fundamentals (slap, fingerstyle, theory)
+13. Drums and rhythm mastery (coordination, speed, groove)
+14. Electronic music production (techno, house, drum & bass)
+15. Songwriting composition (melody, lyrics, structure)
+16. Film scoring fundamentals (orchestration, emotion, timing)
+17. Jazz improvisation (scales, patterns, ear training)
+18. Music theory for producers (harmony, chord progressions)
+19. Vocal harmonization (arranging, stacking, blending)
+20. Live performance technique (stage presence, equipment setup)
+21. Digital illustration (Procreate, Photoshop, concept art)
+22. Character design (games, animation, comics)
+23. Portrait drawing (realism, anatomy, likeness)
+24. UI/UX design (apps, websites, user experience)
+25. Motion graphics (After Effects, kinetic typography)
+26. 3D modeling and rendering (Blender, Cinema 4D)
+27. Concept art for entertainment (games, film, books)
+28. Storyboarding and visual storytelling
+29. Logo design and brand identity
+30. Packaging design (consumer products, branding)
+31. Typography and lettering (font design, hand lettering)
+32. Calligraphy mastery (traditional, modern, brush lettering)
+33. Oil painting layering (classical technique, color theory)
+34. Watercolor technique (washes, blending, control)
+35. Ink illustration (pen work, cross-hatching, comics)
+36. Portrait photography editing (retouching, color grading)
+37. Landscape painting (composition, atmosphere, light)
+38. Abstract art creation (composition, color, expression)
+39. Mural painting technique (scaling, outdoor durability)
+40. Album cover design (music industry, visual storytelling)
+41. Photography for income (portraits, products, weddings)
+42. Portrait photography (lighting, posing, connection)
+43. Product photography (e-commerce, commercial work)
+44. Photo editing mastery (Lightroom, Photoshop retouching)
+45. Videography and cinematography (weddings, commercial)
+46. Video editing for creators (Premiere, DaVinci Resolve)
+47. Color grading (cinematic looks, mood creation)
+48. Drone cinematography technique (aerial shots, regulations)
+49. Street photography (composition, decisive moment, storytelling)
+50. Food photography (styling, lighting, commercial work)
+51. Real estate photography (interiors, HDR, virtual tours)
+52. Wildlife photography (patience, equipment, tracking)
+53. Event photography (weddings, corporate, candids)
+54. Fashion photography (posing, lighting, editing)
+55. Documentary filmmaking (storytelling, interviewing, ethics)
+56. Spanish language mastery (conversational to fluent)
+57. French language learning (pronunciation, grammar, culture)
+58. Japanese language (conversation, kanji, business Japanese)
+59. Mandarin Chinese (tones, characters, business communication)
+60. Korean language (Hangul, conversation, K-culture)
+61. English as a Second Language (ESL) - advanced fluency
+62. American accent training (for non-native speakers)
+63. British accent training (RP, professional English)
+64. German language learning (grammar, pronunciation, business)
+65. Italian language mastery (conversation, culture, pronunciation)
+66. Portuguese language (Brazilian vs European, conversation)
+67. Arabic language learning (Modern Standard, dialects)
+68. Russian language fundamentals (Cyrillic, grammar, pronunciation)
+69. Language pronunciation refinement (phonetics, accent reduction)
+70. Sign language (ASL, BSL, communication for deaf community)
+71. Calisthenics and bodyweight mastery (handstands, muscle-ups, planche)
+72. Yoga teacher training (Vinyasa, Ashtanga, Yin)
+73. Pilates instruction (mat and reformer techniques)
+74. Flexibility and mobility training (splits, contortion basics)
+75. Posture correction and alignment (desk workers, gamers)
+76. Running form refinement (technique, injury prevention, efficiency)
+77. Boxing footwork drills (stance, movement, defense)
+78. Martial arts fundamentals (striking, grappling, discipline)
+79. Dance instruction (salsa, bachata, hip-hop, contemporary)
+80. Movement flow and natural movement (parkour-inspired, functional)
+81. Grip strength progression (climbing, lifting, hand health)
+82. Olympic weightlifting (snatch, clean & jerk, technique)
+83. Powerlifting technique (squat, bench, deadlift form)
+84. Kettlebell training (swings, Turkish get-ups, flows)
+85. Functional fitness for longevity (mobility + strength for aging)
+86. Strength training for older beginners (safe progression, joint health)
+87. Mobility for martial artists (kicks, flexibility, injury prevention)
+88. Swimming technique refinement (stroke efficiency, breathing, turns)
+89. Rock climbing technique (footwork, route reading, strength)
+90. Gymnastics foundations (rings, bars, floor work)
+91. Breathwork and pranayama (Wim Hof, Buteyko, holotropic)
+92. Meditation techniques (Vipassana, Transcendental, mindfulness)
+93. Sleep optimization and insomnia solutions (sleep hygiene, routines)
+94. Chronic pain management (back pain, neck pain, protocols)
+95. Nervous system regulation (polyvagal theory, trauma release)
+96. Cold exposure adaptation (ice baths, cold showers, Wim Hof)
+97. Intermittent fasting coaching (protocols, meal timing, lifestyle)
+98. Gut health and digestive wellness (microbiome, elimination diets)
+99. Hormone optimization (thyroid, cortisol, testosterone naturally)
+100. Pelvic floor training (pre/postnatal, incontinence, strength)
+101. TMJ and jaw tension relief (exercises, awareness, pain management)
+102. Biohacking fundamentals (tracking, supplements, optimization)
+103. Stress response tracking (HRV, cortisol management, resilience)
+104. Sunlight exposure discipline (vitamin D, circadian rhythm)
+105. Ice bath routine structuring (protocol, benefits, recovery)
+106. Qigong and Tai Chi (energy work, flowing movement)
+107. Functional breathing (nasal breathing, CO2 tolerance)
+108. Posture rehabilitation (anterior pelvic tilt, rounded shoulders)
+109. Mobility training for desk workers (hip flexors, thoracic spine)
+110. Walking endurance progression (cardiovascular base, longevity)
+111. Dating skills for men (approach, conversation, confidence)
+112. Dating skills for women (boundaries, screening, self-worth)
+113. Online dating profile optimization (photos, bio, messaging strategy)
+114. Texting and messaging strategy (timing, tone, escalation)
+115. First date confidence and conversation (topics, presence, connection)
+116. Breakup recovery and healing (processing, growth, moving forward)
+117. Self-love and relationship with self (worthiness, boundaries, healing)
+118. Marriage communication and conflict resolution (NVC, active listening)
+119. Attachment theory and secure attachment (anxious, avoidant, healing)
+120. Emotional intelligence in relationships (awareness, regulation, empathy)
+121. Non-violent communication (NVC) (needs, requests, empathy)
+122. Intimacy and connection building (emotional, physical, vulnerability)
+123. Long-distance relationship strategies (communication, trust, visits)
+124. Masculine leadership in marriage (direction, decisiveness, provision)
+125. Feminine polarity expression (receptivity, radiance, energy)
+126. Dating standards calibration (values, non-negotiables, filtering)
+127. Boundary enforcement practice (saying no, consequences, self-respect)
+128. Trust rebuilding dialogues (after betrayal, transparency, time)
+129. Conflict resolution coaching (de-escalation, finding solutions)
+130. Relationship audit frameworks (health check, areas for growth)
+131. Personal finance for millennials (debt payoff, first investments)
+132. Real estate investing for beginners (house hacking, first rental)
+133. Stock market investing (fundamental analysis, long-term strategy)
+134. Dividend investing and passive income (portfolio building, DRIP)
+135. Retirement planning for self-employed (SEP IRA, solo 401k, strategies)
+136. Tax optimization for W2 employees (deductions, strategies, planning)
+137. Credit repair and credit building (score optimization, utilization)
+138. Budgeting systems (zero-based, envelope, intentional spending)
+139. Salary negotiation and career advancement (asking, positioning, leverage)
+140. Financial independence (FIRE) (savings rate, withdrawal strategies)
+141. Wealth psychology and money mindset (scarcity, abundance, beliefs)
+142. Alternative investments (gold, art, collectibles, diversification)
+143. Cash flow stabilization methods (emergency fund, income streams)
+144. Debt payoff sprint systems (snowball, avalanche, motivation)
+145. Side hustle income streams (service-based, scalable, non-digital)
+146. Financial discipline for young earners (lifestyle inflation, investing early)
+147. Wealth tracking systems (net worth, assets, progress monitoring)
+148. Risk tolerance calibration (investing personality, portfolio allocation)
+149. Financial mistake post-mortems (learning, adjusting, growth)
+150. Personal asset mapping (inventory, protection, growth strategy)
+151. Public speaking and presentation mastery (stage presence, structure)
+152. Public speaking anxiety training (exposure, reframing, practice)
+153. Storytelling for impact (business, personal brand, emotional arc)
+154. Charisma and social confidence (presence, warmth, competence)
+155. Debate and persuasive argumentation (logic, rhetoric, rebuttals)
+156. Active listening and deep conversation (presence, curiosity, empathy)
+157. Sales conversations (consultative, needs-based, closing)
+158. Networking and relationship building (genuine connection, follow-up)
+159. Personal branding and positioning (differentiation, messaging, consistency)
+160. Leadership communication (vision, inspiration, feedback)
+161. Voice tonality training (pitch, pace, power, projection)
+162. Storytelling compression drills (brevity, impact, memorability)
+163. Leadership presence posture (body language, gravitas, authority)
+164. Charisma micro-skills (eye contact, smile, energy management)
+165. Social dominance calibration (assertiveness without aggression)
+166. Memory training and mnemonics (memory palaces, linking systems)
+167. Memory palace training (method of loci, recall competitions)
+168. Speed reading with comprehension (subvocalization, eye movement)
+169. Deep work and focus training (attention span, flow states)
+170. Learning optimization (accelerated learning, meta-learning strategies)
+171. Critical thinking and logical reasoning (fallacies, analysis, clarity)
+172. Creative problem solving (lateral thinking, frameworks, innovation)
+173. Habit formation and behavior change (cues, systems, identity)
+174. Habit stacking health systems (morning routines, keystone habits)
+175. Discipline and willpower training (delayed gratification, consistency)
+176. Confidence building and self-esteem (self-talk, evidence, identity)
+177. Productivity systems (GTD, time blocking, energy management)
+178. Decision journaling systems (tracking, analyzing, improving choices)
+179. Visualization and mental rehearsal (sports, performance, outcomes)
+180. Emotional regulation training (awareness, distress tolerance, regulation)
+181. Emotional detachment discipline (stoicism, perspective, non-reactivity)
+182. Focus stamina training (extended concentration, pomodoro progression)
+183. ADHD structure routines (non-clinical organization, systems)
+184. Logic reasoning exercises (syllogisms, formal logic, clarity)
+185. Strategic thinking frameworks (chess, business, life planning)
+186. Woodworking and furniture making (joinery, design, finishing)
+187. Wood joinery technique (dovetails, mortise & tenon, Japanese joinery)
+188. 3D printing design (CAD to functional prints, selling designs)
+189. 3D printer calibration systems (troubleshooting, optimization, settings)
+190. Knitting and advanced textile techniques (cables, colorwork, garment design)
+191. Sewing and pattern making (garment construction, tailoring, alterations)
+192. Embroidery (hand and machine, advanced stitches, design)
+193. Leatherworking craft (tooling, stitching, bag/wallet making)
+194. Blacksmithing basics (forging, tempering, knife making)
+195. Knife sharpening craftsmanship (angles, stones, professional edges)
+196. Pottery and ceramics (wheel throwing, hand building, glazing)
+197. Carpentry finishing technique (sanding, staining, protective coats)
+198. Home renovation instruction (drywall, flooring, basic contracting)
+199. Automotive repair education (diagnostics, maintenance, troubleshooting)
+200. Motorcycle maintenance (routine service, troubleshooting, customization)
 
 OUTPUT RULES
 - Titles ONLY
