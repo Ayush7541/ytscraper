@@ -55,7 +55,17 @@ def build_prompt(bio, titles):
     return f"""
 You are evaluating whether a YouTube channel could support a paid course, community, cohort, certification, or coaching model ICP.
 
-EVALUATION QUESTIONS:
+Your job is to generate BOTH:
+1. A niche label (3–6 words)
+2. A realistic ICP viability score (0–10)
+
+You MUST use the generated niche itself as part of your reasoning for scoring.
+
+-------------------------------------
+EVALUATION CRITERIA
+-------------------------------------
+
+BUSINESS VIABILITY (Core)
 
 1. Do premium ($1K+) courses already exist in this niche?
 2. Do people pay for 1-on-1 coaching or consulting in this skill?
@@ -63,21 +73,54 @@ EVALUATION QUESTIONS:
 4. Can a credible YouTuber teach this without requiring formal medical or licensed credentials?
 5. Does mastering this skill create income potential, career advancement, or meaningful life leverage?
 
-SCORING:
-Evaluate all 5 questions carefully.
-Score from 0 to 10 based on overall strength across these criteria.
-Higher score = stronger high-ticket digital skill viability.
+NICHE QUALITY FILTER
 
-AUTOMATIC DISQUALIFICATION (Return 0 ONLY if clearly and primarily true):
+- If the niche is primarily:
+  • DIY crafts
+  • Home decor
+  • Home renovation
+  • Home improvement
+  • Interior styling
+  • Generic lifestyle vlogging
+  • Pure entertainment
+  • Reaction content
+  • Gaming content
+  • Meme / prank content
+  • General “home hacks”
+Then the score should be LOW (0–3 max), unless it clearly has strong monetizable professional depth.
 
-- Pure gaming/streaming entertainment channel
-- Pure reaction/entertainment channel with no skill progression
-- Credential-required licensed professions (medical, legal, skincare recommendations)
-- Corporate channels
-- Channels that exist purely to sell or teach marketing/funnel/course-creation, copywriting services to other creators
+LANGUAGE & POSITIONING QUALITY
 
-OUTPUT FORMAT:
+Analyze bio and titles:
+
+- Too many hashtags, excessive emojis, clickbait tone, spammy formatting → lower professionalism → reduce score.
+- Clear transformation, structured titles, authority positioning → increase score.
+- If titles look amateur or chaotic → reduce score.
+- If titles show structured skill progression → increase score.
+
+DIGITAL LEARNABILITY
+
+- Can this skill realistically be learned digitally?
+- Does it require physical/in-person supervision?
+- Is it scalable beyond local service business?
+
+-------------------------------------
+SCORING RULES
+-------------------------------------
+
+0–2 → Hobby, entertainment, DIY, lifestyle, weak monetization
+3–5 → Moderate niche, limited high-ticket upside
+6–8 → Strong skill-based niche with coaching/course potential
+9–10 → Excellent high-ticket, scalable, transformation-driven niche
+
+Be strict. Do NOT inflate scores.
+
+-------------------------------------
+OUTPUT FORMAT
+-------------------------------------
+
 Return JSON in this exact format:
+
 {{
   "score": <number 0-10>,
   "niche": "<short niche label (3-6 words)>"
@@ -86,9 +129,11 @@ Return JSON in this exact format:
 No explanation.
 Only valid JSON.
 
+-------------------------------------
 CHANNEL BIO:
 {bio}
 
+-------------------------------------
 RECENT TITLES:
 {titles}
 """.strip()

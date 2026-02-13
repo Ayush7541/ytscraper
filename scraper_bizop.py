@@ -118,7 +118,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "sk-proj-zodOEdwzJNPCq8quN7-u0z_
 
 # Parameters
 MIN_SUBS = 5000
-MAX_SUBS = 99999
+MAX_SUBS = 125000
 MAX_VIDEO_AGE_DAYS = 90       # only consider videos <= 180 days old
 TARGET_LEADS = 10000              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
