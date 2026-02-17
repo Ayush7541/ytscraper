@@ -11,7 +11,7 @@ from openai import OpenAI
 # CONFIG
 # ==============================
 
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 MODEL = "gpt-4o-mini"
 MAX_CONCURRENT_REQUESTS = 12
 
@@ -53,77 +53,97 @@ SHEET = GSPREAD_CLIENT.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
 
 def build_prompt(bio, titles):
     return f"""
-You are evaluating whether a YouTube channel could support a paid course, community, cohort, certification, or coaching model ICP.
+You are evaluating whether a YouTube channel could support a paid course, coaching, certification, cohort, or paid community model.
 
-Your job is to generate BOTH:
+Generate BOTH:
 1. A niche label (3–6 words)
-2. A realistic ICP viability score (0–10)
+2. A strict ICP viability score (0–10)
 
-You MUST use the generated niche itself as part of your reasoning for scoring.
+You MUST use the generated niche in your internal reasoning.
 
 -------------------------------------
-EVALUATION CRITERIA
+CORE BUSINESS VIABILITY
 -------------------------------------
 
-BUSINESS VIABILITY (Core)
+Evaluate strictly:
 
-1. Do premium ($1K+) courses already exist in this niche?
-2. Do people pay for 1-on-1 coaching or consulting in this skill?
-3. Would a paid community add value (accountability, feedback, critique, practice partners)?
-4. Can a credible YouTuber teach this without requiring formal medical or licensed credentials?
-5. Does mastering this skill create income potential, career advancement, or meaningful life leverage?
+1. Do $1K+ programs exist in this niche?
+2. Do people pay for coaching/consulting in this skill?
+3. Does this skill lead to income, career advancement, or major life transformation?
+4. Does mastery require 3+ months of progression?
+5. Would accountability, feedback, critique, or live sessions add real value?
+6. Can this be taught digitally?
+7. Can a credible YouTuber teach this without medical/legal/licensed credentials?
 
-NICHE QUALITY FILTER
+5–7 strong YES → High potential
+3–4 YES → Moderate
+0–2 YES → Weak
 
-- If the niche is primarily:
-  • DIY crafts
-  • Home decor
-  • Home renovation
-  • Home improvement
-  • Interior styling
-  • Generic lifestyle vlogging
-  • Pure entertainment
-  • Reaction content
-  • Gaming content
-  • Meme / prank content
-  • General “home hacks”
-Then the score should be LOW (0–3 max), unless it clearly has strong monetizable professional depth.
+Be strict.
 
+-------------------------------------
+AUTOMATIC LOW SCORE (0–2)
+-------------------------------------
+
+Score MUST be 0–2 if channel is:
+
+• Corporate/brand promotion
+• Local service lead-gen
+• Product showcase / e-commerce
+• News / reaction / commentary
+• Meme / prank / entertainment-first
+• Clip aggregation
+• Credential-locked (medical, therapy, legal, regulated finance)
+• Marketing niches (copywriting, SEO, funnels, YouTube growth, dropshipping, SMMA, affiliate, course-creation education)
+
+Also score 0–3 max if primarily:
+
+• DIY crafts
+• Generic cooking
+• Lifestyle vlogging
+• Gaming
+• Home decor / improvement
+• “Easy hacks” hobby content
+
+Unless there is clear professional, income-generating depth.
+
+-------------------------------------
 LANGUAGE & POSITIONING QUALITY
-
-Analyze bio and titles:
-
-- Too many hashtags, excessive emojis, clickbait tone, spammy formatting → lower professionalism → reduce score.
-- Clear transformation, structured titles, authority positioning → increase score.
-- If titles look amateur or chaotic → reduce score.
-- If titles show structured skill progression → increase score.
-
-DIGITAL LEARNABILITY
-
-- Can this skill realistically be learned digitally?
-- Does it require physical/in-person supervision?
-- Is it scalable beyond local service business?
-
--------------------------------------
-SCORING RULES
 -------------------------------------
 
-0–2 → Hobby, entertainment, DIY, lifestyle, weak monetization
-3–5 → Moderate niche, limited high-ticket upside
-6–8 → Strong skill-based niche with coaching/course potential
-9–10 → Excellent high-ticket, scalable, transformation-driven niche
+Reduce score if:
+• Excess emojis/hashtags/spam formatting
+• Clickbait-only titles
+• No structured progression
+• Amateur positioning
 
-Be strict. Do NOT inflate scores.
+Increase score if:
+• Clear transformation outcomes
+• Structured learning path
+• Authority positioning
+• Skill progression evident
+
+-------------------------------------
+SCORING SCALE
+-------------------------------------
+
+0–2 → Hobby / entertainment / weak monetization
+3–5 → Moderate, limited high-ticket upside
+6–8 → Strong skill-based coaching/course potential
+9–10 → Elite high-ticket transformation niche
+
+Very few deserve 9–10.
+Do NOT inflate scores.
 
 -------------------------------------
 OUTPUT FORMAT
 -------------------------------------
 
-Return JSON in this exact format:
+Return JSON exactly:
 
 {{
   "score": <number 0-10>,
-  "niche": "<short niche label (3-6 words)>"
+  "niche": "<3-6 word niche label>"
 }}
 
 No explanation.
@@ -137,7 +157,6 @@ CHANNEL BIO:
 RECENT TITLES:
 {titles}
 """.strip()
-
 
 # ==============================
 # BATCH MODE MAIN
@@ -239,6 +258,20 @@ def main():
 
     if batch_status.status != "completed":
         print("Batch failed or expired.")
+        print("----- FULL BATCH STATUS OBJECT -----")
+        try:
+            print(batch_status)
+        except Exception as e:
+            print("Could not print batch_status directly:", e)
+
+        try:
+            print("Batch ID:", batch_status.id)
+            print("Status:", batch_status.status)
+            print("Errors:", getattr(batch_status, "errors", None))
+            print("Error file ID:", getattr(batch_status, "error_file_id", None))
+        except Exception as e:
+            print("Error while extracting batch details:", e)
+
         return
 
     print("Downloading results...")

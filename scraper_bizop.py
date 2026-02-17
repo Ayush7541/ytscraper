@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 # === Slack Notification Setup ===
-SLACK_WEBHOOK = "https://hooks.slack.com/services/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"
+SLACK_WEBHOOK = os.environ["SLACK_WEBHOOK"]
 
 def send_slack_message(text):
     """Send a message to Slack channel via webhook."""
@@ -55,66 +55,10 @@ except Exception:
 
 # === CONFIG ===
 
-API_KEYS = [
-    "AIzaSyDe7axLxXM73cBwgWVIiExaxFPo504cTPA",
-    "AIzaSyDhe5odit54OSGWZ4BxDw4-5WO76uYBffE",
-    "AIzaSyCZbEWLcgnThO-cLfzuB411_WyDdPt3cHs",
-    "AIzaSyA8cBjcsrJQCtbh0fID0BUDdAZB8jwG5vI",
-    "AIzaSyC9rwhurm3JL6NkDXzvUWWc079lGsk3Vjk",
-    "AIzaSyB2p8GXoG_AOm9TEDmqpoQiHoyO7IIe3eU",
-    "AIzaSyC2m0NfOQKRuqDPhGucSw22ih3TrYbVoVY",
-    "AIzaSyCsrVNe2Y91pgROG50s8B90AtVmUzi23R0",
-    "AIzaSyC3ziU3IdKt91DFt5XGE4HVepSYs4PDlA4",
-    "AIzaSyB1UdpVtyo5T0rUgEOlkcxodNYy0bhTwiA",
-    "AIzaSyDOl-KJk6uRKXDE2FWiEMo6zgrJTqBmHDQ",
-    "AIzaSyBpU1kDS1Lu6WBI76PbI50XeUfMxcTEdvY",
-    "AIzaSyAze5ZozA0CX0nkc42PxIL6Rc6jQ4SerH0",
-    "AIzaSyAEG5hUpyQM2BQD1NlsfmvZNPJDmZyW4Vw",
-    "AIzaSyCuza6qvawjdeyAaaHT8USqPOHteJb9nuo",
-    "AIzaSyByyMHMehHrCerrUBKBh2gqe0Dl9hkwDAg",
-    "AIzaSyDIzKvn-JDfhQNovNCi-kXKOq7zWyOZPiA",
-    "AIzaSyDe75esEJsvtjy2s48rVqBkCW2_gbt4isc",
-    "AIzaSyDncyAIOlOjG9pjH8xYRLHWvGSg9srSMnA",
-    "AIzaSyBbKXiBfaP5HgOeXr_hOJcTXPf9XNBOCbU",
-    "AIzaSyA4rs-T12x3yv1XG7HcxDeA3Nb-_jyHuqo",
-    "AIzaSyAwtp--S2i1mW8xjhkWF7U3fAgUou0LvsU",
-    "AIzaSyAqhHPtUol73wQ-b9_VPOTLTZCG7aZ7Qdw",
-    "AIzaSyAVRUBx76piHJhAKNmGajjzSq38-4jIeIY",
-    "AIzaSyBVUCKpDQr5bRGsUohKqMN2htkbpFt0vps",
-    "AIzaSyBuQuN03xK7MQgyC1cPC6lP-mKu3V6eZA0",
-    "AIzaSyDiML0AskYNvbKYR0NLkpnfQQevxtVOa38",
-    "AIzaSyA3-Spl1bBQbuuBFHth_JpXWk3m-ZRDoWA",
-    "AIzaSyCmsh_XG3EFiLGsEr17UTfdJrbNKaox-RE",
-    "AIzaSyDC9HLYrEOsOzdhxOT6jNjLJjxZwvCv7As",
-    "AIzaSyAwYXZtT8VAMgYg3_0s_O-LXKW9eM68mFI",
-    "AIzaSyCB4w-BCbo52MGJO8AFq2O2OBKQ5GWqex0",
-    "AIzaSyAN1Np_IDn0K1COuDkUkVi6PJmlCxftF5c",
-    "AIzaSyCZcgVFiMajTC2QojZlU1me5y11Kx8oBp8",
-    "AIzaSyApr-317nNb9dspyCL37YS9XwZzWBxnedc",
-    "AIzaSyA0vWbdoi51LqaqeTddy5bn1xnwFlGXMAY",
-    "AIzaSyBiURjbUL7kiq7bxvd6N4SsetFEMuKb6I4",
-    "AIzaSyD9akEQRpwHRq8mxy8__tA1gP7pyOG_30Q",
-    "AIzaSyDDVj89sCKMZe6mwxUW8LdZxR_Z6a-srU0",
-    "AIzaSyDHHzKtp8VabMy-BxECnxUC1MYHT58JHmo",  # (ayush@loopevery.com)
-    "AIzaSyARJVeTKmKNx7RJUs_-xUvIf_Std2vptdE",  # (ayush@loopevery.com)
-    "AIzaSyCfCBmNCiqa9aoqwaXhSinQXwHJrhLGi_c",  # (ayush@loopivery.com)
-    "AIzaSyAnbiDEwupEVM4st3MjBefaRcLjsbGWmFk",  # (ayush@loopivery.com)
-    "AIzaSyA4KIFnyp1F2p-9P5dWT0y21WAXNb7LjiM",  # (aakash@loopevery.com)
-    "AIzaSyDnKaJjI-PugSu9kxv2jFMvwT8xz0JoMiU",  # (aakash@loopevery.com)
-    "AIzaSyBNCfg0XspQxttCePp4R0rduo9wX0Zg3u0",  # (aakash@loopivery.com)
-    "AIzaSyC7QjuC7_zJjJLMi116XDUGRSqekemxMpE",  # (aakash@loopivery.com)
-    "AIzaSyA4Vdb2KrXjC60NdnYa7INDrvZr6meg83Q",  # (amaan@loopevery.com)
-    "AIzaSyCP8G-JmVlKGa6vn-shSNbFLXCF1sfEpNQ",  # (amaan@loopevery.com)
-    "AIzaSyB4ecwyCeIDPzLk0BnTy6CtNFhMSINQiqs",  # (amaan@loopivery.com)
-    "AIzaSyBdUQ7fjHP0efWD0XF9THf_pxY-W-ND4io",  # (amaan@loopivery.com)
-    "AIzaSyAdKTA1Llc3qD8RCgIlTllT4Hok7IWXSP8",  # (rizwan@loopevery.com)
-    "AIzaSyASLn367rw3IwaaqQ6cW9bwWud1UJZyDnM",  # (rizwan@loopevery.com)
-    "AIzaSyDlO_wzZ3TGKzu6eOA30TVQzew5jaIyUsU",  # (rizwan@loopivery.com)
-    "AIzaSyBptyFiSJx9V-1oJbq2S6fb2p_EIyHcAKs",  # (rizwan@loopivery.com)
-]
+API_KEYS = json.loads(os.environ["YOUTUBE_API_KEYS"])
 
 # OpenAI key via env var preferred
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "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"
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 # Parameters
 MIN_SUBS = 5000
@@ -134,7 +78,8 @@ OUTPUT_EXCEL = "qualified_youtube_leads.xlsx"
 
 # Google Sheets setup
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDS = ServiceAccountCredentials.from_json_keyfile_name("google_sheets_key.json", SCOPE)
+google_creds_dict = json.loads(os.environ["GOOGLE_SHEETS_JSON"])
+CREDS = ServiceAccountCredentials.from_json_keyfile_dict(google_creds_dict, SCOPE)
 GSPREAD_CLIENT = gspread.authorize(CREDS)
 SHEET = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE").worksheet("Raw Leads")
 
