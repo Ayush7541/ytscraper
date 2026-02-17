@@ -2,12 +2,19 @@ name: Daily YouTube Scraper
 
 on:
   schedule:
-    - cron: '30 10 * * *'   # Runs every day at 4:00 PM IST (10:30 UTC)
+    - cron: '30 10 * * *'   # 4:00 PM IST (10:30 UTC)
   workflow_dispatch:
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_SHEETS_JSON: ${{ secrets.GOOGLE_SHEETS_JSON }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      YOUTUBE_API_KEYS: ${{ secrets.YOUTUBE_API_KEYS }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
