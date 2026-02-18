@@ -242,206 +242,206 @@ Below are 200 example niche DIRECTIONS to inspire domain diversity.
 Do NOT repeat them verbatim.
 Use them only to understand the TYPE of creators desired.
 
-1. Music production (Ableton, FL Studio, Logic Pro)
-2. Mixing and mastering (professional audio engineering)
-3. Singing and vocal technique (range, tone, breath control)
-4. Voice acting and character voices
-5. Voice deepening and vocal masculinization
-6. Accent coaching and accent reduction
-7. Podcast production and audio storytelling
-8. Sound design (for games, film, podcasts)
-9. Beat making (hip-hop, lo-fi, trap production)
-10. Guitar mastery (fingerstyle, jazz, classical, shred)
-11. Piano technique and musicality (classical, jazz, contemporary)
-12. Bass guitar fundamentals (slap, fingerstyle, theory)
-13. Drums and rhythm mastery (coordination, speed, groove)
-14. Electronic music production (techno, house, drum & bass)
-15. Songwriting composition (melody, lyrics, structure)
-16. Film scoring fundamentals (orchestration, emotion, timing)
-17. Jazz improvisation (scales, patterns, ear training)
-18. Music theory for producers (harmony, chord progressions)
-19. Vocal harmonization (arranging, stacking, blending)
-20. Live performance technique (stage presence, equipment setup)
-21. Digital illustration (Procreate, Photoshop, concept art)
-22. Character design (games, animation, comics)
-23. Portrait drawing (realism, anatomy, likeness)
-24. UI/UX design (apps, websites, user experience)
-25. Motion graphics (After Effects, kinetic typography)
-26. 3D modeling and rendering (Blender, Cinema 4D)
-27. Concept art for entertainment (games, film, books)
-28. Storyboarding and visual storytelling
-29. Logo design and brand identity
-30. Packaging design (consumer products, branding)
-31. Typography and lettering (font design, hand lettering)
-32. Calligraphy mastery (traditional, modern, brush lettering)
-33. Oil painting layering (classical technique, color theory)
-34. Watercolor technique (washes, blending, control)
-35. Ink illustration (pen work, cross-hatching, comics)
-36. Portrait photography editing (retouching, color grading)
-37. Landscape painting (composition, atmosphere, light)
-38. Abstract art creation (composition, color, expression)
-39. Mural painting technique (scaling, outdoor durability)
-40. Album cover design (music industry, visual storytelling)
-41. Photography for income (portraits, products, weddings)
-42. Portrait photography (lighting, posing, connection)
-43. Product photography (e-commerce, commercial work)
-44. Photo editing mastery (Lightroom, Photoshop retouching)
-45. Videography and cinematography (weddings, commercial)
-46. Video editing for creators (Premiere, DaVinci Resolve)
-47. Color grading (cinematic looks, mood creation)
-48. Drone cinematography technique (aerial shots, regulations)
-49. Street photography (composition, decisive moment, storytelling)
-50. Food photography (styling, lighting, commercial work)
-51. Real estate photography (interiors, HDR, virtual tours)
-52. Wildlife photography (patience, equipment, tracking)
-53. Event photography (weddings, corporate, candids)
-54. Fashion photography (posing, lighting, editing)
-55. Documentary filmmaking (storytelling, interviewing, ethics)
-56. Spanish language mastery (conversational to fluent)
-57. French language learning (pronunciation, grammar, culture)
-58. Japanese language (conversation, kanji, business Japanese)
-59. Mandarin Chinese (tones, characters, business communication)
-60. Korean language (Hangul, conversation, K-culture)
-61. English as a Second Language (ESL) - advanced fluency
-62. American accent training (for non-native speakers)
-63. British accent training (RP, professional English)
-64. German language learning (grammar, pronunciation, business)
-65. Italian language mastery (conversation, culture, pronunciation)
-66. Portuguese language (Brazilian vs European, conversation)
-67. Arabic language learning (Modern Standard, dialects)
-68. Russian language fundamentals (Cyrillic, grammar, pronunciation)
-69. Language pronunciation refinement (phonetics, accent reduction)
-70. Sign language (ASL, BSL, communication for deaf community)
-71. Calisthenics and bodyweight mastery (handstands, muscle-ups, planche)
-72. Yoga teacher training (Vinyasa, Ashtanga, Yin)
-73. Pilates instruction (mat and reformer techniques)
-74. Flexibility and mobility training (splits, contortion basics)
-75. Posture correction and alignment (desk workers, gamers)
-76. Running form refinement (technique, injury prevention, efficiency)
-77. Boxing footwork drills (stance, movement, defense)
-78. Martial arts fundamentals (striking, grappling, discipline)
-79. Dance instruction (salsa, bachata, hip-hop, contemporary)
-80. Movement flow and natural movement (parkour-inspired, functional)
-81. Grip strength progression (climbing, lifting, hand health)
-82. Olympic weightlifting (snatch, clean & jerk, technique)
-83. Powerlifting technique (squat, bench, deadlift form)
-84. Kettlebell training (swings, Turkish get-ups, flows)
-85. Functional fitness for longevity (mobility + strength for aging)
-86. Strength training for older beginners (safe progression, joint health)
-87. Mobility for martial artists (kicks, flexibility, injury prevention)
-88. Swimming technique refinement (stroke efficiency, breathing, turns)
-89. Rock climbing technique (footwork, route reading, strength)
-90. Gymnastics foundations (rings, bars, floor work)
-91. Breathwork and pranayama (Wim Hof, Buteyko, holotropic)
-92. Meditation techniques (Vipassana, Transcendental, mindfulness)
-93. Sleep optimization and insomnia solutions (sleep hygiene, routines)
-94. Chronic pain management (back pain, neck pain, protocols)
-95. Nervous system regulation (polyvagal theory, trauma release)
-96. Cold exposure adaptation (ice baths, cold showers, Wim Hof)
-97. Intermittent fasting coaching (protocols, meal timing, lifestyle)
-98. Gut health and digestive wellness (microbiome, elimination diets)
-99. Hormone optimization (thyroid, cortisol, testosterone naturally)
-100. Pelvic floor training (pre/postnatal, incontinence, strength)
-101. TMJ and jaw tension relief (exercises, awareness, pain management)
-102. Biohacking fundamentals (tracking, supplements, optimization)
-103. Stress response tracking (HRV, cortisol management, resilience)
-104. Sunlight exposure discipline (vitamin D, circadian rhythm)
-105. Ice bath routine structuring (protocol, benefits, recovery)
-106. Qigong and Tai Chi (energy work, flowing movement)
-107. Functional breathing (nasal breathing, CO2 tolerance)
-108. Posture rehabilitation (anterior pelvic tilt, rounded shoulders)
-109. Mobility training for desk workers (hip flexors, thoracic spine)
-110. Walking endurance progression (cardiovascular base, longevity)
-111. Dating skills for men (approach, conversation, confidence)
-112. Dating skills for women (boundaries, screening, self-worth)
-113. Online dating profile optimization (photos, bio, messaging strategy)
-114. Texting and messaging strategy (timing, tone, escalation)
-115. First date confidence and conversation (topics, presence, connection)
-116. Breakup recovery and healing (processing, growth, moving forward)
-117. Self-love and relationship with self (worthiness, boundaries, healing)
-118. Marriage communication and conflict resolution (NVC, active listening)
-119. Attachment theory and secure attachment (anxious, avoidant, healing)
-120. Emotional intelligence in relationships (awareness, regulation, empathy)
-121. Non-violent communication (NVC) (needs, requests, empathy)
-122. Intimacy and connection building (emotional, physical, vulnerability)
-123. Long-distance relationship strategies (communication, trust, visits)
-124. Masculine leadership in marriage (direction, decisiveness, provision)
-125. Feminine polarity expression (receptivity, radiance, energy)
-126. Dating standards calibration (values, non-negotiables, filtering)
-127. Boundary enforcement practice (saying no, consequences, self-respect)
-128. Trust rebuilding dialogues (after betrayal, transparency, time)
-129. Conflict resolution coaching (de-escalation, finding solutions)
-130. Relationship audit frameworks (health check, areas for growth)
-131. Personal finance for millennials (debt payoff, first investments)
-132. Real estate investing for beginners (house hacking, first rental)
-133. Stock market investing (fundamental analysis, long-term strategy)
-134. Dividend investing and passive income (portfolio building, DRIP)
-135. Retirement planning for self-employed (SEP IRA, solo 401k, strategies)
-136. Tax optimization for W2 employees (deductions, strategies, planning)
-137. Credit repair and credit building (score optimization, utilization)
-138. Budgeting systems (zero-based, envelope, intentional spending)
-139. Salary negotiation and career advancement (asking, positioning, leverage)
-140. Financial independence (FIRE) (savings rate, withdrawal strategies)
-141. Wealth psychology and money mindset (scarcity, abundance, beliefs)
-142. Alternative investments (gold, art, collectibles, diversification)
-143. Cash flow stabilization methods (emergency fund, income streams)
-144. Debt payoff sprint systems (snowball, avalanche, motivation)
-145. Side hustle income streams (service-based, scalable, non-digital)
-146. Financial discipline for young earners (lifestyle inflation, investing early)
-147. Wealth tracking systems (net worth, assets, progress monitoring)
-148. Risk tolerance calibration (investing personality, portfolio allocation)
-149. Financial mistake post-mortems (learning, adjusting, growth)
-150. Personal asset mapping (inventory, protection, growth strategy)
-151. Public speaking and presentation mastery (stage presence, structure)
-152. Public speaking anxiety training (exposure, reframing, practice)
-153. Storytelling for impact (business, personal brand, emotional arc)
-154. Charisma and social confidence (presence, warmth, competence)
-155. Debate and persuasive argumentation (logic, rhetoric, rebuttals)
-156. Active listening and deep conversation (presence, curiosity, empathy)
-157. Sales conversations (consultative, needs-based, closing)
-158. Networking and relationship building (genuine connection, follow-up)
-159. Personal branding and positioning (differentiation, messaging, consistency)
-160. Leadership communication (vision, inspiration, feedback)
-161. Voice tonality training (pitch, pace, power, projection)
-162. Storytelling compression drills (brevity, impact, memorability)
-163. Leadership presence posture (body language, gravitas, authority)
-164. Charisma micro-skills (eye contact, smile, energy management)
-165. Social dominance calibration (assertiveness without aggression)
-166. Memory training and mnemonics (memory palaces, linking systems)
-167. Memory palace training (method of loci, recall competitions)
-168. Speed reading with comprehension (subvocalization, eye movement)
-169. Deep work and focus training (attention span, flow states)
-170. Learning optimization (accelerated learning, meta-learning strategies)
-171. Critical thinking and logical reasoning (fallacies, analysis, clarity)
-172. Creative problem solving (lateral thinking, frameworks, innovation)
-173. Habit formation and behavior change (cues, systems, identity)
-174. Habit stacking health systems (morning routines, keystone habits)
-175. Discipline and willpower training (delayed gratification, consistency)
-176. Confidence building and self-esteem (self-talk, evidence, identity)
-177. Productivity systems (GTD, time blocking, energy management)
-178. Decision journaling systems (tracking, analyzing, improving choices)
-179. Visualization and mental rehearsal (sports, performance, outcomes)
-180. Emotional regulation training (awareness, distress tolerance, regulation)
-181. Emotional detachment discipline (stoicism, perspective, non-reactivity)
-182. Focus stamina training (extended concentration, pomodoro progression)
-183. ADHD structure routines (non-clinical organization, systems)
-184. Logic reasoning exercises (syllogisms, formal logic, clarity)
-185. Strategic thinking frameworks (chess, business, life planning)
-186. Woodworking and furniture making (joinery, design, finishing)
-187. Wood joinery technique (dovetails, mortise & tenon, Japanese joinery)
-188. 3D printing design (CAD to functional prints, selling designs)
-189. 3D printer calibration systems (troubleshooting, optimization, settings)
-190. Knitting and advanced textile techniques (cables, colorwork, garment design)
-191. Sewing and pattern making (garment construction, tailoring, alterations)
-192. Embroidery (hand and machine, advanced stitches, design)
-193. Leatherworking craft (tooling, stitching, bag/wallet making)
-194. Blacksmithing basics (forging, tempering, knife making)
-195. Knife sharpening craftsmanship (angles, stones, professional edges)
-196. Pottery and ceramics (wheel throwing, hand building, glazing)
-197. Carpentry finishing technique (sanding, staining, protective coats)
-198. Home renovation instruction (drywall, flooring, basic contracting)
-199. Automotive repair education (diagnostics, maintenance, troubleshooting)
-200. Motorcycle maintenance (routine service, troubleshooting, customization)
+1. Fingerstyle guitar arrangement and chord melody technique  
+2. Jazz chord voicing and comping for self-taught players  
+3. Film score orchestration for indie composers  
+4. Live sound FOH mixing and monitor technique  
+5. Eurorack modular synthesis patching and sound design  
+6. Drum programming realism and groove design in DAW  
+7. Vocal layering and harmony stacking in production  
+8. Bass guitar slap technique and groove construction  
+9. Podcast audio editing and sound quality mastery  
+10. Music theory for non-classically trained producers  
+11. Acoustic room treatment and home studio design  
+12. Audio post-production for film and dialogue editing  
+13. Digital portrait painting in Procreate and Photoshop  
+14. Character concept art for games and animation  
+15. Architectural visualization rendering in Blender  
+16. Scientific and botanical illustration technique  
+17. Textile surface pattern design for commercial licensing  
+18. Motion graphics and kinetic typography in After Effects  
+19. 2D hand-drawn animation principles and timing  
+20. VFX compositing and green screen work  
+21. Miniature painting precision and detailing  
+22. Storyboard art for film and advertising  
+23. Digital sculpting anatomy in ZBrush  
+24. Game environment and level design in Unreal Engine  
+25. Astrophotography capture tracking and stacking  
+26. Underwater photography and housing technique  
+27. Analog film photography and darkroom printing  
+28. Wedding photography posing and natural light reading  
+29. Documentary interview lighting and camera setup  
+30. Color grading for cinematic commercial video  
+31. Real estate photography HDR processing and editing  
+32. Product photography lighting and compositing  
+33. Drone cinematography shot design and movement  
+34. Stop motion animation workflow and set construction  
+35. Portrait lighting ratio mastery and modifier control  
+36. Luxury brand videography technique and delivery  
+37. Accent coaching for actors and voice professionals  
+38. American English pronunciation for non-native speakers  
+39. Business Japanese conversation and professional writing  
+40. Phonetics and IPA transcription mastery  
+41. Heritage Spanish recovery for second-generation speakers  
+42. Technical writing for SaaS and software documentation  
+43. Speechwriting structure and rhetorical craft  
+44. Competitive debate cross-examination technique  
+45. ASL conversational fluency for hearing individuals  
+46. Mandarin tonal accuracy and character writing systems  
+47. Speech articulation refinement for public speakers  
+48. Accent neutralization for corporate professionals  
+49. Calisthenics skill progression handstand planche front lever  
+50. Olympic weightlifting snatch and clean and jerk technique  
+51. Kettlebell flow design and programming  
+52. Running gait correction for amateur runners  
+53. Competitive swimming stroke efficiency drilling  
+54. Triathlon race pacing and transition systems  
+55. Active flexibility and split training progression  
+56. Gymnastics ring and bar foundation skills  
+57. Surf technique correction for intermediate surfers  
+58. Obstacle course racing grip and obstacle mechanics  
+59. Sprint acceleration mechanics and block start technique  
+60. Marathon fueling and pacing systems  
+61. Powerlifting squat bench and deadlift form correction  
+62. Climbing grip endurance and route reading systems  
+63. Shoulder mobility restoration without clinical intervention  
+64. Hip capsule mobility for athletes and desk workers  
+65. Ankle stability progression for injury prevention  
+66. Athletic longevity and tendon resilience programming  
+67. Sourdough fermentation science and crust control  
+68. Professional pastry and laminated dough technique  
+69. Artisan cheese aging and culture management  
+70. Espresso extraction and pressure profiling  
+71. Fermentation mastery kimchi miso koji kefir  
+72. Specialty coffee roasting calibration and cupping  
+73. Craft mead brewing refinement and competition prep  
+74. Natural wine sensory evaluation and small-batch production  
+75. Knife sharpening on whetstones for professional edges  
+76. Artisan chocolate tempering and bonbon construction  
+77. Fermented hot sauce formulation and flavor development  
+78. Cocktail balance frameworks and flavor pairing  
+79. Pasta extrusion science and fresh dough technique  
+80. Gluten-free bread structure and crumb mastery  
+81. Furniture joinery and hand tool woodworking  
+82. Japanese joinery systems and precision fitting  
+83. Leather goods construction and hand saddle stitching  
+84. Pottery wheel throwing and glaze chemistry  
+85. Blacksmithing and knife forging fundamentals  
+86. Calligraphy flourishing and brush lettering mastery  
+87. Tailoring and suit construction from scratch  
+88. Furniture restoration and antique refinishing technique  
+89. 3D printing design optimization and functional CAD  
+90. Welding technique for artists and metal fabricators  
+91. Advanced crochet garment construction and pattern writing  
+92. Quilting pattern engineering and precision piecing  
+93. Fine furniture finishing sanding staining topcoat  
+94. Graffiti lettering discipline and wall mural scaling  
+95. Memory palace construction and competitive recall training  
+96. Speed reading with comprehension and retention systems  
+97. Mental math acceleration and estimation systems  
+98. Chess opening repertoire building and endgame calculation  
+99. Deep work protocol and attention span rebuilding  
+100. Stoic philosophy applied to daily decisions and journaling  
+101. Habit architecture and identity-based behavior change  
+102. Visualization and mental rehearsal for athletes  
+103. Focus stamina training for knowledge workers  
+104. Strategic thinking and decision journaling systems  
+105. Cognitive reframing training for performance under pressure  
+106. Stress inoculation and emotional regulation discipline  
+107. Dopamine discipline and distraction resistance frameworks  
+108. Learning optimization and accelerated skill acquisition  
+109. Secure attachment behavior training for anxious adults  
+110. Boundary enforcement skill systems for professionals  
+111. Masculine leadership communication in long-term relationships  
+112. Conflict de-escalation frameworks for couples  
+113. Assertiveness training for chronic people-pleasers  
+114. Charisma micro-skill drilling eye contact presence warmth  
+115. Social confidence building through exposure systems  
+116. High-trust dialogue systems for difficult conversations  
+117. Emotional detachment discipline using Stoic frameworks  
+118. Dating standards calibration and filtering systems  
+119. Quran tajweed rules and recitation mastery  
+120. Biblical Hebrew reading and Old Testament exegesis  
+121. Vedic chanting and Sanskrit pronunciation technique  
+122. Torah study methodology and Talmudic text interpretation  
+123. Stoic journaling and philosophical practice systems  
+124. Applied Stoicism for modern performance and resilience  
+125. Bushcraft and primitive survival skill progression  
+126. Beekeeping hive management and honey yield optimization  
+127. Aquaponics system design and fish plant balancing  
+128. Permaculture design and food forest establishment  
+129. Wilderness navigation without GPS map compass terrain  
+130. Indoor mushroom cultivation and small-scale commercial scaling  
+131. Emergency preparedness and disaster logistics planning  
+132. Off-grid water purification systems  
+133. Hydroponic nutrient balancing and system builds  
+134. Microgreen commercial growing and yield scaling  
+135. Soil regeneration and composting science  
+136. Orchard pruning mastery and fruit tree management  
+137. Rainwater harvesting and grey water system design  
+138. Bonsai shaping discipline and species-specific care  
+139. Salary negotiation systems for mid-career professionals  
+140. Grant writing for nonprofits and government foundations  
+141. UX research and usability testing methodology  
+142. Data visualization and executive-level storytelling  
+143. Prompt engineering and AI workflow integration  
+144. Freelance contract negotiation and client structuring  
+145. Case interview preparation for consulting roles  
+146. Technical interview coaching for software engineers  
+147. Academic publishing navigation and journal submission  
+148. Policy analysis writing for government and think tanks  
+149. Financial statement analysis for non-finance operators  
+150. Business acquisition analysis and due diligence walkthrough  
+151. Real estate underwriting and rental cash flow analysis  
+152. Retirement planning for self-employed professionals  
+153. Dividend portfolio structuring and DRIP discipline  
+154. Cash flow stabilization and emergency fund engineering  
+155. Personal asset protection and wealth tracking systems  
+156. Debt payoff sprint systems snowball avalanche behavioral  
+157. Budget forecasting and zero-based budgeting frameworks  
+158. Capital allocation discipline for early-stage wealth builders  
+159. Real estate house hacking and first rental acquisition  
+160. Tax optimization strategies for W2 and self-employed earners  
+161. Advanced Excel financial modeling and dashboard building  
+162. SQL query writing and database fundamentals for analysts  
+163. Operations workflow design and process documentation  
+164. Inventory forecasting and demand planning models  
+165. 3D CAD mechanical drafting for product designers  
+166. Arduino and electronics for commercial product prototyping  
+167. 3D scanning and photogrammetry for manufacturing  
+168. Home energy efficiency retrofitting and insulation systems  
+169. Solar panel system sizing and installation fundamentals  
+170. Smart home automation design and device integration  
+171. Architectural sketch rendering and perspective drawing  
+172. Passive house design principles and energy modeling  
+173. Vineyard microclimate control and small-batch winemaking  
+174. Backyard egg production scaling and flock management  
+175. Irrigation automation setup and water scheduling  
+176. Compost heat optimization and hot composting systems  
+177. Seed saving genetics and open-pollinated variety selection  
+178. Goat milk processing and small-batch dairy production  
+179. Urban balcony vegetable yield optimization  
+180. Exotic plant propagation and rare cultivar development  
+181. Dog behavior correction and obedience systems  
+182. Working dog advanced obedience and task training  
+183. Aquarium aquascaping design and planted tank systems  
+184. Reef tank water chemistry and coral health management  
+185. Civilian situational awareness and threat assessment training  
+186. Everyday carry loadout logic and gear optimization  
+187. Tactical gear setup and kit organization systems  
+188. Urban survival strategy and resource mapping  
+189. Survival shelter construction and material sourcing  
+190. Wilderness first response skills for outdoor leaders  
+191. Voice-over home studio setup and audition performance  
+192. Stage storytelling and narrative arc for live speakers  
+193. Interview presence and on-camera confidence training  
+194. Panel discussion performance and moderator technique  
+195. Freediving breath-hold training and equalization technique  
+196. Open water swimming navigation and endurance pacing  
+197. Competitive archery form release mechanics mental game  
+198. Ski carving mechanics and edge control progression  
+199. Interview performance coaching for executives  
+200. Executive presence and boardroom communication mastery  
 
 OUTPUT RULES
 - Titles ONLY
@@ -717,7 +717,7 @@ load_state()
 try:
     # Get all relevant sheets
     SHEET_BOOK = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE")
-    worksheet_names = ["Raw Leads", "Processed Leads", "Invalid Leads"]
+    worksheet_names = ["Raw Leads", "Processed Leads", "Invalid Leads", "Rated and Approved"]
     all_ids_urls = set()
     for ws_name in worksheet_names:
         try:
@@ -862,7 +862,7 @@ try:
         title_keyword_lead_count = 0
         found_good_lead = False
         page_token = None
-        for page_num in range(2):
+        for page_num in range(3):
             if unique_appended_this_run >= TARGET_LEADS or stop_scraping:
                 stop_scraping = True
                 break
