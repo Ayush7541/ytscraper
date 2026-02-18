@@ -242,206 +242,207 @@ Below are 200 example niche DIRECTIONS to inspire domain diversity.
 Do NOT repeat them verbatim.
 Use them only to understand the TYPE of creators desired.
 
-1. Fingerstyle guitar arrangement and chord melody technique  
-2. Jazz chord voicing and comping for self-taught players  
-3. Film score orchestration for indie composers  
-4. Live sound FOH mixing and monitor technique  
-5. Eurorack modular synthesis patching and sound design  
-6. Drum programming realism and groove design in DAW  
-7. Vocal layering and harmony stacking in production  
-8. Bass guitar slap technique and groove construction  
-9. Podcast audio editing and sound quality mastery  
-10. Music theory for non-classically trained producers  
-11. Acoustic room treatment and home studio design  
-12. Audio post-production for film and dialogue editing  
-13. Digital portrait painting in Procreate and Photoshop  
-14. Character concept art for games and animation  
-15. Architectural visualization rendering in Blender  
-16. Scientific and botanical illustration technique  
-17. Textile surface pattern design for commercial licensing  
-18. Motion graphics and kinetic typography in After Effects  
-19. 2D hand-drawn animation principles and timing  
-20. VFX compositing and green screen work  
-21. Miniature painting precision and detailing  
-22. Storyboard art for film and advertising  
-23. Digital sculpting anatomy in ZBrush  
-24. Game environment and level design in Unreal Engine  
-25. Astrophotography capture tracking and stacking  
-26. Underwater photography and housing technique  
-27. Analog film photography and darkroom printing  
-28. Wedding photography posing and natural light reading  
-29. Documentary interview lighting and camera setup  
-30. Color grading for cinematic commercial video  
-31. Real estate photography HDR processing and editing  
-32. Product photography lighting and compositing  
-33. Drone cinematography shot design and movement  
-34. Stop motion animation workflow and set construction  
-35. Portrait lighting ratio mastery and modifier control  
-36. Luxury brand videography technique and delivery  
-37. Accent coaching for actors and voice professionals  
-38. American English pronunciation for non-native speakers  
-39. Business Japanese conversation and professional writing  
-40. Phonetics and IPA transcription mastery  
-41. Heritage Spanish recovery for second-generation speakers  
-42. Technical writing for SaaS and software documentation  
-43. Speechwriting structure and rhetorical craft  
-44. Competitive debate cross-examination technique  
-45. ASL conversational fluency for hearing individuals  
-46. Mandarin tonal accuracy and character writing systems  
-47. Speech articulation refinement for public speakers  
-48. Accent neutralization for corporate professionals  
-49. Calisthenics skill progression handstand planche front lever  
-50. Olympic weightlifting snatch and clean and jerk technique  
-51. Kettlebell flow design and programming  
-52. Running gait correction for amateur runners  
-53. Competitive swimming stroke efficiency drilling  
-54. Triathlon race pacing and transition systems  
-55. Active flexibility and split training progression  
-56. Gymnastics ring and bar foundation skills  
-57. Surf technique correction for intermediate surfers  
-58. Obstacle course racing grip and obstacle mechanics  
-59. Sprint acceleration mechanics and block start technique  
-60. Marathon fueling and pacing systems  
-61. Powerlifting squat bench and deadlift form correction  
-62. Climbing grip endurance and route reading systems  
-63. Shoulder mobility restoration without clinical intervention  
-64. Hip capsule mobility for athletes and desk workers  
-65. Ankle stability progression for injury prevention  
-66. Athletic longevity and tendon resilience programming  
-67. Sourdough fermentation science and crust control  
-68. Professional pastry and laminated dough technique  
-69. Artisan cheese aging and culture management  
-70. Espresso extraction and pressure profiling  
-71. Fermentation mastery kimchi miso koji kefir  
-72. Specialty coffee roasting calibration and cupping  
-73. Craft mead brewing refinement and competition prep  
-74. Natural wine sensory evaluation and small-batch production  
-75. Knife sharpening on whetstones for professional edges  
-76. Artisan chocolate tempering and bonbon construction  
-77. Fermented hot sauce formulation and flavor development  
-78. Cocktail balance frameworks and flavor pairing  
-79. Pasta extrusion science and fresh dough technique  
-80. Gluten-free bread structure and crumb mastery  
-81. Furniture joinery and hand tool woodworking  
-82. Japanese joinery systems and precision fitting  
-83. Leather goods construction and hand saddle stitching  
-84. Pottery wheel throwing and glaze chemistry  
-85. Blacksmithing and knife forging fundamentals  
-86. Calligraphy flourishing and brush lettering mastery  
-87. Tailoring and suit construction from scratch  
-88. Furniture restoration and antique refinishing technique  
-89. 3D printing design optimization and functional CAD  
-90. Welding technique for artists and metal fabricators  
-91. Advanced crochet garment construction and pattern writing  
-92. Quilting pattern engineering and precision piecing  
-93. Fine furniture finishing sanding staining topcoat  
-94. Graffiti lettering discipline and wall mural scaling  
-95. Memory palace construction and competitive recall training  
-96. Speed reading with comprehension and retention systems  
-97. Mental math acceleration and estimation systems  
-98. Chess opening repertoire building and endgame calculation  
-99. Deep work protocol and attention span rebuilding  
-100. Stoic philosophy applied to daily decisions and journaling  
-101. Habit architecture and identity-based behavior change  
-102. Visualization and mental rehearsal for athletes  
-103. Focus stamina training for knowledge workers  
-104. Strategic thinking and decision journaling systems  
-105. Cognitive reframing training for performance under pressure  
-106. Stress inoculation and emotional regulation discipline  
-107. Dopamine discipline and distraction resistance frameworks  
-108. Learning optimization and accelerated skill acquisition  
-109. Secure attachment behavior training for anxious adults  
-110. Boundary enforcement skill systems for professionals  
-111. Masculine leadership communication in long-term relationships  
-112. Conflict de-escalation frameworks for couples  
-113. Assertiveness training for chronic people-pleasers  
-114. Charisma micro-skill drilling eye contact presence warmth  
-115. Social confidence building through exposure systems  
-116. High-trust dialogue systems for difficult conversations  
-117. Emotional detachment discipline using Stoic frameworks  
-118. Dating standards calibration and filtering systems  
-119. Quran tajweed rules and recitation mastery  
-120. Biblical Hebrew reading and Old Testament exegesis  
-121. Vedic chanting and Sanskrit pronunciation technique  
-122. Torah study methodology and Talmudic text interpretation  
-123. Stoic journaling and philosophical practice systems  
-124. Applied Stoicism for modern performance and resilience  
-125. Bushcraft and primitive survival skill progression  
-126. Beekeeping hive management and honey yield optimization  
-127. Aquaponics system design and fish plant balancing  
-128. Permaculture design and food forest establishment  
-129. Wilderness navigation without GPS map compass terrain  
-130. Indoor mushroom cultivation and small-scale commercial scaling  
-131. Emergency preparedness and disaster logistics planning  
-132. Off-grid water purification systems  
-133. Hydroponic nutrient balancing and system builds  
-134. Microgreen commercial growing and yield scaling  
-135. Soil regeneration and composting science  
-136. Orchard pruning mastery and fruit tree management  
-137. Rainwater harvesting and grey water system design  
-138. Bonsai shaping discipline and species-specific care  
-139. Salary negotiation systems for mid-career professionals  
-140. Grant writing for nonprofits and government foundations  
-141. UX research and usability testing methodology  
-142. Data visualization and executive-level storytelling  
-143. Prompt engineering and AI workflow integration  
-144. Freelance contract negotiation and client structuring  
-145. Case interview preparation for consulting roles  
-146. Technical interview coaching for software engineers  
-147. Academic publishing navigation and journal submission  
-148. Policy analysis writing for government and think tanks  
-149. Financial statement analysis for non-finance operators  
-150. Business acquisition analysis and due diligence walkthrough  
-151. Real estate underwriting and rental cash flow analysis  
-152. Retirement planning for self-employed professionals  
-153. Dividend portfolio structuring and DRIP discipline  
-154. Cash flow stabilization and emergency fund engineering  
-155. Personal asset protection and wealth tracking systems  
-156. Debt payoff sprint systems snowball avalanche behavioral  
-157. Budget forecasting and zero-based budgeting frameworks  
-158. Capital allocation discipline for early-stage wealth builders  
-159. Real estate house hacking and first rental acquisition  
-160. Tax optimization strategies for W2 and self-employed earners  
-161. Advanced Excel financial modeling and dashboard building  
-162. SQL query writing and database fundamentals for analysts  
-163. Operations workflow design and process documentation  
-164. Inventory forecasting and demand planning models  
-165. 3D CAD mechanical drafting for product designers  
-166. Arduino and electronics for commercial product prototyping  
-167. 3D scanning and photogrammetry for manufacturing  
-168. Home energy efficiency retrofitting and insulation systems  
-169. Solar panel system sizing and installation fundamentals  
-170. Smart home automation design and device integration  
-171. Architectural sketch rendering and perspective drawing  
-172. Passive house design principles and energy modeling  
-173. Vineyard microclimate control and small-batch winemaking  
-174. Backyard egg production scaling and flock management  
-175. Irrigation automation setup and water scheduling  
-176. Compost heat optimization and hot composting systems  
-177. Seed saving genetics and open-pollinated variety selection  
-178. Goat milk processing and small-batch dairy production  
-179. Urban balcony vegetable yield optimization  
-180. Exotic plant propagation and rare cultivar development  
-181. Dog behavior correction and obedience systems  
-182. Working dog advanced obedience and task training  
-183. Aquarium aquascaping design and planted tank systems  
-184. Reef tank water chemistry and coral health management  
-185. Civilian situational awareness and threat assessment training  
-186. Everyday carry loadout logic and gear optimization  
-187. Tactical gear setup and kit organization systems  
-188. Urban survival strategy and resource mapping  
-189. Survival shelter construction and material sourcing  
-190. Wilderness first response skills for outdoor leaders  
-191. Voice-over home studio setup and audition performance  
-192. Stage storytelling and narrative arc for live speakers  
-193. Interview presence and on-camera confidence training  
-194. Panel discussion performance and moderator technique  
-195. Freediving breath-hold training and equalization technique  
-196. Open water swimming navigation and endurance pacing  
-197. Competitive archery form release mechanics mental game  
-198. Ski carving mechanics and edge control progression  
-199. Interview performance coaching for executives  
-200. Executive presence and boardroom communication mastery  
+
+1. Behavior correction systems for parents of ADHD children without medication dependency  
+2. Teaching emotional regulation skills to children ages 4–10 through daily routines  
+3. Co-parenting communication frameworks after high-conflict divorce  
+4. Blended family boundary-setting and stepparent role definition systems  
+5. Caregiver communication skills for adult children managing aging parents  
+6. Biblical parenting methodology and scripture-based discipline systems  
+7. Rebuilding parental authority after permissive parenting years  
+8. Parenting gifted and twice-exceptional children through structured challenge systems  
+9. Screen time boundary enforcement systems for families with young children  
+10. Raising emotionally intelligent boys through deliberate daily practice  
+11. Conflict de-escalation scripts and frameworks for married couples  
+12. Rebuilding trust after infidelity through structured reconciliation systems  
+13. Gottman-based communication skill drilling for couples without therapy  
+14. Rebuilding intimacy after years of emotional disconnection in marriage  
+15. Pre-marriage compatibility assessment and hard conversation frameworks  
+16. Long-distance relationship maintenance systems and communication discipline  
+17. Rebuilding social identity and daily structure after spouse loss  
+18. Attachment style identification and behavior change for anxious partners  
+19. Setting and enforcing boundaries in codependent relationship patterns  
+20. Masculine leadership communication frameworks for long-term relationships  
+21. Social confidence rebuilding for late-diagnosed ADHD and autism adults  
+22. Dating standards calibration and filtering systems for women over 35  
+23. Rejection desensitization and exposure systems for socially anxious men  
+24. Re-entering dating after long-term relationship or divorce at 40+  
+25. Conversation depth-building skills for people stuck in surface-level interactions  
+26. Body language and presence calibration for professional and social settings  
+27. Charisma micro-skill drilling — eye contact, vocal tonality, and warmth  
+28. Assertiveness training systems for chronic people-pleasers  
+29. Building genuine male friendships in adulthood through deliberate systems  
+30. Social skill rebuilding for adults after extended isolation  
+31. Corporate culture navigation for first-generation professionals  
+32. Career re-entry positioning and interview systems for women after long gaps  
+33. Burnout-to-pivot framework for mid-career professionals changing industries  
+34. Salary negotiation systems for mid-career professionals who avoid conflict  
+35. Executive presence and boardroom communication mastery  
+36. Internal promotion strategy systems for corporate employees stuck at mid-level  
+37. Performance review preparation and self-advocacy frameworks  
+38. Building workplace visibility without political game-playing  
+39. Professional boundary enforcement for people who over-deliver and undercharge  
+40. Transitioning from individual contributor to first-time manager systems  
+41. Pre-retirement purpose planning and identity transition for ages 55–65  
+42. Faith deconstruction journaling and identity rebuilding frameworks  
+43. Empty nest identity rebuilding for mothers after children leave home  
+44. Post-military civilian life integration and career translation systems  
+45. Rebuilding identity after leaving a high-control religious group or cult  
+46. Career identity rebuilding after involuntary job loss at 50+  
+47. Sobriety lifestyle design and identity reconstruction after quitting alcohol  
+48. Rebuilding masculine identity after divorce for men over 40  
+49. Second-chapter purpose mapping for corporate professionals near retirement  
+50. Life redesign systems for adults after chronic illness diagnosis  
+51. Medical writing skill-building for nurses, PAs, and allied health professionals  
+52. Grant proposal writing for small nonprofit leaders and community organizers  
+53. Expert witness report writing and testimony preparation for licensed professionals  
+54. Academic journal writing and publication navigation for early-career researchers  
+55. Policy memo and briefing writing for government and think tank professionals  
+56. Technical documentation writing for non-native English software professionals  
+57. Business case writing and internal proposal frameworks for corporate employees  
+58. White paper writing for consultants and independent subject matter experts  
+59. Regulatory submission writing for pharmaceutical and medical device professionals  
+60. Legal brief writing skill-building for paralegals and law clerks  
+61. Quran tajweed rules and recitation mastery for adult learners  
+62. Biblical Hebrew reading and Old Testament exegesis for lay Christians  
+63. Torah study methodology and Talmudic text interpretation for non-rabbinical learners  
+64. Stoic journaling and philosophical practice systems for daily life  
+65. Lectio Divina and contemplative prayer practice systems for Catholics  
+66. Sanskrit pronunciation and Vedic chanting technique for yoga practitioners  
+67. Integrating faith with modern psychology for practicing Christians  
+68. Sabbath practice design and rest discipline systems for evangelical families  
+69. Islamic jurisprudence self-study systems for English-speaking Muslims  
+70. Applied Stoicism for emotional regulation and performance under pressure  
+71. Perimenopause strength training and body composition self-management  
+72. Chronic desk posture correction through daily movement reprogramming  
+73. Sleep schedule rebuilding and architecture repair for shift workers  
+74. Pelvic floor rehabilitation exercise systems for postpartum women  
+75. Shoulder mobility restoration through movement reprogramming for desk workers  
+76. Hip capsule mobility systems for athletes and sedentary professionals  
+77. Scoliosis self-management through targeted corrective movement systems  
+78. Breathwork protocols for anxiety and nervous system regulation  
+79. Jaw tension and TMJ self-management through corrective movement  
+80. Flat foot correction and arch rebuilding through progressive loading systems  
+81. Running gait correction and injury prevention for amateur runners  
+82. Calisthenics skill progression systems — handstand, planche, front lever  
+83. Olympic weightlifting snatch and clean-and-jerk technique for self-coached athletes  
+84. Kettlebell flow design and programming for independent practitioners  
+85. Triathlon race pacing and transition optimization systems  
+86. Sprint acceleration mechanics and block start technique for field athletes  
+87. Competitive swimming stroke efficiency drilling for adult swimmers  
+88. Rock climbing grip endurance and route reading systems  
+89. Surf technique correction for intermediate surfers plateauing on waves  
+90. Gymnastics ring and bar foundation skills for adult beginners  
+91. Memory palace construction and competitive recall training systems  
+92. Speed reading with comprehension and retention verification systems  
+93. Mental math acceleration and estimation systems for professionals  
+94. Deep work protocol design and attention span rebuilding for knowledge workers  
+95. Cognitive reframing training for performance under pressure  
+96. Stress inoculation and emotional regulation discipline for high-stakes professionals  
+97. Dopamine discipline and distraction resistance frameworks for creatives  
+98. Visualization and mental rehearsal systems for athletes and performers  
+99. Learning acceleration and deliberate practice design for skill acquisition  
+100. Focus stamina training and single-tasking discipline for knowledge workers  
+101. Fingerstyle guitar arrangement and chord melody technique for self-taught players  
+102. Jazz chord voicing and comping systems for non-classically trained guitarists  
+103. Film score orchestration for indie composers working in DAWs  
+104. Drum programming realism and groove design for beatmakers  
+105. Vocal harmony stacking and layering technique in home production  
+106. Bass guitar slap technique and groove construction for intermediate players  
+107. Music theory application systems for producers without classical training  
+108. Acoustic room treatment and home studio design on a budget  
+109. Audio post-production dialogue editing for independent filmmakers  
+110. Eurorack modular synthesis patching and sound design systems  
+111. Digital portrait painting rendering systems in Procreate and Photoshop  
+112. Character concept art development for game and animation pipelines  
+113. Scientific and botanical illustration technique for publishing and licensing  
+114. Textile surface pattern design for commercial fabric licensing  
+115. Motion graphics and kinetic typography systems in After Effects  
+116. 2D hand-drawn animation principles and timing for independent animators  
+117. Digital sculpting anatomy systems in ZBrush for character artists  
+118. Architectural visualization rendering workflow in Blender  
+119. Storyboard art technique for film and advertising professionals  
+120. Miniature painting precision and detailing systems for tabletop artists  
+121. Wedding photography posing and natural light reading systems  
+122. Documentary interview lighting and camera setup for independent filmmakers  
+123. Color grading systems for cinematic commercial video production  
+124. Real estate photography HDR processing and editing workflow  
+125. Product photography lighting and compositing for independent sellers  
+126. Drone cinematography shot design and movement systems  
+127. Portrait lighting ratio mastery and modifier control  
+128. Analog film photography and darkroom printing technique  
+129. Astrophotography capture tracking and image stacking systems  
+130. Underwater photography and housing technique for dive enthusiasts  
+131. American English pronunciation systems for non-native professional speakers  
+132. Accent coaching technique for actors and voice professionals  
+133. Business Japanese conversation and professional writing systems  
+134. Mandarin tonal accuracy and character writing systems for self-taught learners  
+135. Heritage Spanish recovery systems for second-generation speakers  
+136. ASL conversational fluency for hearing individuals in professional settings  
+137. IPA phonetics and transcription mastery for language coaches  
+138. Speechwriting structure and rhetorical craft for executives and leaders  
+139. Competitive debate cross-examination technique and argumentation systems  
+140. Public speaking anxiety elimination through structured exposure systems  
+141. Furniture joinery and hand tool woodworking for independent craftspeople  
+142. Japanese joinery systems and precision fitting for furniture makers  
+143. Leather goods construction and hand saddle stitching for independent sellers  
+144. Pottery wheel throwing and glaze chemistry for production potters  
+145. Blacksmithing and knife forging technique for independent makers  
+146. Tailoring and suit construction from scratch for aspiring clothiers  
+147. Furniture restoration and antique refinishing for independent restorers  
+148. Knife sharpening on whetstones to professional edges for service providers  
+149. Artisan chocolate tempering and bonbon construction for small-batch producers  
+150. Calligraphy flourishing and brush lettering mastery for commissioned artists  
+151. Sourdough fermentation science and crust control for serious home bakers  
+152. Artisan cheese aging and culture management for small-batch producers  
+153. Espresso extraction and pressure profiling for home baristas and café owners  
+154. Craft mead brewing refinement and competition preparation systems  
+155. Fermentation mastery — kimchi, miso, koji, and kefir for health-focused practitioners  
+156. Natural wine sensory evaluation and small-batch production systems  
+157. Artisan pasta extrusion science and fresh dough technique  
+158. Specialty coffee roasting calibration and cupping systems  
+159. Fermented hot sauce formulation and flavor development for small producers  
+160. Cocktail balance frameworks and flavor pairing for independent bartenders  
+161. Beekeeping hive management and honey yield optimization systems  
+162. Aquaponics system design and fish-plant nutrient balancing  
+163. Permaculture design and food forest establishment for small land owners  
+164. Indoor mushroom cultivation and small-scale commercial yield scaling  
+165. Hydroponic nutrient balancing and system builds for home growers  
+166. Microgreen commercial growing and yield scaling systems  
+167. Seed saving genetics and open-pollinated variety selection systems  
+168. Orchard pruning mastery and fruit tree management for homesteaders  
+169. Rainwater harvesting and greywater system design for off-grid properties  
+170. Bonsai shaping discipline and species-specific care systems  
+171. Dividend portfolio structuring and DRIP discipline for long-term investors  
+172. Real estate underwriting and rental cash flow analysis for first-time investors  
+173. Retirement planning systems for self-employed and freelance professionals  
+174. Debt payoff sprint systems using snowball and avalanche behavioral frameworks  
+175. Zero-based budgeting and monthly cash flow forecasting systems  
+176. Real estate house hacking and first rental acquisition systems  
+177. Tax optimization strategy education for W2 and self-employed earners  
+178. Financial statement analysis skill-building for non-finance operators  
+179. Emergency fund engineering and capital allocation for early wealth builders  
+180. Business acquisition analysis and due diligence walkthrough for searchers  
+181. Advanced Excel financial modeling and dashboard building for analysts  
+182. SQL query writing and database fundamentals for non-technical analysts  
+183. Data visualization and executive-level storytelling for business professionals  
+184. Operations workflow design and process documentation for small businesses  
+185. 3D CAD mechanical drafting for independent product designers  
+186. Prompt engineering and AI workflow integration for knowledge professionals  
+187. Home energy efficiency retrofitting and insulation systems for homeowners  
+188. Solar panel system sizing and installation fundamentals for homeowners  
+189. Smart home automation design and device integration systems  
+190. 3D printing design optimization and functional CAD for product makers  
+191. Bushcraft and primitive survival skill progression for outdoor enthusiasts  
+192. Wilderness navigation without GPS using map, compass, and terrain reading  
+193. Emergency preparedness and disaster logistics planning for families  
+194. Wilderness first response skills for outdoor trip leaders  
+195. Freediving breath-hold training and equalization technique for divers  
+196. Open water swimming navigation and endurance pacing systems  
+197. Competitive archery form, release mechanics, and mental game systems  
+198. Civilian situational awareness and threat assessment training  
+199. Off-grid water purification system design and implementation  
+200. Survival shelter construction and natural material sourcing systems  
 
 OUTPUT RULES
 - Titles ONLY
