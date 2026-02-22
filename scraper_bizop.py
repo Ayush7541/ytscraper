@@ -862,7 +862,7 @@ try:
         title_keyword_lead_count = 0
         found_good_lead = False
         page_token = None
-        for page_num in range(3):
+        for page_num in range(2):
             if unique_appended_this_run >= TARGET_LEADS or stop_scraping:
                 stop_scraping = True
                 break
