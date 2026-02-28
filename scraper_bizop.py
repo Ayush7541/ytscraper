@@ -238,160 +238,210 @@ STRUCTURAL DIVERSITY RULE
 Each title must come from a completely different domain.
 Maximize industry and skill diversity.
 
-Below are 150 curated niche DIRECTIONS to inspire domain diversity.
+Below are 200 curated niche DIRECTIONS to inspire domain diversity.
 Do NOT repeat them verbatim.
 Use them only to understand the TYPE of creators desired.
 
-1. Advanced violin bow control technique  
-2. Jazz reharmonization systems  
-3. Film score orchestration workflow  
-4. Vocal resonance placement training  
-5. Guitar fretboard visualization mastery  
-6. Piano improvisation frameworks  
-7. Studio vocal layering systems  
-8. Dialogue editing for cinematic realism  
-9. Documentary story structure design  
-10. Wedding filmmaking client workflow  
-11. UI UX case study storytelling  
-12. SaaS onboarding experience design  
-13. Motion design for paid ads  
-14. 3D character topology optimization  
-15. Lighting design for game environments  
-16. Brand identity systems thinking  
-17. Packaging psychology for retail  
-18. Editorial typography systems  
-19. Cinematic color grading workflows  
-20. Actor direction techniques for filmmakers  
-21. Public speaking structure engineering  
-22. Executive persuasion strategy  
-23. Negotiation roleplay breakdowns  
-24. Boardroom communication rehearsal  
-25. Strength program periodization  
-26. Olympic lifting bar path correction  
-27. Calisthenics progression mapping  
-28. Brazilian Jiu Jitsu positional strategy  
-29. Boxing defensive movement systems  
-30. Athletic speed mechanics coaching  
-31. Memory palace competition training  
-32. Speed reading retention drills  
-33. Deep work environment design  
-34. Habit identity rewiring systems  
-35. Decision making under uncertainty  
-36. Real estate underwriting models  
-37. Rental portfolio scaling strategy  
-38. Commercial lease negotiation  
-39. Dividend portfolio construction  
-40. Asset allocation modeling  
-41. Relationship conflict repair frameworks  
-42. Attachment style recalibration  
-43. Assertiveness roleplay training  
-44. Social confidence exposure drills  
-45. Screenwriting act structure breakdown  
-46. Novel plotting architecture  
-47. Memoir narrative clarity coaching  
-48. Fiction worldbuilding systems  
-49. Unity gameplay scripting fundamentals  
-50. Unreal blueprint logic systems  
-51. Technical writing clarity frameworks  
-52. Data storytelling presentation systems  
-53. Enterprise UX strategy mapping  
-54. Product management roadmap design  
-55. Career transition positioning systems  
-56. Consulting client acquisition frameworks  
-57. Coaching session design methodology  
-58. Curriculum outcome mapping  
-59. Leadership development assessment systems  
-60. High performance mindset conditioning  
-61. Studio mixing signal flow mastery  
-62. Sound design layering techniques  
-63. Film budgeting optimization systems  
-64. Documentary funding pitch strategy  
-65. Voice projection and breath support  
-66. Speech articulation precision drills  
-67. Conflict de-escalation communication  
-68. Strategic influence modeling  
-69. Presentation slide narrative design  
-70. Mobility programming for athletes  
-71. Sprint mechanics breakdown  
-72. Athletic skill acquisition science  
-73. Conditioning block design  
-74. Hypertrophy volume optimization  
-75. Financial independence withdrawal modeling  
-76. Options risk structuring  
-77. Investment thesis development  
-78. Property acquisition deal sourcing  
-79. Dating conversation flow systems  
-80. Emotional intelligence calibration  
-81. Trust rebuilding communication scripts  
-82. Story dialogue realism training  
-83. Publishing proposal development  
-84. Game mechanics balancing systems  
-85. SaaS product validation frameworks  
-86. Portfolio review for designers  
-87. Creative direction moodboarding systems  
-88. Documentary interview technique  
-89. Narrative pacing analysis  
-90. Cinematic shot composition drills  
-91. Live performance stage presence  
-92. Music licensing deal structures  
-93. Audiobook narration pacing control  
-94. Opera breath control conditioning  
-95. Foley recording techniques  
-96. Editing rhythm and pacing mastery  
-97. Authority positioning strategy  
-98. Workshop facilitation systems  
-99. Thought leadership content structuring  
-100. Executive career positioning  
-101. Advanced composition counterpoint  
-102. Interactive storytelling design  
-103. UX research synthesis workflows  
-104. Product case study refinement  
-105. Screen performance coaching  
-106. Script doctoring methodology  
-107. Negotiation leverage mapping  
-108. Board presentation rehearsal systems  
-109. Social dominance calibration training  
-110. High stakes conversation scripting  
-111. Technical portfolio optimization  
-112. Enterprise product discovery  
-113. Curriculum certification pathway design  
-114. Coaching offer packaging  
-115. Community program structuring  
-116. Leadership presence conditioning  
-117. Strategic thinking scenario planning  
-118. Focus stamina training systems  
-119. Knowledge retention spaced repetition  
-120. Creative problem solving labs  
-121. Asset protection structuring  
-122. Commercial property underwriting  
-123. Portfolio risk modeling  
-124. Relationship polarity recalibration  
-125. Communication boundary enforcement  
-126. Emotional regulation practice drills  
-127. Film distribution planning  
-128. Independent game launch strategy  
-129. UX usability testing systems  
-130. SaaS retention optimization  
-131. Negotiation psychology breakdown  
-132. Corporate training design  
-133. Executive influence workshops  
-134. Strength coach assessment models  
-135. Athletic performance analytics  
-136. Advanced mobility diagnostics  
-137. Real estate financial modeling  
-138. Dividend reinvestment discipline  
-139. Conflict mediation systems  
-140. Fiction editing structural analysis  
-141. Documentary arc refinement  
-142. Cinematography lighting breakdown  
-143. Product storytelling narratives  
-144. Data visualization clarity systems  
-145. Script development labs  
-146. Coaching mastery frameworks  
-147. Leadership communication drills  
-148. Strategic roadmap design  
-149. Professional skill acceleration systems  
-150. Authority-based education models
+1. Orchestral Viola Audition Preparation
+2. Double Bass Jazz Improvisation
+3. French Horn Excerpt Audition Systems
+4. Choir Conducting for Professional Directors
+5. Film Trailer Orchestration Systems
+6. Music Transcription for Studio Musicians
+7. Film Dialogue Coaching for Actors
+8. Script Doctoring for Feature Films
+9. Virtual Production Workflow in Unreal
+10. Film Sound Mixing for Cinema Release
+11. Film Trailer Editing Systems
+12. Type Design and Font Creation
+13. Packaging Design for CPG Brands
+14. Automotive Rendering for Designers
+15. Footwear Design Portfolio Development
+16. Apparel Technical Pattern Development
+17. Lighting Design for Stage Production
+18. Service Design for Enterprise Products
+19. UX Design Systems Architecture
+20. Data Storytelling for Executives
+21. Policy Debate Evidence Structuring
+22. High-Level Argumentation Coaching
+23. Analytical Writing for Policy Professionals
+24. Technical Portfolio for Mechanical Engineers
+25. Aerospace Systems Interview Preparation
+26. Cybersecurity Penetration Testing Mastery
+27. Cloud Architecture Career Acceleration
+28. Quantitative Research Interview Coaching
+29. Supply Chain Analytics Career Systems
+30. Data Engineering Portfolio Development
+31. DevOps Career Acceleration
+32. Executive Media Appearance Coaching
+33. Crisis Leadership Communication
+34. Strategic Negotiation Simulation Training
+35. Corporate Storytelling Mastery
+36. Leadership Presence Conditioning
+37. Investor Pitch Rehearsal Systems
+38. Strategic Partnership Negotiation
+39. Multifamily Real Estate Acquisition
+40. Commercial Property Value-Add Strategy
+41. Real Estate Development Feasibility Modeling
+42. Franchise Due Diligence Systems
+43. Small Business Acquisition Search
+44. Olympic Weightlifting Competition Prep
+45. Brazilian Jiu-Jitsu Tournament Systems
+46. Rowing Regatta Preparation
+47. Track Cycling Performance Systems
+48. Tennis Match Strategy Mastery
+49. Archery Tournament Preparation
+50. Competitive Chess Opening Repertoire
+51. Memory Competition Strategy Training
+52. Advanced Mental Math for Finance
+53. Strategic Decision-Making Under Pressure
+54. Critical Thinking for Analysts
+55. Research Synthesis for Think Tanks
+56. Speechwriting for Political Leaders
+57. Technical Documentation Systems
+58. Scientific Publishing Strategy
+59. Business Japanese Fluency Systems
+60. Mandarin Tone Precision Mastery
+61. German C1 Career Fluency
+62. French Business Negotiation Communication
+63. Accent Neutralization for Broadcasters
+64. Commercial Drone Surveying Systems
+65. Architectural Photography Mastery
+66. Luxury Brand Photography Direction
+67. Documentary Editing Workflow Systems
+68. Studio Mixing for Streaming Platforms
+69. Voice Acting Character Development
+70. Storyboarding for Animation
+71. Advanced Cabinetry Design Systems
+72. CNC Machining Programming Systems
+73. Residential Blueprint Drafting Systems
+74. Sustainable Building Systems Education
+75. Financial Modeling for Corporate Finance
+76. College Admissions Strategy Coaching
+77. Professional Portfolio for Architects
+78. Interior Architecture Portfolio Coaching
+79. Landscape Design Business Systems
+80. Construction Project Management
+81. Performance Psychology for Athletes
+82. Endurance Race Strategy Consulting
+83. Athletic Recruiting Positioning Systems
+84. Strength Coach Career Development
+85. Rowing Technique Video Analysis
+86. Golf Tournament Preparation Coaching
+87. Climbing Route Setting Education
+88. CrossFit Competition Programming
+89. Advanced Mobility for Strength Athletes
+90. Industrial Product Design Portfolio
+91. Human Factors Engineering Portfolio
+92. Robotics Systems Interview Preparation
+93. Embedded Systems Career Coaching
+94. Semiconductor Design Interview Prep
+95. Aerospace CAD Systems Mastery
+96. Documentary Grant Funding Strategy
+97. Virtual Event Production Systems
+98. Advanced Livestream Production
+99. Audio Post-Production for Film
+100. Foley Sound Design Systems
+101. Cinematic Camera Movement Mastery
+102. Corporate Trainer Career Development
+103. Executive Coaching Practice Systems
+104. Certification Program Structuring
+105. Cohort-Based Learning Architecture
+106. Workshop Facilitation Mastery
+107. Internal Consulting Skill Development
+108. Opera Audition Aria Preparation Systems
+109. Contemporary Dance Choreography Portfolio Development
+110. Film Color Science for Cinematographers
+111. Production Design for Feature Films
+112. Advanced Dialogue Editing for Streaming Series
+113. Soundtrack Composition for Video Games
+114. Music Supervision for Film and TV
+115. Advanced Mixing for Dolby Atmos
+116. Session Guitar Recording for Studio Musicians
+117. Jazz Ensemble Arranging for Big Band
+118. Brand Identity Systems for Tech Startups
+119. Enterprise Product Discovery Facilitation
+120. Accessibility Design for Digital Products
+121. Motion Design Systems for SaaS Platforms
+122. Industrial Sketching for Product Designers
+123. Transportation Design Portfolio Coaching
+124. Luxury Retail Visual Merchandising Strategy
+125. Exhibition Graphics Design Systems
+126. Information Architecture for Large Platforms
+127. Design Leadership for Creative Directors
+128. AI Systems Engineering Interview Mastery
+129. Machine Learning Model Deployment Systems
+130. Site Reliability Engineering Career Acceleration
+131. Blockchain Systems Engineering Architecture
+132. Computer Vision Portfolio Development
+133. Data Science Case Study Interview Coaching
+134. Systems Design Interview Mastery
+135. Firmware Engineering Career Preparation
+136. High-Performance Computing Programming
+137. Technical Program Management Interview Prep
+138. Executive Presence for C-Suite Leaders
+139. Board Presentation Narrative Structuring
+140. High-Stakes Deal Negotiation Simulation
+141. Investor Relations Communication Systems
+142. Leadership Communication for Technical Founders
+143. Corporate Crisis Simulation Workshops
+144. Cross-Cultural Negotiation Strategy
+145. Enterprise Change Leadership Facilitation
+146. Strategic Influence Mapping for Executives
+147. High-Performance Team Facilitation
+148. Real Estate Syndication Education
+149. Commercial Lease Negotiation Strategy
+150. Property Development Deal Analysis
+151. Real Estate Asset Repositioning Strategy
+152. Construction Cost Estimation Systems
+153. Due Diligence for Commercial Acquisitions
+154. Self-Storage Facility Acquisition Systems
+155. Hospitality Asset Management Strategy
+156. Industrial Warehouse Investment Analysis
+157. Retail Center Value Optimization
+158. Olympic Marathon Qualification Strategy
+159. Competitive Swimming Race Strategy
+160. Collegiate Tennis Recruiting Systems
+161. Fencing Tactical Bout Preparation
+162. Triathlon Long-Course Race Execution
+163. Combat Sports Conditioning Programming
+164. Elite Powerlifting Competition Strategy
+165. Advanced Gymnastics Floor Routine Construction
+166. Mountain Bike Race Strategy Systems
+167. Track & Field Sprint Periodization
+168. Advanced Rhetoric for Trial Advocacy
+169. Structured Thinking for Management Consultants
+170. Policy Writing for Government Professionals
+171. Executive Briefing Document Mastery
+172. Debate Coaching for National Circuits
+173. Research Methodology for Graduate Students
+174. Scientific Grant Proposal Strategy
+175. Behavioral Interview Simulation Systems
+176. Executive Career Transition Strategy
+177. Fellowship Interview Preparation
+178. Advanced Arabic Fluency for Diplomats
+179. Japanese Keigo Business Mastery
+180. Mandarin Business Presentation Skills
+181. German Technical Fluency for Engineers
+182. French Legal Communication Mastery
+183. Spanish Corporate Negotiation Fluency
+184. Professional Accent Reduction for Lawyers
+185. Advanced IELTS 8.5+ Preparation
+186. TOEFL 110+ Score Systems
+187. Interpreter Performance Mastery
+188. Architectural Visualization for Real Estate Developers
+189. Automotive Lighting Design Systems
+190. Game Environment Lighting for AAA Studios
+191. Product Photography for Luxury Brands
+192. Documentary Cinematography for Streaming Platforms
+193. Film Score Mixing for Orchestra
+194. 3D Hard Surface Modeling for Film
+195. Industrial Animation for Engineering Firms
+196. Broadcast News Presentation Coaching
+197. Virtual Conference Production Direction
+198. Commercial Ship Navigation Systems Training
+199. Broadcast Meteorology Presentation Coaching
+200. Luxury Hotel Revenue Management Strategy
 
 OUTPUT RULES
 - Titles ONLY
