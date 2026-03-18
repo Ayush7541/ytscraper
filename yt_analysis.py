@@ -33,14 +33,14 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/@stayreadyto3dprint"
+    "https://www.youtube.com/channel/UC_15lYbMxpZXv5OEVY5rN2w"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "Stay Ready To 3D Print",
-        "url": "https://www.stayreadyto3dprint.com/"
+        "name": "TaxCred Academy Scheduler",
+        "url": "https://taxcredacademy.as.me/schedule/d9af75d6"
     }
 ]
 
