@@ -617,7 +617,7 @@ load_state()
 try:
     # Get all relevant sheets
     SHEET_BOOK = GSPREAD_CLIENT.open_by_key("1cbTEk9zmouLGUhnvzVxea6oChbj0WmeHKlqHG55Z0XE")
-    worksheet_names = ["Raw Leads", "Processed Leads", "Invalid Leads", "Rated and Approved"]
+    worksheet_names = ["Raw Leads", "Processed Leads", "Invalid Leads", "Rated and Approved", "Emails Pending"]
     all_ids_urls = set()
     for ws_name in worksheet_names:
         try:

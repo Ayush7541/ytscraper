@@ -33,14 +33,18 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/channel/UC_15lYbMxpZXv5OEVY5rN2w"
+    "https://www.youtube.com/channel/UCCUQcYl9nqmztVGjuTbzCOQ"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "TaxCred Academy Scheduler",
-        "url": "https://taxcredacademy.as.me/schedule/d9af75d6"
+        "name": "Nutri-Tech Courses",
+        "url": "https://nutri-tech.com.au/pages/courses"
+    },
+    {
+        "name": "Nutri-Tech Main",
+        "url": "https://nutri-tech.com.au/"
     }
 ]
 
