@@ -33,23 +33,19 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/channel/UCCUQcYl9nqmztVGjuTbzCOQ"
+    "https://www.youtube.com/channel/UCIdaiMpZGQ-SPvjBXhmpw8A"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "Nutri-Tech Courses",
-        "url": "https://nutri-tech.com.au/pages/courses"
-    },
-    {
-        "name": "Nutri-Tech Main",
-        "url": "https://nutri-tech.com.au/"
+        "name": "EJS Golf",
+        "url": "https://ejsgolf.com/"
     }
 ]
 
 # ---- TRANSCRIPT API CONFIG ----
-TRANSCRIPT_API_KEY = "sk_nOhB6o3f9KdYsYe6orvSBhhMU7fCakH9rtfWptMY2DA"
+TRANSCRIPT_API_KEY = "sk_RWTXvLNe6vXNs_K7c0_zA_p86VTOncBbUmO1ac8gjDQ"
 TRANSCRIPT_API_BASE = "https://transcriptapi.com/api/v2/youtube/transcript"
 
 OUTPUT_DIR = "output"
