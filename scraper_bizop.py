@@ -61,8 +61,8 @@ API_KEYS = json.loads(os.environ["YOUTUBE_API_KEYS"])
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 # Parameters
-MIN_SUBS = 5000
-MAX_SUBS = 125000
+MIN_SUBS = 10000
+MAX_SUBS = 150000
 MAX_VIDEO_AGE_DAYS = 90       # only consider videos <= 180 days old
 TARGET_LEADS = 10000              # collect 15 qualified leads (rating >= 7)
 DELAY_BETWEEN_REQUESTS = 1.2   # seconds between API calls
@@ -165,204 +165,196 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate YouTube video titles that implicitly define a complete, monetizable channel niche.
+Generate YouTube video titles that identify EXPERT PRACTITIONERS teaching HIGH-VALUE, PRACTICAL SKILLS.
 
 CRITICAL OBJECTIVE
-These titles must represent creators who:
-- Have real skill depth
-- Teach structured knowledge or technique
-- Have practitioner authority
+We are targeting creators who:
+- Teach REAL, PRACTICAL SKILLS (not theory, not mindset)
+- Have depth and real-world ability
+- Serve an ADULT audience (age 25–65 with disposable income)
 - Likely monetize poorly or inconsistently
-- Would NEED help building funnels, offers, courses, communities, and backend systems
+- Need help building offers, funnels, courses, and communities
 
-Avoid creators who already understand marketing infrastructure.
+These are NOT influencers, NOT entertainers, NOT productivity gurus.
 
-CORE REQUIREMENT (NON-NEGOTIABLE)
-Each title must clearly represent:
-- A hyper-specific PRACTICE or CRAFT (not a topic, identity, or broad category)
-- Something people actively DO and try to improve
-- Narrow enough to build an entire channel around ONLY that thing
-- A skill that could support a paid course, community, cohort, certification, or coaching model
+---
 
-VALIDATION TEST (APPLY INTERNALLY)
+CORE RULE (NON-NEGOTIABLE)
 
-Only include the title if ALL answers are YES:
+Each title MUST represent:
+- A SPECIFIC, PRACTICE-BASED SKILL
+- Something people actively DO and improve over time
+- A skill that requires repetition, drills, or structured learning
+- Something that can be packaged into a $500–$5000 program
 
-1. Do premium ($1K+) courses already exist in this niche?
-2. Do people pay for 1-on-1 coaching or consulting in this skill?
-3. Is there a clear transformation or measurable before/after result?
-4. Would a paid community add value (accountability, feedback, critique, practice partners)?
-5. Can a credible YouTuber teach this without requiring formal medical or licensed credentials?
-6. Is this evergreen with ongoing demand (not trend-based)?
-7. Can this skill realistically be learned digitally without mandatory in-person supervision?
-8. Does mastering this skill create income potential, career advancement, or meaningful life leverage?
+If it is not a SKILL someone practices → REJECT IT.
 
-If any answer is NO, discard it.
+---
 
-STRICTLY AVOID:
-- Funnels
-- Digital marketing
-- Copywriting
-- SMMA
-- Dropshipping
-- Ecommerce strategy
-- Shopify
-- Make money online
-- Crypto speculation
-- Trading signals
-- Productivity guru niches
-- Entertainment
+VALIDATION FILTER (ALL must be YES)
+
+1. Would someone pay $500–$5000 to learn this?
+2. Is there a clear BEFORE/AFTER transformation?
+3. Can progress be measured or observed?
+4. Does it take months to improve (not quick tips)?
+5. Does coaching/feedback significantly improve results?
+6. Does this attract ADULT learners (not teens)?
+7. Can this be turned into a structured course/community?
+
+If ANY answer is NO → discard it.
+
+---
+
+HIGH-VALUE NICHE BASE (REFERENCE ONLY)
+
+Use these as anchor examples. You MAY expand into closely related niches with similar characteristics.
+
+adult piano technique
+fingerstyle guitar technique
+vocal control training
+music production in daw
+mixing and mastering audio
+songwriting structure
+violin technique training
+
+calisthenics progression training
+posture correction exercises
+mobility for desk workers
+strength training for adults 30+
+boxing fundamentals training
+flexibility training routines
+
+english fluency training
+accent reduction training
+pronunciation drills training
+conversation practice training
+
+public speaking delivery training
+sales communication training
+negotiation skills training
+voice tonality training
+confidence speaking training
+
+digital illustration training
+3d modeling blender training
+video editing training
+cinematography fundamentals
+photography training
+
+woodworking furniture training
+leathercraft product making
+3d printing design training
+cnc machining training
+
+astrophotography training
+drone cinematography training
+voice acting training
+automotive repair training
+home renovation training
+chess improvement training
+screenwriting training
+audio engineering training
+tai chi training
+qigong training
+breathwork training systems
+
+---
+
+NICHE EXPANSION RULE (IMPORTANT)
+
+You are allowed to generate niches SIMILAR to the above, but they must follow the same pattern:
+
+- Skill-based (not informational)
+- Requires practice and progression
+- Has real-world or serious hobby value
+- Has enough creators teaching it on YouTube
+- Attracts adults willing to pay for learning
+
+DO NOT go outside this pattern.
+
+---
+
+AVOID COMPLETELY
+
+- Productivity / mindset / discipline
+- Business / marketing / make money online
+- Content creation / YouTube growth
+- Entertainment / vlogs / reactions
 - Gaming
-- Reaction channels
-- Vlogs
-- Meme content
-- Board games
-- Licensed medical doctors or clinical treatment
+- Cooking / recipes / food niches
+- Low-value hobby crafts
+- Extremely obscure or rare niches
+
+If the niche feels small or low-value → REJECT IT.
+
+---
+
+KEYWORD MIX RULE (CRITICAL)
+
+- 50% of titles should be BROAD but skill-based (for volume)
+  Example: "Beginner piano practice routine for adults"
+
+- 50% should be DEEP and specific (for precision)
+  Example: "Left hand independence exercises for piano players"
+
+---
 
 DEPTH REQUIREMENT
-Go 2–3 layers deeper than the obvious category.
+
+Go 2–3 layers deeper than obvious.
 
 Bad:
 - Piano lessons
 - Fitness training
-- Investing advice
-- Dating tips
+- Public speaking
 
 Good:
-- Adult piano finger independence drills
-- Running gait correction for amateur runners
-- Dividend reinvestment discipline systems
-- Conflict debrief frameworks for married couples
+- Adult piano hand independence drills
+- Shoulder mobility correction for desk workers
+- Pausing and pacing techniques in presentations
+- Guitar fingerstyle timing control exercises
+- Pronunciation drills for non-native professionals
 
-STRUCTURAL DIVERSITY RULE
-Each title must come from a completely different domain.
-Maximize industry and skill diversity.
+---
 
-Use them only to understand the TYPE of creators desired.
+KEYWORD STYLE REQUIREMENT
 
-Below are 100 NEW adjacent and complementary high-ticket niche DIRECTIONS (fresh, non-exhausted):
+Titles should naturally include words like:
+- drills
+- exercises
+- training
+- technique
+- practice
+- routine
+- mistakes
 
-1. Executive communication coaching for technical professionals
-2. Confidence training for introverted professionals
-3. Career storytelling for promotions
-4. Transitioning from employee to independent consultant
-5. Teaching professionals how to think strategically
-6. Workplace influence without authority
-7. Managing workplace anxiety and performance pressure
-8. High-stakes presentation delivery systems
-9. Persuasive communication in corporate settings
-10. Leading meetings with authority
+---
 
-11. Recovery protocols for burnout professionals
-12. Energy management for high performers
-13. Mental resilience training after failure
-14. Stress recovery systems for corporate workers
-15. Rebuilding confidence after career setbacks
-16. Identity rebuilding after job loss
-17. Overcoming fear of public judgment
-18. Discipline systems for busy adults
-19. Breaking bad habits in adulthood
-20. Consistency systems for long-term goals
+CREATOR SIGNAL RULE
 
-21. Real-world problem solving frameworks
-22. Critical thinking for everyday decisions
-23. Decision-making for business owners
-24. Risk assessment in personal decisions
-25. Long-term planning systems for adults
-26. Structured thinking for complex problems
-27. Systems thinking for beginners
-28. Analytical thinking without technical background
-29. Improving judgment and intuition
-30. Making better life decisions under pressure
+Prefer niches where creators:
+- upload tutorials, drills, training videos
+- teach step-by-step processes
+- show skill progression
 
-31. Teaching practical communication to couples
-32. Repairing trust in long-term relationships
-33. Emotional control during arguments
-34. Conflict resolution without escalation
-35. Rebuilding connection in marriages
-36. Communication after long-term resentment
-37. Understanding emotional triggers in relationships
-38. Teaching boundaries in relationships
-39. Handling difficult family dynamics
-40. Building emotional stability in relationships
+Avoid niches where content is mostly:
+- entertainment
+- commentary
+- opinions
 
-41. Teaching children discipline without punishment
-42. Structuring learning routines for kids
-43. Helping children focus and avoid distraction
-44. Teaching children independence skills
-45. Managing screen addiction in kids
-46. Helping kids develop long-term habits
-47. Teaching problem-solving to children
-48. Preparing children for real-world challenges
-49. Building confidence in shy children
-50. Parenting systems for behavior transformation
-
-51. Teaching practical English for workplace success
-52. Communication clarity for non-native professionals
-53. Speaking confidently in meetings
-54. Reducing translation thinking in speech
-55. Training professionals to speak concisely
-56. Teaching persuasive English communication
-57. Eliminating hesitation in conversations
-58. Teaching real-life conversation skills
-59. Improving listening in fast conversations
-60. Communication training for job interviews
-
-61. Injury-proof training for aging adults
-62. Strength maintenance after 40
-63. Daily movement systems for busy adults
-64. Recovering from long-term inactivity
-65. Fixing posture from desk work
-66. Eliminating chronic body stiffness
-67. Rebuilding strength after injury
-68. Functional strength for real life
-69. Training without gym dependency
-70. Sustainable physical health systems
-
-71. Teaching storytelling for educators
-72. Structuring lessons for better retention
-73. Explaining complex ideas simply (advanced level)
-74. Building authority through teaching
-75. Turning expertise into structured lessons
-76. Teaching without overwhelming students
-77. Designing learning paths step-by-step
-78. Improving clarity in teaching delivery
-79. Breaking down complex topics
-80. Teaching beginners effectively
-
-81. Client communication for service providers
-82. Managing client expectations effectively
-83. Delivering results without overpromising
-84. Handling difficult clients professionally
-85. Structuring service delivery systems
-86. Improving client retention without marketing
-87. Building trust with clients quickly
-88. Communicating value without selling aggressively
-89. Managing freelance work professionally
-90. Delivering consistent client outcomes
-
-91. Personal discipline systems for adults
-92. Building routines that actually stick
-93. Overcoming laziness and inertia
-94. Creating structure in chaotic lifestyles
-95. Rebuilding self-control habits
-96. Eliminating distractions in daily life
-97. Managing time without burnout
-98. Building focus in low-energy states
-99. Creating long-term personal systems
-100. Designing a disciplined lifestyle
+---
 
 OUTPUT RULES
-- Titles ONLY
-- Return ONLY a valid JSON array of strings
-- No numbering
-- No markdown
-- No explanation
-- Clear literal language
-- Each title should feel like an entire channel niche
-- Strong diversity between titles
 
-Generate 25–30 distinct YouTube video titles that meet ALL rules above.
+- Return ONLY a JSON array of strings
+- No numbering
+- No explanation
+- No markdown
+- 25–30 titles
+- Each title must represent a DIFFERENT niche
+- Titles should feel like real YouTube video titles
+
+Generate now.
 """
 
     attempts, backoff = 3, 1
