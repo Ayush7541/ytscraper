@@ -33,14 +33,14 @@ API_VERSION = "v3"
 # ---- CHANNELS TO ANALYZE (EDIT HERE) ----
 # You can paste channel IDs, channel URLs, or @handles
 CHANNELS_TO_ANALYZE = [
-    "https://www.youtube.com/channel/UCIdaiMpZGQ-SPvjBXhmpw8A"
+    "https://www.youtube.com/channel/UCaCGKJVPW-z7gNXLJUThsNg"
 ]
 
 # ---- WEBSITES TO SCRAPE (EDIT HERE) ----
 WEBSITES_TO_SCRAPE = [
     {
-        "name": "EJS Golf",
-        "url": "https://ejsgolf.com/"
+        "name": "Joy Fahey Website",
+        "url": "https://joyfahey.com/"
     }
 ]
 

@@ -207,56 +207,108 @@ If ANY answer is NO → discard it.
 
 HIGH-VALUE NICHE BASE (REFERENCE ONLY)
 
-Use these as anchor examples. You MAY expand into closely related niches with similar characteristics.
+Use ONLY these ecosystems as anchors. Do NOT invent new categories outside this pattern.
 
-adult piano technique
-fingerstyle guitar technique
-vocal control training
-music production in daw
-mixing and mastering audio
-songwriting structure
-violin technique training
-
-calisthenics progression training
-posture correction exercises
-mobility for desk workers
-strength training for adults 30+
-boxing fundamentals training
-flexibility training routines
-
-english fluency training
-accent reduction training
-pronunciation drills training
-conversation practice training
-
-public speaking delivery training
-sales communication training
-negotiation skills training
-voice tonality training
-confidence speaking training
-
-digital illustration training
-3d modeling blender training
-video editing training
-cinematography fundamentals
-photography training
-
-woodworking furniture training
-leathercraft product making
-3d printing design training
-cnc machining training
-
-astrophotography training
-drone cinematography training
-voice acting training
-automotive repair training
-home renovation training
-chess improvement training
-screenwriting training
-audio engineering training
-tai chi training
-qigong training
-breathwork training systems
+	1.	menopause coach
+	2.	perimenopause coach
+	3.	postpartum recovery coach
+	4.	diastasis recti coach
+	5.	pcos lifestyle coach
+	6.	hormonal weight loss coach women 35+
+	7.	women 40+ fitness coach
+	8.	marriage repair coach
+	9.	couples communication coach
+	10.	relationship conflict coach
+	11.	trust rebuilding coach after infidelity
+	12.	dating after divorce coach
+	13.	toxic relationship recovery coach
+	14.	attachment patterns coach
+	15.	parenting coach
+	16.	baby sleep coach
+	17.	toddler behavior coach
+	18.	teen discipline coach
+	19.	difficult child behavior coach
+	20.	parenting neurodivergent kids coach
+	21.	emotional eating coach
+	22.	binge eating recovery coach
+	23.	food addiction coach
+	24.	weight loss women 40+ coach
+	25.	post pregnancy weight loss coach
+	26.	social anxiety coach
+	27.	adult adhd systems coach
+	28.	burnout recovery coach
+	29.	stress regulation coach
+	30.	overwhelm recovery coach
+	31.	habit consistency coach
+	32.	procrastination systems coach
+	33.	mens mental health coach
+	34.	male confidence coach
+	35.	dating coach for men
+	36.	divorce recovery coach men
+	37.	masculinity identity coach
+	38.	social skills coach
+	39.	communication skills coach
+	40.	assertiveness coach
+	41.	conversation skills coach
+	42.	public speaking coach
+	43.	sleep coach
+	44.	insomnia coach
+	45.	energy management coach
+	46.	chronic pain lifestyle coach
+	47.	back pain coach
+	48.	posture correction coach
+	49.	mobility coach adults
+	50.	tai chi coach
+	51.	qigong coach
+	52.	breathwork coach
+	53.	meditation practice coach
+	54.	yoga practice coach
+	55.	addiction recovery coach
+	56.	alcohol reduction coach
+	57.	porn addiction coach
+	58.	dopamine regulation coach
+	59.	career transition coach 30+
+	60.	job loss recovery coach
+	61.	midlife reset coach
+	62.	retirement transition coach
+	63.	loneliness recovery coach
+	64.	social exposure coach
+	65.	friendship building coach adults
+	66.	family relationship coach
+	67.	boundary setting coach
+	68.	toxic family recovery coach
+	69.	breakup recovery coach
+	70.	emotional healing coach
+	71.	grief recovery coach
+	72.	routine building coach
+	73.	life organization coach
+	74.	discipline coach execution
+	75.	consistency coach
+	76.	decision making coach
+	77.	clarity coach
+	78.	focus execution coach
+	79.	identity rebuilding coach
+	80.	self worth coach
+	81.	self sabotage coach
+	82.	aging well coach
+	83.	caregiving systems coach
+	84.	functional fitness coach adults
+	85.	low impact fitness coach
+	86.	emotional regulation coach
+	87.	nervous system regulation coach
+	88.	weight maintenance coach
+	89.	body image coach
+	90.	time discipline coach
+	91.	daily structure coach
+	92.	resilience coach
+	93.	mental toughness coach
+	94.	relationship boundaries coach
+	95.	conflict avoidance recovery coach
+	96.	life reset coach
+	97.	reinvention coach 30+
+	98.	parenting burnout coach
+	99.	professional burnout coach
+	100.	lifestyle transformation coach structured
 
 ---
 
