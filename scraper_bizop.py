@@ -167,7 +167,10 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     prompt = """
 Generate YouTube video titles that identify EXPERT PRACTITIONERS teaching HIGH-VALUE, PRACTICAL SKILLS.
 
+---
+
 CRITICAL OBJECTIVE
+
 We are targeting creators who:
 - Teach REAL, PRACTICAL SKILLS (not theory, not mindset)
 - Have depth and real-world ability
@@ -182,24 +185,24 @@ These are NOT influencers, NOT entertainers, NOT productivity gurus.
 CORE RULE (NON-NEGOTIABLE)
 
 Each title MUST represent:
-- A SPECIFIC, PRACTICE-BASED SKILL
-- Something people actively DO and improve over time
-- A skill that requires repetition, drills, or structured learning
+- A SPECIFIC, PRACTICE-BASED PROBLEM
+- Something people actively try to fix
+- A problem that requires structured effort over time
 - Something that can be packaged into a $500–$5000 program
 
-If it is not a SKILL someone practices → REJECT IT.
+If it is not a REAL problem people work on → REJECT IT.
 
 ---
 
 VALIDATION FILTER (ALL must be YES)
 
-1. Would someone pay $500–$5000 to learn this?
+1. Would someone pay $500–$5000 to fix this?
 2. Is there a clear BEFORE/AFTER transformation?
-3. Can progress be measured or observed?
-4. Does it take months to improve (not quick tips)?
-5. Does coaching/feedback significantly improve results?
-6. Does this attract ADULT learners (not teens)?
-7. Can this be turned into a structured course/community?
+3. Does it take months to improve?
+4. Does coaching significantly improve results?
+5. Is this relevant for adults (25–65)?
+6. Can this be taught digitally?
+7. No license required?
 
 If ANY answer is NO → discard it.
 
@@ -207,204 +210,204 @@ If ANY answer is NO → discard it.
 
 HIGH-VALUE NICHE BASE (REFERENCE ONLY)
 
-Use ONLY these ecosystems as anchors. Do NOT invent new categories outside this pattern.
+Use ONLY these ecosystems as anchors.
 
-	1.	menopause coach
-	2.	perimenopause coach
-	3.	postpartum recovery coach
-	4.	diastasis recti coach
-	5.	pcos lifestyle coach
-	6.	hormonal weight loss coach women 35+
-	7.	women 40+ fitness coach
-	8.	marriage repair coach
-	9.	couples communication coach
-	10.	relationship conflict coach
-	11.	trust rebuilding coach after infidelity
-	12.	dating after divorce coach
-	13.	toxic relationship recovery coach
-	14.	attachment patterns coach
-	15.	parenting coach
-	16.	baby sleep coach
-	17.	toddler behavior coach
-	18.	teen discipline coach
-	19.	difficult child behavior coach
-	20.	parenting neurodivergent kids coach
-	21.	emotional eating coach
-	22.	binge eating recovery coach
-	23.	food addiction coach
-	24.	weight loss women 40+ coach
-	25.	post pregnancy weight loss coach
-	26.	social anxiety coach
-	27.	adult adhd systems coach
-	28.	burnout recovery coach
-	29.	stress regulation coach
-	30.	overwhelm recovery coach
-	31.	habit consistency coach
-	32.	procrastination systems coach
-	33.	mens mental health coach
-	34.	male confidence coach
-	35.	dating coach for men
-	36.	divorce recovery coach men
-	37.	masculinity identity coach
-	38.	social skills coach
-	39.	communication skills coach
-	40.	assertiveness coach
-	41.	conversation skills coach
-	42.	public speaking coach
-	43.	sleep coach
-	44.	insomnia coach
-	45.	energy management coach
-	46.	chronic pain lifestyle coach
-	47.	back pain coach
-	48.	posture correction coach
-	49.	mobility coach adults
-	50.	tai chi coach
-	51.	qigong coach
-	52.	breathwork coach
-	53.	meditation practice coach
-	54.	yoga practice coach
-	55.	addiction recovery coach
-	56.	alcohol reduction coach
-	57.	porn addiction coach
-	58.	dopamine regulation coach
-	59.	career transition coach 30+
-	60.	job loss recovery coach
-	61.	midlife reset coach
-	62.	retirement transition coach
-	63.	loneliness recovery coach
-	64.	social exposure coach
-	65.	friendship building coach adults
-	66.	family relationship coach
-	67.	boundary setting coach
-	68.	toxic family recovery coach
-	69.	breakup recovery coach
-	70.	emotional healing coach
-	71.	grief recovery coach
-	72.	routine building coach
-	73.	life organization coach
-	74.	discipline coach execution
-	75.	consistency coach
-	76.	decision making coach
-	77.	clarity coach
-	78.	focus execution coach
-	79.	identity rebuilding coach
-	80.	self worth coach
-	81.	self sabotage coach
-	82.	aging well coach
-	83.	caregiving systems coach
-	84.	functional fitness coach adults
-	85.	low impact fitness coach
-	86.	emotional regulation coach
-	87.	nervous system regulation coach
-	88.	weight maintenance coach
-	89.	body image coach
-	90.	time discipline coach
-	91.	daily structure coach
-	92.	resilience coach
-	93.	mental toughness coach
-	94.	relationship boundaries coach
-	95.	conflict avoidance recovery coach
-	96.	life reset coach
-	97.	reinvention coach 30+
-	98.	parenting burnout coach
-	99.	professional burnout coach
-	100.	lifestyle transformation coach structured
+WOMEN / HORMONAL  
+1. menopause weight gain coach  
+2. perimenopause fatigue coach  
+3. perimenopause mood swings coach  
+4. perimenopause anxiety coach  
+5. hormonal belly fat coach  
+6. menopause sleep coach  
+7. menopause strength loss coach  
+8. osteoporosis prevention coach women  
+9. postpartum core recovery coach  
+10. diastasis recti coach  
+11. pelvic floor recovery coach  
+12. c-section scar recovery coach  
+13. postpartum nervous system coach  
+14. pcos weight management coach  
+15. endometriosis pain coach  
+16. fibromyalgia movement coach  
+17. long covid recovery coach  
+18. hashimoto lifestyle coach  
+19. fertility tracking coach  
+20. pregnancy safe fitness coach  
+
+MEN  
+21. male anger management coach  
+22. male social anxiety coach  
+23. male loneliness coach  
+24. male confidence coach  
+25. post-divorce identity coach men  
+26. dating struggles coach men 30+  
+27. erectile dysfunction confidence coach  
+28. male body image coach  
+29. testosterone optimization coach  
+30. mens emotional regulation coach  
+31. masculinity identity coach  
+32. social isolation coach men  
+33. male relationship patterns coach  
+34. male purpose crisis coach  
+35. breakup recovery coach men  
+
+BODY / PERFORMANCE  
+36. posture improvement coach desk workers  
+37. mobility coach stiff adults  
+38. flexibility coach beginners  
+39. core strength coach adults  
+40. functional fitness coach 40+  
+41. weight training coach beginners 30+  
+42. joint mobility coach adults  
+43. balance training coach adults  
+44. injury prevention coach gym  
+45. strength training coach women 40+  
+46. movement quality coach  
+47. body alignment coach  
+48. daily movement coach  
+49. sedentary lifestyle recovery coach  
+50. back stiffness coach  
+51. shoulder mobility coach  
+52. hip mobility coach  
+53. beginner fitness habit coach  
+54. fitness consistency coach  
+55. low impact fitness coach adults  
+
+CHRONIC CONDITIONS  
+56. rheumatoid arthritis coach  
+57. multiple sclerosis lifestyle coach  
+58. lupus lifestyle coach  
+59. type 2 diabetes lifestyle coach  
+60. migraine trigger coach  
+61. crohn’s ibd coach  
+62. tinnitus management coach  
+63. chronic fatigue coach  
+64. autoimmune lifestyle coach  
+65. inflammation reduction coach  
+66. gut health behavior coach  
+67. metabolic syndrome coach  
+68. insulin resistance coach  
+69. energy management coach  
+70. chronic illness adaptation coach  
+
+RELATIONSHIPS  
+71. marriage communication coach  
+72. relationship conflict coach  
+73. trust rebuilding coach  
+74. infidelity recovery coach  
+75. emotional neglect coach marriage  
+76. anxious attachment coach  
+77. avoidant attachment coach  
+78. codependency coach  
+79. toxic relationship coach  
+80. narcissistic abuse coach  
+81. covert narcissist coach  
+82. boundary setting coach  
+83. family boundary coach  
+84. toxic family coach  
+85. relationship jealousy coach  
+86. breakup recovery coach  
+87. dating after trauma coach  
+88. intimacy coach long-term relationships  
+89. blended family coach  
+90. conflict escalation coach  
+91. relationship patterns coach  
+92. fear of abandonment coach  
+93. emotional dependency coach  
+94. relationship anxiety coach  
+95. communication breakdown coach  
+
+PARENTING  
+96. baby sleep coach  
+97. toddler sleep coach  
+98. toddler tantrum coach  
+99. strong-willed child coach  
+100. difficult child behavior coach  
+101. parenting burnout coach  
+102. co-parenting coach  
+103. parenting child anxiety coach  
+104. neurodivergent child coach  
+105. adhd child parenting coach  
+106. highly sensitive child coach  
+107. adoptive parenting coach  
+108. foster parenting coach  
+109. discipline strategy coach  
+110. emotional regulation parenting coach  
+
+EATING / WEIGHT  
+111. binge eating coach  
+112. emotional eating coach  
+113. stress eating coach  
+114. late night eating coach  
+115. weight regain coach  
+116. food addiction coach  
+117. food craving coach  
+118. metabolic reset coach  
+119. weight loss women 40+ coach  
+120. body recomposition coach  
+
+ADDICTION  
+121. porn addiction coach  
+122. alcohol reduction coach  
+123. gambling addiction coach  
+124. cannabis dependency coach  
+125. social media addiction coach  
+126. phone addiction coach  
+127. dopamine regulation coach  
+128. shopping addiction coach  
+129. gaming addiction coach  
+130. work addiction coach  
+
+ANXIETY / CONTROL  
+131. social anxiety coach  
+132. panic attack coach  
+133. insomnia coach anxiety  
+134. burnout recovery coach  
+135. caregiver burnout coach  
+136. sleep anxiety coach  
+137. adult ADHD coach  
+138. OCD behavior coach  
+139. overthinking coach  
+140. emotional regulation coach  
+
+SOMATIC  
+141. breathwork coach  
+142. nervous system regulation coach  
+143. somatic stress coach  
+144. trauma body release coach  
+145. tai chi coach  
+
+FINANCIAL BEHAVIOR  
+146. debt payoff coach  
+147. emotional spending coach  
+148. financial recovery coach post-divorce  
+149. money avoidance coach  
+150. financial trauma coach  
 
 ---
 
-NICHE EXPANSION RULE (IMPORTANT)
+TITLE STYLE GUIDELINES
 
-You are allowed to generate niches SIMILAR to the above, but they must follow the same pattern:
+Titles should:
+- reflect real problems people search for  
+- feel natural and human (not keyword stuffed)  
+- sometimes include practical words like:
+  exercises, routine, technique, practice  
 
-- Skill-based (not informational)
-- Requires practice and progression
-- Has real-world or serious hobby value
-- Has enough creators teaching it on YouTube
-- Attracts adults willing to pay for learning
-
-DO NOT go outside this pattern.
-
----
-
-AVOID COMPLETELY
-
-- Productivity / mindset / discipline
-- Business / marketing / make money online
-- Content creation / YouTube growth
-- Entertainment / vlogs / reactions
-- Gaming
-- Cooking / recipes / food niches
-- Low-value hobby crafts
-- Extremely obscure or rare niches
-
-If the niche feels small or low-value → REJECT IT.
-
----
-
-KEYWORD MIX RULE (CRITICAL)
-
-- 50% of titles should be BROAD but skill-based (for volume)
-  Example: "Beginner piano practice routine for adults"
-
-- 50% should be DEEP and specific (for precision)
-  Example: "Left hand independence exercises for piano players"
-
----
-
-DEPTH REQUIREMENT
-
-Go 2–3 layers deeper than obvious.
-
-Bad:
-- Piano lessons
-- Fitness training
-- Public speaking
-
-Good:
-- Adult piano hand independence drills
-- Shoulder mobility correction for desk workers
-- Pausing and pacing techniques in presentations
-- Guitar fingerstyle timing control exercises
-- Pronunciation drills for non-native professionals
-
----
-
-KEYWORD STYLE REQUIREMENT
-
-Titles should naturally include words like:
-- drills
-- exercises
-- training
-- technique
-- practice
-- routine
-- mistakes
-
----
-
-CREATOR SIGNAL RULE
-
-Prefer niches where creators:
-- upload tutorials, drills, training videos
-- teach step-by-step processes
-- show skill progression
-
-Avoid niches where content is mostly:
-- entertainment
-- commentary
-- opinions
+BUT:
+- Do NOT force these words  
+- Do NOT repeat the same structure  
 
 ---
 
 OUTPUT RULES
 
-- Return ONLY a JSON array of strings
-- No numbering
-- No explanation
-- No markdown
-- 25–30 titles
-- Each title must represent a DIFFERENT niche
-- Titles should feel like real YouTube video titles
+- Return ONLY a JSON array of strings  
+- No numbering  
+- No explanation  
+- 25–30 titles  
+- Each title must represent a DIFFERENT niche  
+- Titles should feel like real YouTube videos  
 
 Generate now.
 """
