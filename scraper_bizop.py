@@ -165,249 +165,290 @@ def generate_keywords_with_openai(n_min=KEYWORD_TITLES_MIN, n_max=KEYWORD_TITLES
     n_target = random.randint(n_min, n_max)
 
     prompt = """
-Generate YouTube video titles that identify EXPERT PRACTITIONERS teaching HIGH-VALUE, PRACTICAL SKILLS.
+Generate YouTube search queries that will surface EXPERT PRACTITIONERS 
+teaching HIGH-VALUE, PRACTICAL SKILLS who are under-monetized.
 
 ---
 
-CRITICAL OBJECTIVE
+OBJECTIVE
 
-We are targeting creators who:
-- Teach REAL, PRACTICAL SKILLS (not theory, not mindset)
-- Have depth and real-world ability
-- Serve an ADULT audience (age 25–65 with disposable income)
-- Likely monetize poorly or inconsistently
-- Need help building offers, funnels, courses, and communities
+Short search queries (2–5 words) that a real viewer types into YouTube.
+NOT video titles. NOT constructed phrases. Natural search terms only.
 
-These are NOT influencers, NOT entertainers, NOT productivity gurus.
-
----
-
-CORE RULE (NON-NEGOTIABLE)
-
-Each title MUST represent:
-- A SPECIFIC, PRACTICE-BASED PROBLEM
-- Something people actively try to fix
-- A problem that requires structured effort over time
-- Something that can be packaged into a $500–$5000 program
-
-If it is not a REAL problem people work on → REJECT IT.
+Target creators who:
+- Teach transformation-focused content to adults with real problems
+- Have audiences that would pay $1,000–$5,000 for structured coaching
+- Have weak or no monetization backend (no funnel, no offer, no email list)
+- Are personal brand / creator-led (not companies or institutions)
+- Could realistically generate $20,000+/month with the right system
 
 ---
 
-VALIDATION FILTER (ALL must be YES)
+SEARCH QUERY RULES
 
-1. Would someone pay $500–$5000 to fix this?
-2. Is there a clear BEFORE/AFTER transformation?
-3. Does it take months to improve?
-4. Does coaching significantly improve results?
-5. Is this relevant for adults (25–65)?
-6. Can this be taught digitally?
-7. No license required?
+- 2–5 words maximum
+- Sound like a real person typed it
+- Target a specific problem, not a broad category
+- No brand names, celebrity names, platform names
 
-If ANY answer is NO → discard it.
+BAD: "Reclaim Your Mobility: Practical Techniques for Stiff Adults"
+GOOD: "hip mobility exercises" / "fix chronic back pain"
 
 ---
 
-HIGH-VALUE NICHE BASE (REFERENCE ONLY)
+APPROVED NICHE LIST
 
-Use ONLY these ecosystems as anchors.
+Every niche below has been pre-validated:
+✓ $1K+ coaching programs exist in this space
+✓ People actively seek coaches or structured help
+✓ High-pain: health, identity, relationships, addiction, or parenting
+✓ Accountability and structure significantly improve results
+✓ Requires behavior change over weeks or months
+✓ Can be coached digitally without a license
 
-WOMEN / HORMONAL  
-1. menopause weight gain coach  
-2. perimenopause fatigue coach  
-3. perimenopause mood swings coach  
-4. perimenopause anxiety coach  
-5. hormonal belly fat coach  
-6. menopause sleep coach  
-7. menopause strength loss coach  
-8. osteoporosis prevention coach women  
-9. postpartum core recovery coach  
-10. diastasis recti coach  
-11. pelvic floor recovery coach  
-12. c-section scar recovery coach  
-13. postpartum nervous system coach  
-14. pcos weight management coach  
-15. endometriosis pain coach  
-16. fibromyalgia movement coach  
-17. long covid recovery coach  
-18. hashimoto lifestyle coach  
-19. fertility tracking coach  
-20. pregnancy safe fitness coach  
+Pull search queries ONLY from this list.
 
-MEN  
-21. male anger management coach  
-22. male social anxiety coach  
-23. male loneliness coach  
-24. male confidence coach  
-25. post-divorce identity coach men  
-26. dating struggles coach men 30+  
-27. erectile dysfunction confidence coach  
-28. male body image coach  
-29. testosterone optimization coach  
-30. mens emotional regulation coach  
-31. masculinity identity coach  
-32. social isolation coach men  
-33. male relationship patterns coach  
-34. male purpose crisis coach  
-35. breakup recovery coach men  
+WOMEN / HORMONAL HEALTH
+- perimenopause symptoms
+- menopause weight gain
+- PCOS management
+- postpartum pelvic floor
+- diastasis recti recovery
+- hormonal belly fat
+- fertility awareness natural
+- endometriosis pain lifestyle
+- hashimoto's fatigue management
+- postpartum core recovery
+- menopause sleep problems
+- osteoporosis prevention women
+- c-section scar recovery
+- pregnancy safe fitness
+- postpartum anxiety coach
 
-BODY / PERFORMANCE  
-36. posture improvement coach desk workers  
-37. mobility coach stiff adults  
-38. flexibility coach beginners  
-39. core strength coach adults  
-40. functional fitness coach 40+  
-41. weight training coach beginners 30+  
-42. joint mobility coach adults  
-43. balance training coach adults  
-44. injury prevention coach gym  
-45. strength training coach women 40+  
-46. movement quality coach  
-47. body alignment coach  
-48. daily movement coach  
-49. sedentary lifestyle recovery coach  
-50. back stiffness coach  
-51. shoulder mobility coach  
-52. hip mobility coach  
-53. beginner fitness habit coach  
-54. fitness consistency coach  
-55. low impact fitness coach adults  
+MEN'S HEALTH & IDENTITY
+- male loneliness adults
+- men emotional regulation
+- testosterone optimization natural
+- post-divorce identity men
+- dating over 30 men
+- male confidence coach
+- male anger management
+- breakup recovery men
+- masculinity purpose coach
+- men social anxiety
+- erectile dysfunction confidence
+- male body image
 
-CHRONIC CONDITIONS  
-56. rheumatoid arthritis coach  
-57. multiple sclerosis lifestyle coach  
-58. lupus lifestyle coach  
-59. type 2 diabetes lifestyle coach  
-60. migraine trigger coach  
-61. crohn’s ibd coach  
-62. tinnitus management coach  
-63. chronic fatigue coach  
-64. autoimmune lifestyle coach  
-65. inflammation reduction coach  
-66. gut health behavior coach  
-67. metabolic syndrome coach  
-68. insulin resistance coach  
-69. energy management coach  
-70. chronic illness adaptation coach  
+CHRONIC PAIN & MOVEMENT
+- chronic back pain fix
+- hip mobility adults
+- posture correction desk workers
+- joint pain relief adults
+- functional fitness over 40
+- beginner strength training women
+- shoulder mobility exercises
+- balance training older adults
+- injury prevention training
+- sedentary lifestyle recovery
+- chronic pain movement coach
+- sciatica exercises relief
+- neck pain desk workers
+- knee pain fix adults
+- scoliosis exercise adults
 
-RELATIONSHIPS  
-71. marriage communication coach  
-72. relationship conflict coach  
-73. trust rebuilding coach  
-74. infidelity recovery coach  
-75. emotional neglect coach marriage  
-76. anxious attachment coach  
-77. avoidant attachment coach  
-78. codependency coach  
-79. toxic relationship coach  
-80. narcissistic abuse coach  
-81. covert narcissist coach  
-82. boundary setting coach  
-83. family boundary coach  
-84. toxic family coach  
-85. relationship jealousy coach  
-86. breakup recovery coach  
-87. dating after trauma coach  
-88. intimacy coach long-term relationships  
-89. blended family coach  
-90. conflict escalation coach  
-91. relationship patterns coach  
-92. fear of abandonment coach  
-93. emotional dependency coach  
-94. relationship anxiety coach  
-95. communication breakdown coach  
+CHRONIC CONDITIONS & LIFESTYLE
+- chronic fatigue recovery
+- autoimmune lifestyle coach
+- gut health behavior change
+- type 2 diabetes lifestyle
+- migraine trigger management
+- fibromyalgia movement coach
+- long covid recovery
+- insulin resistance lifestyle
+- inflammation reduction habits
+- lupus lifestyle coach
+- rheumatoid arthritis movement
+- tinnitus management coach
+- metabolic syndrome coach
+- crohn's disease lifestyle
+- hashimoto's weight loss
 
-PARENTING  
-96. baby sleep coach  
-97. toddler sleep coach  
-98. toddler tantrum coach  
-99. strong-willed child coach  
-100. difficult child behavior coach  
-101. parenting burnout coach  
-102. co-parenting coach  
-103. parenting child anxiety coach  
-104. neurodivergent child coach  
-105. adhd child parenting coach  
-106. highly sensitive child coach  
-107. adoptive parenting coach  
-108. foster parenting coach  
-109. discipline strategy coach  
-110. emotional regulation parenting coach  
+MENTAL HEALTH & ANXIETY
+- social anxiety adults
+- panic attack recovery
+- burnout recovery coach
+- adult ADHD management
+- OCD behavior coach
+- chronic insomnia fix
+- overthinking anxiety coach
+- nervous system regulation
+- somatic trauma release
+- high functioning anxiety
+- rejection sensitivity adults
+- people pleasing recovery
+- perfectionism coach adults
+- HSP highly sensitive person
+- dissociation grounding coach
 
-EATING / WEIGHT  
-111. binge eating coach  
-112. emotional eating coach  
-113. stress eating coach  
-114. late night eating coach  
-115. weight regain coach  
-116. food addiction coach  
-117. food craving coach  
-118. metabolic reset coach  
-119. weight loss women 40+ coach  
-120. body recomposition coach  
+RELATIONSHIPS & ATTACHMENT
+- anxious attachment recovery
+- codependency recovery coach
+- narcissistic abuse recovery
+- toxic relationship patterns
+- marriage conflict coach
+- infidelity recovery couples
+- intimacy long-term relationship
+- breakup recovery coach
+- avoidant attachment style
+- family boundary setting
+- covert narcissist recovery
+- emotional neglect recovery
+- fear of abandonment coach
+- relationship anxiety coach
+- blended family coach
 
-ADDICTION  
-121. porn addiction coach  
-122. alcohol reduction coach  
-123. gambling addiction coach  
-124. cannabis dependency coach  
-125. social media addiction coach  
-126. phone addiction coach  
-127. dopamine regulation coach  
-128. shopping addiction coach  
-129. gaming addiction coach  
-130. work addiction coach  
+PARENTING
+- toddler behavior problems
+- strong-willed child parenting
+- ADHD child parenting
+- parenting burnout coach
+- co-parenting conflict
+- neurodivergent child parenting
+- toddler sleep training
+- child emotional regulation
+- highly sensitive child
+- adoptive parenting coach
+- foster parenting support
+- parenting anxiety child
+- discipline without yelling
+- screen time child behavior
+- gifted child parenting
 
-ANXIETY / CONTROL  
-131. social anxiety coach  
-132. panic attack coach  
-133. insomnia coach anxiety  
-134. burnout recovery coach  
-135. caregiver burnout coach  
-136. sleep anxiety coach  
-137. adult ADHD coach  
-138. OCD behavior coach  
-139. overthinking coach  
-140. emotional regulation coach  
+EATING & WEIGHT (psychology-driven)
+- binge eating recovery
+- emotional eating coach
+- food addiction recovery
+- weight loss women 40+
+- body recomposition coach
+- stress eating habits
+- metabolic reset coach
+- weight regain prevention
+- intuitive eating coach
+- orthorexia recovery
+- late night eating habits
+- restriction binge cycle
 
-SOMATIC  
-141. breathwork coach  
-142. nervous system regulation coach  
-143. somatic stress coach  
-144. trauma body release coach  
-145. tai chi coach  
+ADDICTION & BEHAVIORAL
+- porn addiction recovery
+- alcohol reduction coach
+- gambling addiction recovery
+- dopamine detox coach
+- phone addiction recovery
+- work addiction burnout
+- cannabis dependency coach
+- shopping addiction recovery
+- gaming addiction adults
+- sugar addiction habits
+- nicotine quit coach
+- sober lifestyle coach
 
-FINANCIAL BEHAVIOR  
-146. debt payoff coach  
-147. emotional spending coach  
-148. financial recovery coach post-divorce  
-149. money avoidance coach  
-150. financial trauma coach  
+SOMATIC & NERVOUS SYSTEM
+- breathwork coach adults
+- somatic healing coach
+- nervous system reset
+- trauma body release
+- vagus nerve exercises
+- polyvagal theory practice
+- somatic anxiety relief
+- body-based trauma healing
+- freeze response recovery
+- hypervigilance recovery coach
+
+MUSIC & PERFORMANCE (adult learners with clear coaching demand)
+- learn guitar adults
+- adult piano lessons
+- singing technique adults
+- music theory adults
+- vocal training coach
+- fingerpicking guitar coach
+- voice training adults
+- songwriting coach beginners
+
+CREATIVE PROFESSIONAL SKILLS (income-focused only)
+- photography business coach
+- videography professional beginners
+- graphic design freelance
+- UX design career coach
+- copywriting skills coach
+- video editing professional
+- illustration digital career
+- web design freelance coach
+
+SPIRITUAL & IDENTITY (where paid coaching markets exist)
+- life purpose coach adults
+- midlife identity crisis
+- spiritual awakening coach
+- grief recovery coach
+- inner child healing
+- self-worth coach adults
+- shame recovery coach
+- enneagram coaching
+- ikigai life purpose
+- existential anxiety coach
+
+HEALTH PROFESSIONAL COACHING (non-clinical, lifestyle focused)
+- functional medicine lifestyle
+- holistic nutrition coach
+- integrative health coach
+- sports performance coach
+- corrective exercise coach
+- health behavior change coach
+- longevity lifestyle coach
+- biohacking basics coach
+- sleep optimization coach
+- circadian rhythm health
 
 ---
 
-TITLE STYLE GUIDELINES
+HARD EXCLUSIONS — NEVER GENERATE QUERIES FOR THESE
 
-Titles should:
-- reflect real problems people search for  
-- feel natural and human (not keyword stuffed)  
-- sometimes include practical words like:
-  exercises, routine, technique, practice  
+CAREER & FINANCE: career coaching, personal finance, investing,
+salary negotiation, LinkedIn, job interviews, financial independence
+→ Saturated with operators, creators already know monetization exists
 
-BUT:
-- Do NOT force these words  
-- Do NOT repeat the same structure  
+ENTERTAINMENT & VLOGGING: daily vlogs, reaction content, travel vlogs,
+product reviews, unboxings, lifestyle content without transformation
+
+FOOD & COOKING: recipes, meal prep, cooking techniques, air fryer,
+budget meals, food entertainment
+
+LOW-TICKET HOBBIES: candle making, soap making, resin art,
+scrapbooking, jewelry making, generic DIY crafts
+
+HOBBYIST TECH: Arduino, PC building, retro gaming, smartphone tips,
+basic electronics
+
+OVERSATURATED SELF-HELP: generic motivation, generic mindset,
+generic productivity, generic self-improvement without specific transformation
+
+MICRO-NICHES: stamp collecting, yo-yo tricks, beatboxing, pen spinning,
+any niche with insufficient audience scale to support $20K/month revenue
+
+LICENSED / CLINICAL: active medical diagnosis, legal advice,
+clinical therapy, academic credentialed instruction
 
 ---
 
 OUTPUT RULES
 
-- Return ONLY a JSON array of strings  
-- No numbering  
-- No explanation  
-- 25–30 titles  
-- Each title must represent a DIFFERENT niche  
-- Titles should feel like real YouTube videos  
+- Return ONLY a JSON array of strings
+- No numbering, no explanation
+- 40–50 queries total
+- Each query must represent a DIFFERENT niche or sub-niche
+- Every query must come from the APPROVED NICHE LIST above
+- Queries must feel like real YouTube searches
+- Mix short (2–3 word) and medium (4–5 word) queries
+- Do NOT repeat queries from previous runs
 
 Generate now.
 """
